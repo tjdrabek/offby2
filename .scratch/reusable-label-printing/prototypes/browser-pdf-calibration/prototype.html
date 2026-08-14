@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PROTOTYPE — Browser PDF calibration</title>
+  <style>
+    :root { color-scheme: light; --ink:#17221d; --muted:#5b6861; --paper:#f6f4ed; --panel:#fffdf7; --line:#d8d5ca; --accent:#176b50; --warn:#a34b16; --bad:#a52b2b; }
+    * { box-sizing: border-box; }
+    [hidden] { display:none !important; }
+    body { margin:0; font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink); background:var(--paper); }
+    main { width:min(1180px,calc(100% - 32px)); margin:32px auto 96px; }
+    h1,h2,h3 { line-height:1.15; }
+    h1 { margin-bottom:6px; }
+    h2 { margin-top:0; font-size:1.25rem; }
+    h3 { margin-bottom:8px; font-size:1rem; }
+    p { max-width:82ch; }
+    .eyebrow { color:var(--accent); font-weight:800; letter-spacing:.08em; text-transform:uppercase; font-size:.75rem; }
+    .question { font-size:1.08rem; border-left:4px solid var(--accent); padding-left:16px; }
+    .notice { border:1px solid #e2bd83; background:#fff7e6; padding:12px 14px; border-radius:8px; }
+    .danger { border-color:#e1a8a8; background:#fff0f0; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:16px; }
+    .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px; margin-top:16px; box-shadow:0 2px 9px #27352e0d; }
+    .state-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; }
+    .state-item { border:1px solid var(--line); background:white; border-radius:8px; padding:10px; min-height:68px; }
+    .state-item b { display:block; color:var(--muted); font-size:.75rem; text-transform:uppercase; letter-spacing:.04em; }
+    .ok { color:var(--accent); font-weight:700; } .warn { color:var(--warn); font-weight:700; } .bad { color:var(--bad); font-weight:700; }
+    button { appearance:none; border:1px solid var(--accent); background:var(--accent); color:white; border-radius:7px; padding:9px 13px; font:inherit; font-weight:700; cursor:pointer; }
+    button.secondary { color:var(--accent); background:white; }
+    button.ghost { color:var(--ink); background:white; border-color:var(--line); }
+    button:disabled { opacity:.45; cursor:not-allowed; }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; }
+    label { display:block; font-weight:650; margin:8px 0; }
+    label small { display:block; color:var(--muted); font-weight:400; }
+    input[type="text"],input[type="number"],select,textarea { width:100%; border:1px solid #aaa; border-radius:6px; padding:8px; background:white; font:inherit; }
+    input[type="checkbox"] { width:17px; height:17px; vertical-align:-3px; margin-right:7px; }
+    textarea { min-height:90px; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:.84rem; }
+    table { width:100%; border-collapse:collapse; font-size:.86rem; }
+    th,td { border-bottom:1px solid var(--line); padding:7px 5px; text-align:left; }
+    td input { min-width:66px; }
+    .table-wrap { overflow:auto; }
+    .tabs { display:flex; flex-wrap:wrap; gap:6px; border-bottom:1px solid var(--line); padding-bottom:8px; }
+    .tabs button[aria-selected="false"] { background:white; color:var(--ink); border-color:var(--line); }
+    .steps { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-top:14px; }
+    .steps span { color:var(--muted); }
+    .diagram { background:#eef2ef; border:1px solid var(--line); border-radius:8px; padding:16px; text-align:center; font-family:ui-monospace,Consolas,monospace; white-space:pre; overflow:auto; }
+    details { margin-top:12px; }
+    code { font-family:ui-monospace,Consolas,monospace; }
+    .mark-chip { display:inline-block; padding:2px 7px; border-radius:99px; background:#e8eee9; margin:2px; }
+    .hero { text-align:center; padding:20px 0 8px; }
+    .hero p { margin:8px auto; }
+    .progress { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin:24px 0 8px; }
+    .progress button { background:white; color:var(--muted); border-color:var(--line); padding:8px 4px; font-size:.78rem; }
+    .progress button.current { background:var(--accent); color:white; border-color:var(--accent); }
+    .progress button.done { color:var(--accent); border-color:var(--accent); }
+    .flow-step { display:none; }
+    .flow-step.active { display:block; }
+    .step-kicker { color:var(--accent); font-weight:800; text-transform:uppercase; letter-spacing:.06em; font-size:.75rem; }
+    .step-nav { display:flex; justify-content:space-between; gap:8px; margin-top:18px; }
+    .status-toast { position:sticky; bottom:12px; z-index:3; width:min(760px,calc(100% - 16px)); margin:18px auto 0; padding:11px 14px; border-radius:9px; color:white; background:#26352e; box-shadow:0 5px 20px #0003; }
+    .experiment-details { margin-top:26px; border-top:1px solid var(--line); padding-top:12px; }
+    .experiment-details > summary, .advanced > summary { cursor:pointer; font-weight:700; color:var(--muted); }
+    .simple-labels textarea { min-height:70px; font-family:inherit; font-size:1rem; }
+    .label-count-control { display:flex; align-items:center; gap:12px; margin:14px 0; }
+    .label-count-control output { min-width:3ch; text-align:center; font-size:1.4rem; font-weight:800; }
+    .label-count-control button { width:42px; height:42px; padding:0; font-size:1.4rem; }
+    .visual-guide { display:grid; grid-template-columns:minmax(240px,.8fr) minmax(280px,1.2fr); gap:24px; align-items:center; margin:18px 0; padding:18px; border:1px solid var(--line); border-radius:12px; background:#f2f5f2; }
+    .paper-picture { display:block; width:min(100%,320px); height:auto; margin:auto; filter:drop-shadow(0 5px 7px #0002); }
+    .instruction-list { margin:0; padding:0; list-style:none; counter-reset:instructions; }
+    .instruction-list li { counter-increment:instructions; position:relative; padding:0 0 16px 46px; min-height:38px; }
+    .instruction-list li::before { content:counter(instructions); position:absolute; left:0; top:-3px; display:grid; place-items:center; width:32px; height:32px; border-radius:50%; color:white; background:var(--accent); font-weight:800; }
+    .direction-key { display:grid; grid-template-columns:repeat(2,minmax(170px,1fr)); gap:12px; margin:14px 0; }
+    .direction-example { display:flex; align-items:center; gap:12px; border:1px solid var(--line); border-radius:9px; padding:10px; background:white; }
+    .direction-example svg { flex:0 0 92px; }
+    .measure-callout { border-left:4px solid var(--accent); padding:8px 12px; background:#edf7f2; }
+    .feed-instruction { border:2px solid var(--accent); padding:14px 16px; border-radius:10px; background:#edf7f2; font-size:1.04rem; }
+    .field-error { border:1px solid #e1a8a8; background:#fff0f0; color:var(--bad); padding:10px 12px; border-radius:8px; font-weight:700; }
+    input[aria-invalid="true"] { border-color:var(--bad); outline:2px solid #a52b2b33; }
+    .layout-calculator { margin:18px 0; padding:16px; border:1px solid var(--line); border-radius:10px; background:#f2f5f2; }
+    .layout-calculator h3 { margin-top:0; }
+    .layout-inputs { display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:8px 12px; }
+    .layout-result { display:grid; grid-template-columns:minmax(170px,.7fr) minmax(250px,1.3fr); gap:18px; align-items:center; margin-top:14px; }
+    .layout-preview { position:relative; width:min(100%,230px); aspect-ratio:8.5/11; margin:auto; border:2px solid #809087; background:white; box-shadow:0 3px 8px #0002; }
+    .layout-preview-grid { position:absolute; display:grid; }
+    .layout-preview-label { min-width:0; min-height:0; border:1px solid var(--accent); background:#dcebe4; }
+    footer { color:var(--muted); margin-top:32px; }
+    @media (max-width:700px) { main { width:min(100% - 18px,1180px); margin-top:16px; } .card { padding:13px; } .progress button { font-size:0; } .progress button::first-letter { font-size:.9rem; } .visual-guide,.direction-key,.layout-result { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div class="eyebrow">Print setup</div>
+    <h1>Get your labels lined up</h1>
+    <p>Print one test page, then measure one label sheet. Choose three sheets if you want a higher-confidence result.</p>
+  </header>
+
+  <nav class="progress" aria-label="Calibration progress">
+    <button data-go-step="1" class="current">1 · Printer</button><button data-go-step="2">2 · Settings</button><button data-go-step="3">3 · Print test</button><button data-go-step="4">4 · Inspect test</button><button data-go-step="5">5 · Measure</button><button data-go-step="6">6 · Result</button><button data-go-step="7">7 · Labels</button>
+  </nav>
+
+  <section class="card flow-step active" data-step="1" aria-labelledby="setup-title">
+    <div class="step-kicker">Step 1 of 7</div>
+    <h2 id="setup-title">Confirm what you're using</h2>
+    <p><strong>Labels:</strong> TownStix US-4, four labels on a Letter sheet</p>
+    <p><strong>Printer:</strong> Brother HL-L2340DW using the manual feed slot</p>
+    <details class="layout-calculator" open>
+      <summary><strong>Figure out label dimensions</strong></summary>
+      <p>Enter the measurements from a US Letter label sheet. The calculator derives each label's width and height.</p>
+      <div class="layout-inputs">
+        <label>Top margin <small>Millimetres</small><input class="layout-value" id="layout-top" type="number" min="0" step="0.1" value="12.7"></label>
+        <label>Bottom margin <small>Millimetres</small><input class="layout-value" id="layout-bottom" type="number" min="0" step="0.1" value="12.7"></label>
+        <label>Left margin <small>Millimetres</small><input class="layout-value" id="layout-left" type="number" min="0" step="0.1" value="4.318"></label>
+        <label>Right margin <small>Millimetres</small><input class="layout-value" id="layout-right" type="number" min="0" step="0.1" value="4.318"></label>
+        <label>Vertical gap <small>Between rows, mm</small><input class="layout-value" id="layout-v-gap" type="number" min="0" step="0.1" value="0"></label>
+        <label>Horizontal gap <small>Between columns, mm</small><input class="layout-value" id="layout-h-gap" type="number" min="0" step="0.1" value="4.064"></label>
+        <label>Number of rows<input class="layout-value" id="layout-rows" type="number" min="1" step="1" value="2"></label>
+        <label>Total number of labels on each sheet<input class="layout-value" id="layout-count" type="number" min="1" step="1" value="4"></label>
+      </div>
+      <div class="layout-result">
+        <div class="layout-preview" aria-label="Calculated label sheet preview"><div id="layout-preview-grid" class="layout-preview-grid"></div></div>
+        <div>
+          <p id="layout-error" class="field-error" role="alert" hidden></p>
+          <div id="layout-output" class="state-grid"></div>
+          <p><small>Columns are calculated as total labels divided by rows. The label count must divide evenly across the rows.</small></p>
+          <button class="secondary" id="reset-layout" type="button">Reset to TownStix US-4</button>
+        </div>
+      </div>
+    </details>
+    <label>How is the printer connected?<select id="driver"><option>USB</option><option>Wi-Fi</option><option>I’m not sure</option></select></label>
+    <input id="setup-name" type="hidden" value="Brother HL-L2340DW · Windows · Chromium · manual feed">
+    <input id="browser-build" type="hidden" value="Chromium browser">
+    <input id="loading-revision" type="hidden" value="loading-unverified-r1">
+    <p class="notice"><strong>Before continuing:</strong> use a fresh, undamaged sheet. The plain-paper test will determine which way the printable face must point. The label-sheet margins will determine which short edge goes in first.</p>
+    <button class="ghost" id="clear-saved-inputs" type="button">Clear saved inputs and start over</button>
+    <div class="step-nav"><span></span><button data-action="start-setup">Yes, this is my setup</button></div>
+  </section>
+
+  <section class="card flow-step" data-step="2" aria-labelledby="load-title">
+    <div class="step-kicker">Step 2 of 7</div>
+    <h2 id="load-title">Use these print settings</h2>
+    <p>Open the print window and check each item. The browser cannot check these settings for you.</p>
+    <div class="grid">
+      <div>
+        <label><input class="config-check" type="checkbox" value="letter">Paper: <strong>US Letter</strong></label>
+        <label><input class="config-check" type="checkbox" value="scale">Scale: <strong>100% or Actual size</strong></label>
+        <label><input class="config-check" type="checkbox" value="portrait">Layout: <strong>Portrait</strong></label>
+        <label><input class="config-check" type="checkbox" value="label">Paper type: <strong>Plain</strong> for the test; <strong>Label</strong> for label sheets</label>
+      </div><div>
+        <label><input class="config-check" type="checkbox" value="manual">Paper source: <strong>Manual feed</strong></label>
+        <label><input class="config-check" type="checkbox" value="duplex">Print on both sides: <strong>Off</strong></label>
+        <label><input class="config-check" type="checkbox" value="decorations">Headers and footers: <strong>Off</strong></label>
+        <label><input class="config-check" type="checkbox" value="remove">Remove each sheet as soon as it exits</label>
+      </div>
+    </div>
+    <div class="step-nav"><button class="secondary" data-go-step="1">Back</button><div class="actions"><button class="secondary" id="select-all-config">Select all settings</button><button id="confirm-config">I checked all eight</button></div></div>
+  </section>
+
+  <details class="experiment-details">
+    <summary>Experiment details and developer controls</summary>
+  <section class="card" aria-labelledby="state-title">
+    <h2 id="state-title">Current experiment state</h2>
+    <p id="technical-last-change">Nothing has been changed yet.</p>
+    <div id="state-panel" class="state-grid"></div>
+    <details><summary>Full serializable state</summary><pre id="state-json"></pre></details>
+  </section>
+
+  <section class="card" aria-labelledby="free-title">
+    <h2 id="free-title">Free play</h2>
+    <p>Use these in any order. Invalid actions are refused rather than silently changing the evidence.</p>
+    <div class="actions">
+      <button data-action="select-layout">Select published US-4 layout</button>
+      <button data-action="select-setup">Select Brother setup</button>
+      <button data-action="generate-calibration">Generate calibration PDF</button>
+      <button data-action="record-plain">Accept plain-paper checks</button>
+      <button data-action="load-example">Load illustrative measurements</button>
+      <button data-action="derive-profile">Derive profile</button>
+      <button data-action="save-profile">Save profile locally</button>
+      <button data-action="validate-content">Validate label content package</button>
+      <button data-action="generate-final">Generate final PDF</button>
+      <button class="secondary" data-action="reset">Reset in-memory experiment</button>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="walk-title">
+    <h2 id="walk-title">Guided walkthroughs</h2>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="geometry">1. Geometry first</button>
+      <button role="tab" aria-selected="false" data-tab="calibration">2. Calibration</button>
+      <button role="tab" aria-selected="false" data-tab="rejection">3. Reject unstable feed</button>
+      <button role="tab" aria-selected="false" data-tab="output">4. Final output</button>
+    </div>
+    <div id="walkthrough"></div>
+  </section>
+  </details>
+
+  <section class="card flow-step" data-step="3" aria-labelledby="cal-title">
+    <div class="step-kicker">Step 3 of 7</div>
+    <h2 id="cal-title">Mark and print one plain-paper test</h2>
+    <p>Mark the paper <strong>before</strong> printing. These handwritten marks preserve how the sheet was physically loaded.</p>
+    <label>When loading the test, which way will SIDE A face?
+      <select id="loaded-face"><option value="up" selected>SIDE A facing up</option><option value="down">SIDE A facing down</option></select>
+      <small>Remember this choice. The result tells us whether the printable face of the label sheet must face up or down.</small>
+    </label>
+    <div class="visual-guide">
+      <svg class="paper-picture" viewBox="0 0 310 380" role="img" aria-labelledby="mark-paper-title mark-paper-desc">
+        <title id="mark-paper-title">How to mark the plain test sheet before loading it</title>
+        <desc id="mark-paper-desc">Write Side A on the face you can see. Choose one of the two 8.5-inch-wide edges at the top or bottom of the page and mark it Feed First. Do not use either 11-inch-long side.</desc>
+        <rect x="20" y="15" width="240" height="330" rx="3" fill="white" stroke="#809087" stroke-width="2"/>
+        <path d="M140 102 V42 M140 42 l-12 18 M140 42 l12 18" fill="none" stroke="#176b50" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="140" y="125" text-anchor="middle" fill="#176b50" font-family="system-ui" font-size="16" font-weight="800">FEED FIRST</text>
+        <text x="140" y="192" text-anchor="middle" fill="#17221d" font-family="system-ui" font-size="30" font-weight="800" transform="rotate(-7 140 192)">SIDE A</text>
+        <path d="M70 208 Q140 225 210 205" fill="none" stroke="#17221d" stroke-width="3"/>
+        <path d="M20 337v14m240-14v14M20 349h240" fill="none" stroke="#176b50" stroke-width="2"/>
+        <text x="140" y="365" text-anchor="middle" fill="#176b50" font-family="system-ui" font-size="12" font-weight="800">8½-INCH EDGE — USE TOP OR BOTTOM</text>
+        <path d="M267 15h10m-10 330h10M274 15v330" fill="none" stroke="#a34b16" stroke-width="2"/>
+        <text x="287" y="180" text-anchor="middle" fill="#a34b16" font-family="system-ui" font-size="11" font-weight="800" transform="rotate(90 287 180)">11-INCH SIDE — NOT THIS EDGE</text>
+        <text x="140" y="326" text-anchor="middle" fill="#5b6861" font-family="system-ui" font-size="12">Write directly on the paper with a pen</text>
+      </svg>
+      <ol class="instruction-list">
+        <li>Take one ordinary Letter-size sheet. On the side facing you, write <strong>SIDE A</strong> in large letters.</li>
+        <li>Choose the <strong>8½-inch-wide top or bottom edge</strong> that you will put into the printer first. Draw a large arrow there and write <strong>FEED FIRST</strong>. Do not use either 11-inch side.</li>
+        <li>Put the edge marked <strong>FEED FIRST</strong> into the manual feed slot first. Keep <strong>SIDE A</strong> facing <strong id="plain-face-direction">up</strong>.</li>
+        <li>Open or download the test PDF and print it using the settings from step 2. Do not rotate the PDF.</li>
+      </ol>
+    </div>
+    <label>Edge cutoff scale units
+      <select id="edge-scale-units"><option value="metric" selected>Metric · marks every 2 mm</option><option value="imperial">Imperial · marks every 1/16 inch</option></select>
+      <small>This changes only the small printer-cutoff scales. Calibration measurements remain in millimetres.</small>
+    </label>
+    <div class="actions">
+      <button data-action="generate-calibration">Download calibration PDF</button>
+      <button class="secondary" id="inspect-pdf">Check PDF size</button>
+    </div>
+    <div class="step-nav"><button class="secondary" data-go-step="2">Back</button><button data-action="printed-test">I printed the test page</button></div>
+  </section>
+
+  <section class="card flow-step" data-step="4" aria-labelledby="inspect-title">
+    <div class="step-kicker">Step 4 of 7</div>
+    <h2 id="inspect-title">After it prints: inspect the test page</h2>
+    <p>Compare the printed marks with your handwritten <strong>SIDE A</strong> and <strong>FEED FIRST</strong> marks.</p>
+    <div class="grid">
+      <label>Which side received the printed test?<select id="printable-face"><option value="unverified">Choose one</option><option value="face-up">My handwritten SIDE A</option><option value="face-down">The unmarked side</option></select></label>
+      <label>Where is the PDF's printed “TOP EDGE” text?<select id="leading-edge"><option value="unverified">Choose one</option><option value="short-edge-arrow">Beside my handwritten FEED FIRST edge</option><option value="opposite-short-edge">At the other 8½-inch edge</option></select></label>
+      <label>Where did the page come out?<select id="output-path"><option value="unverified">Choose one</option><option value="face-down">Top output tray</option><option value="rear-face-up">Open rear output</option></select></label>
+    </div>
+    <h3>Find where printing cuts off near each paper edge</h3>
+    <p id="cutoff-help"></p>
+    <div class="grid">
+      <label>Top edge<select class="cutoff-observation" id="cutoff-leading"></select></label>
+      <label>Bottom edge<select class="cutoff-observation" id="cutoff-trailing"></select></label>
+      <label>Left edge<select class="cutoff-observation" id="cutoff-left"></select></label>
+      <label>Right edge<select class="cutoff-observation" id="cutoff-right"></select></label>
+    </div>
+    <div class="step-nav"><button class="secondary" data-go-step="3">Back</button><button data-action="record-plain">Continue to label-sheet measurements</button></div>
+  </section>
+
+  <section class="card flow-step" data-step="5" aria-labelledby="measure-title">
+    <div class="step-kicker">Step 5 of 7</div>
+    <h2 id="measure-title">Print and measure your label sheet</h2>
+    <label>How many sheets do you want to measure?
+      <select id="sheet-count"><option value="1" selected>1 sheet · faster, preliminary result</option><option value="3">3 sheets · higher confidence</option></select>
+    </label>
+    <p id="sheet-count-help" class="notice"><strong>One sheet is enough to calculate an initial adjustment.</strong> It cannot show whether the printer feeds each sheet consistently. Choose three when alignment matters or before trusting the saved result for repeated printing.</p>
+    <div id="label-loading-instructions" class="feed-instruction"></div>
+    <p>Print the same page on fresh label media, one sheet at a time. After printing, keep the edge that entered the printer first pointing away from you while measuring every sheet.</p>
+    <p class="measure-callout"><strong>You do not need to measure a grid, the label outlines, or the center of the sheet.</strong> Measure only the centers of the four numbered corner crosshairs. The center alignment is calculated from those four measurements.</p>
+    <div class="visual-guide">
+      <svg class="paper-picture" viewBox="0 0 300 390" role="img" aria-labelledby="measure-sheet-title measure-sheet-desc">
+        <title id="measure-sheet-title">Locations of the four corner crosshairs to measure</title>
+        <desc id="measure-sheet-desc">A portrait sheet with crosshairs at top left, top right, bottom left, and bottom right. The center is derived automatically from these four measurements.</desc>
+        <rect x="35" y="25" width="230" height="330" rx="3" fill="white" stroke="#809087" stroke-width="2"/>
+        <path d="M150 28 V5 M150 5 l-8 11 M150 5 l8 11" fill="none" stroke="#176b50" stroke-width="4"/>
+        <text x="150" y="43" text-anchor="middle" fill="#176b50" font-family="system-ui" font-size="12" font-weight="800">PRINTED TOP EDGE</text>
+        <g fill="none" stroke="#17221d" stroke-width="2">
+          <path d="M55 55h22m-11-11v22 M223 55h22m-11-11v22 M55 325h22m-11-11v22 M223 325h22m-11-11v22"/>
+        </g>
+        <g fill="#176b50" font-family="system-ui" font-size="11" font-weight="800"><text x="78" y="52">1 TOP LEFT</text><text x="172" y="52">2 TOP RIGHT</text><text x="78" y="322">3 BOTTOM LEFT</text><text x="158" y="322">4 BOTTOM RIGHT</text></g>
+      </svg>
+      <div>
+        <h3>Measure these four marks</h3>
+        <p><span class="mark-chip">1 · Top Left</span><span class="mark-chip">2 · Top Right</span><span class="mark-chip">3 · Bottom Left</span><span class="mark-chip">4 · Bottom Right</span></p>
+        <p class="measure-callout"><strong>For each corner:</strong> measure from the two nearest paper edges to the center of the crosshair. Both target distances are <strong>12 mm</strong>. The app averages the four corner displacements to derive the center.</p>
+      </div>
+    </div>
+    <div class="direction-key">
+      <div class="direction-example"><svg viewBox="0 0 100 72" aria-hidden="true"><path d="M15 10v52M15 36h70" stroke="#aeb7b2" stroke-width="2"/><circle cx="67" cy="36" r="5" fill="#176b50"/><path d="M15 58h52M15 53v10M67 53v10" stroke="#176b50" stroke-width="3"/></svg><div><strong>Example: top-left mark</strong><br>Measure paper edge to crosshair center. If the ruler says <strong>13 mm</strong>, enter 13. The app calculates the +1 mm shift.</div></div>
+      <div class="direction-example"><svg viewBox="0 0 100 72" aria-hidden="true"><path d="M15 10h70M50 10v52" stroke="#aeb7b2" stroke-width="2"/><circle cx="50" cy="25" r="5" fill="#176b50"/><path d="M78 10v15M73 10h10M73 25h10" stroke="#176b50" stroke-width="3"/></svg><div><strong>Always measure to the center</strong><br>For this top mark, measure down from the edge labeled <strong>TOP EDGE</strong> to the crosshair center.</div></div>
+    </div>
+    <div class="actions notice">
+      <label style="margin:0;flex:1 1 210px">Horizontal distance for every visible mark<input id="apply-horizontal-value" type="number" step="0.1" placeholder="12.0 mm"></label>
+      <button class="secondary" id="apply-horizontal" type="button">Apply to all horizontal</button>
+      <label style="margin:0;flex:1 1 210px">Vertical distance for every visible mark<input id="apply-vertical-value" type="number" step="0.1" placeholder="12.0 mm"></label>
+      <button class="secondary" id="apply-vertical" type="button">Apply to all vertical</button>
+    </div>
+    <div class="table-wrap"><table id="measurements"><thead><tr><th>Sheet</th><th>Printed ruler</th><th>Mark and edges</th><th>Horizontal distance</th><th>Vertical distance</th></tr></thead><tbody></tbody></table></div>
+    <p id="measurement-error" class="field-error" role="alert" hidden></p>
+    <div class="actions">
+      <button data-action="record-and-derive">Calculate my result</button>
+    </div>
+    <details class="advanced"><summary>Demo controls</summary><div class="actions"><button class="secondary" data-action="load-example">Load stable example</button><button class="secondary" data-action="load-unstable">Load unstable example</button><button class="secondary" data-action="clear-measurements">Clear table</button></div><p>Examples demonstrate the calculation but cannot unlock final printing.</p></details>
+    <div class="step-nav"><button class="secondary" data-go-step="4">Back</button><span></span></div>
+  </section>
+
+  <section class="card flow-step" data-step="6" aria-labelledby="profile-title">
+    <div class="step-kicker">Step 6 of 7</div>
+    <h2 id="profile-title">Your alignment result</h2>
+    <div id="profile-result"><p>No profile has been derived.</p></div>
+    <p id="profile-next-help" class="notice"></p>
+    <div class="actions"><button id="save-and-continue" data-action="save-and-continue">Save this result and make labels</button><button class="secondary" id="retry-measurements" data-go-step="5" hidden>Return to measurements</button><button class="secondary" id="load-profile">Load saved result</button><button class="secondary" id="clear-profile">Clear saved result</button></div>
+    <div class="step-nav"><button class="secondary" data-go-step="5">Back</button><span></span></div>
+  </section>
+
+  <section class="card flow-step" data-step="7" aria-labelledby="content-title">
+    <div class="step-kicker">Step 7 of 7</div>
+    <h2 id="content-title">Add your label text</h2>
+    <p>Choose how many actual labels to print, up to eight. If they do not all fit on one sheet, the PDF adds another page.</p>
+    <div class="label-count-control" aria-label="Number of labels to print">
+      <button class="secondary" id="remove-print-label" type="button" aria-label="Print one fewer label">−</button>
+      <output id="print-label-count" for="print-label-count-input">4</output>
+      <button id="add-print-label" type="button" aria-label="Print one more label">+</button>
+      <span id="print-label-count-help">actual labels</span>
+      <input id="print-label-count-input" type="hidden" value="4">
+    </div>
+    <p>Type different content for each label. Mark any missing positions on the first physical sheet as already used.</p>
+    <input id="content-revision" type="hidden" value="content-r1">
+    <textarea id="content-css" hidden>.label { height: 100%; display: grid; place-content: center; text-align: center; color: #16382d; font: 700 22px/1.25 Arial, sans-serif; white-space: pre-line; }</textarea>
+    <div class="grid simple-labels">
+      <label class="label-position" data-label-position="0">Label 1<textarea class="content-text">HERB GARDEN&#10;Basil · planted Aug 2026</textarea></label>
+      <label class="label-position" data-label-position="1">Label 2<textarea class="content-text">PANTRY&#10;Rolled oats · use by Jan 2027</textarea></label>
+      <label class="label-position" data-label-position="2">Label 3<textarea class="content-text">WORKSHOP&#10;M4 × 20 mm</textarea></label>
+      <label class="label-position" data-label-position="3">Label 4<textarea class="content-text">ARCHIVE&#10;Project notes · 2026</textarea></label>
+      <label class="label-position" data-label-position="4">Label 5<textarea class="content-text">GREENHOUSE&#10;Tomatoes · south row</textarea></label>
+      <label class="label-position" data-label-position="5">Label 6<textarea class="content-text">FREEZER&#10;Vegetable stock · Aug 2026</textarea></label>
+      <label class="label-position" data-label-position="6">Label 7<textarea class="content-text">STUDIO&#10;Watercolor brushes</textarea></label>
+      <label class="label-position" data-label-position="7">Label 8<textarea class="content-text">SEED LIBRARY&#10;Purple coneflower</textarea></label>
+    </div>
+    <h3>Are any positions missing from the first sheet?</h3>
+    <div class="actions">
+      <label class="used-label-position" data-label-position="0"><input class="used-position" type="checkbox" value="0">1 used</label>
+      <label class="used-label-position" data-label-position="1"><input class="used-position" type="checkbox" value="1">2 used</label>
+      <label class="used-label-position" data-label-position="2"><input class="used-position" type="checkbox" value="2">3 used</label>
+      <label class="used-label-position" data-label-position="3"><input class="used-position" type="checkbox" value="3">4 used</label>
+      <label class="used-label-position" data-label-position="4"><input class="used-position" type="checkbox" value="4">5 used</label>
+      <label class="used-label-position" data-label-position="5"><input class="used-position" type="checkbox" value="5">6 used</label>
+      <label class="used-label-position" data-label-position="6"><input class="used-position" type="checkbox" value="6">7 used</label>
+      <label class="used-label-position" data-label-position="7"><input class="used-position" type="checkbox" value="7">8 used</label>
+    </div>
+    <label><input id="show-label-outlines" type="checkbox">Show label outlines in the PDF <small>Adds a thin outline at the exact calculated edge of every label so you can verify the Step 1 dimensions.</small></label>
+    <input id="safe-inset" type="hidden" value="3">
+    <div class="actions"><button data-action="validate-and-generate">Download my label PDF</button></div>
+    <div id="content-result"></div>
+  </section>
+
+  <section class="card flow-step" data-step="7" aria-labelledby="final-title">
+    <h2 id="final-title">Before you print</h2>
+    <div id="final-loading-instructions" class="feed-instruction"></div>
+    <p>Use the same printer connection and eight print settings you used during calibration.</p>
+    <p class="notice danger"><strong>If labels are missing from the sheet:</strong> skipping those positions in the PDF does not guarantee that the sheet is safe to feed again. When in doubt, use a new sheet.</p>
+  </section>
+
+  <div id="last-change" class="status-toast">Start by confirming your printer and label sheet.</div>
+
+  <footer>PROTOTYPE — Browser-only experiment. No production API, universal printer support, or physical alignment claim is implied.</footer>
+</main>
+
+<script>
+/*
+  Portable prototype logic. This module is deliberately DOM-free: state transitions,
+  validation, least-squares calibration, profile gating, and PDF byte construction
+  can be lifted independently from the throwaway page shell.
+*/
+const PrototypeLogic = (() => {
+  const MM_TO_PT = 72 / 25.4;
+  const SHEET = { widthMm: 215.9, heightMm: 279.4 };
+  const LAYOUT = Object.freeze({
+    id: 'townstix-us-4', revision: 'published-2026-08-14', provenance: 'TownStix published dimensions',
+    sheet: SHEET, safeInsetMm: 3,
+    labels: [
+      { x:4.318, y:12.7, width:101.6, height:127 }, { x:109.982, y:12.7, width:101.6, height:127 },
+      { x:4.318, y:139.7, width:101.6, height:127 }, { x:109.982, y:139.7, width:101.6, height:127 }
+    ]
+  });
+  const MARKS = Object.freeze([
+    { id:'TL', x:12, y:12 }, { id:'TR', x:203.9, y:12 },
+    { id:'BL', x:12, y:267.4 }, { id:'BR', x:203.9, y:267.4 }
+  ]);
+  const requiredConfig = ['letter','scale','portrait','label','manual','duplex','decorations','remove'];
+  const initialState = () => ({
+    stage:'unconfigured', layout:null, setup:null, printConfiguration:[], calibrationPdf:null,
+    plainPaper:{ rulerMm:null, printableFace:'unverified', leadingEdge:'unverified', outputPath:'unverified', edgeCutoff:null, accepted:false },
+    observations:[], profile:null, profileSaved:false, contentPackage:null, validation:null, finalPdf:null,
+    evidence:'none', lastChange:'Nothing has been changed yet.'
+  });
+  const fail = (state, message) => ({ ...state, lastChange:`Refused: ${message}` });
+  const advance = (state, patch, message) => ({ ...state, ...patch, lastChange:message });
+
+  function reduce(state, action) {
+    switch (action.type) {
+      case 'RESET': return initialState();
+      case 'SELECT_LAYOUT': return advance(state, { layout:LAYOUT, stage:'layout-selected' }, 'Selected the immutable published US-4 sheet-layout revision.');
+      case 'SELECT_SETUP':
+        if (!action.setup.name || !action.setup.browser || !action.setup.driver) return fail(state, 'setup name, browser build, and driver/connection are required.');
+        return advance(state, { setup:{...action.setup}, profile:null, profileSaved:false, stage:'setup-selected' }, 'Recorded the exact printing setup; any relevant change invalidates its profile.');
+      case 'CONFIRM_CONFIG': {
+        const missing = requiredConfig.filter(x => !action.values.includes(x));
+        if (missing.length) return fail(state, `print configuration still lacks ${missing.join(', ')}.`);
+        return advance(state, { printConfiguration:[...action.values] }, 'Explicitly confirmed all user-controlled print configuration values.');
+      }
+      case 'GENERATE_CALIBRATION':
+        if (!state.layout || !state.setup) return fail(state, 'select the sheet layout and printing setup first.');
+        return advance(state, { calibrationPdf:{ generatedAt:new Date().toISOString(), mediaBoxPt:[0,0,612,792], edgeScaleUnit:action.edgeScaleUnit }, stage:'calibration-generated' }, 'Generated a Letter-size calibration PDF with exact point geometry.');
+      case 'RECORD_PLAIN': {
+        const p = action.result;
+        if (!state.calibrationPdf) return fail(state, 'generate the calibration PDF first.');
+        if (state.printConfiguration.length !== requiredConfig.length) return fail(state, 'explicitly confirm every print configuration value first.');
+        if ([p.printableFace,p.leadingEdge].includes('unverified')) return fail(state, 'the asymmetric test must verify printable face and top edge.');
+        return advance(state, { plainPaper:{...p, accepted:true}, stage:'plain-paper-passed' }, 'Plain paper recorded the observed loading orientation.');
+      }
+      case 'RECORD_OBSERVATIONS':
+        if (!state.plainPaper.accepted) return fail(state, 'pass the plain-paper scaling/orientation gate first.');
+        if (!validObservationSet(action.observations)) return fail(state, 'the ruler and all four corner points are required on every selected sheet.');
+        return advance(state, { observations:action.observations, profile:null, evidence:action.evidence || 'physical', stage:'observed' }, `Recorded ${action.observations.length} complete real-media sheets as ${action.evidence || 'physical'} evidence.`);
+      case 'DERIVE_PROFILE':
+        if (!validObservationSet(state.observations)) return fail(state, 'complete every measurement on the selected sheet count first.');
+        return advance(state, { profile:deriveProfile(state), stage:'profile-derived' }, 'Separated stable placement bias from placement variation and derived only justified corrections.');
+      case 'SAVE_PROFILE':
+        if (!state.profile || !state.profile.suitable || state.evidence !== 'physical') return fail(state, 'only a suitable profile derived from physical evidence may be saved.');
+        return advance(state, { profileSaved:true }, 'Saved the physical-evidence printer profile to browser-local storage.');
+      case 'LOAD_PROFILE': return advance(state, { profile:action.profile, profileSaved:true, evidence:action.profile.evidence||'physical', stage:'profile-derived' }, 'Loaded the browser-local printer profile.');
+      case 'SET_CONTENT': return advance(state, { contentPackage:action.package, validation:action.validation }, action.validation.valid ? 'Validated the isolated label content package.' : 'Content package validation found blocking problems.');
+      case 'FINAL_PDF':
+        if (!state.profile?.suitable || state.evidence !== 'physical') return fail(state, 'final output requires a suitable profile derived from real physical measurements; illustrative data cannot unlock it.');
+        if (!state.validation?.valid) return fail(state, 'validate the isolated label content package first.');
+        if (!state.profileSaved) return fail(state, 'save the profile tied to this exact setup before final output.');
+        return advance(state, { finalPdf:{generatedAt:new Date().toISOString(), mediaBoxPt:[0,0,612,792]}, stage:'final-generated' }, 'Generated final printable output; reconfirm loading and print configuration before printing.');
+      default: return fail(state, `unknown action ${action.type}.`);
+    }
+  }
+
+  function validObservationSet(sheets) {
+    return Array.isArray(sheets) && (sheets.length === 1 || sheets.length === 3) && sheets.every((s,i) =>
+      s.sheet === i + 1 && Number.isFinite(s.rulerMm) && s.marks.length === MARKS.length &&
+      MARKS.every(m => s.marks.some(v => v.id === m.id && Number.isFinite(v.dx) && Number.isFinite(v.dy)))
+    );
+  }
+
+  function solveLeastSquares(rows, values, width) {
+    const a = Array.from({length:width}, () => Array(width).fill(0));
+    const b = Array(width).fill(0);
+    rows.forEach((row,r) => row.forEach((v,i) => { b[i] += v * values[r]; row.forEach((w,j) => a[i][j] += v*w); }));
+    for (let i=0;i<width;i++) {
+      let pivot=i; for(let r=i+1;r<width;r++) if(Math.abs(a[r][i])>Math.abs(a[pivot][i])) pivot=r;
+      [a[i],a[pivot]]=[a[pivot],a[i]]; [b[i],b[pivot]]=[b[pivot],b[i]];
+      const d=a[i][i]; if(Math.abs(d)<1e-12) return Array(width).fill(0);
+      for(let c=i;c<width;c++) a[i][c]/=d; b[i]/=d;
+      for(let r=0;r<width;r++) if(r!==i) { const f=a[r][i]; for(let c=i;c<width;c++) a[r][c]-=f*a[i][c]; b[r]-=f*b[i]; }
+    }
+    return b;
+  }
+
+  function fitSheet(marks) {
+    const cx=SHEET.widthMm/2, cy=SHEET.heightMm/2;
+    const dxRows=marks.map(v => [1, MARKS.find(m=>m.id===v.id).x-cx, -(MARKS.find(m=>m.id===v.id).y-cy)]);
+    const dyRows=marks.map(v => [1, MARKS.find(m=>m.id===v.id).y-cy,  (MARKS.find(m=>m.id===v.id).x-cx)]);
+    const fx=solveLeastSquares(dxRows, marks.map(v=>v.dx), 3);
+    const fy=solveLeastSquares(dyRows, marks.map(v=>v.dy), 3);
+    return { tx:fx[0], sx:fx[1], thetaX:fx[2], ty:fy[0], sy:fy[1], thetaY:fy[2], theta:(fx[2]+fy[2])/2 };
+  }
+
+  function deriveProfile(state) {
+    const all=state.observations.flatMap(s=>s.marks.map(v=>({...v,sheet:s.sheet})));
+    const byMark=MARKS.map(m => {
+      const values=all.filter(v=>v.id===m.id);
+      const meanDx=average(values.map(v=>v.dx)), meanDy=average(values.map(v=>v.dy));
+      return {...m, dx:meanDx, dy:meanDy, variation:Math.max(...values.map(v=>Math.hypot(v.dx-meanDx,v.dy-meanDy)))};
+    });
+    const sheetFits=state.observations.map(s=>fitSheet(s.marks));
+    const fit=fitSheet(byMark);
+    const translationResidual = worstResidual(byMark, {tx:average(all.map(v=>v.dx)),ty:average(all.map(v=>v.dy)),sx:0,sy:0,theta:0});
+    const fullResidual = worstResidual(byMark, fit);
+    const scaleXEffect=Math.abs(fit.sx)*(SHEET.widthMm-24), scaleYEffect=Math.abs(fit.sy)*(SHEET.heightMm-24);
+    const rotationEffect=Math.abs(fit.theta)*Math.hypot(SHEET.widthMm-24,SHEET.heightMm-24);
+    const scaleXStable=spread(sheetFits.map(f=>f.sx))*(SHEET.widthMm-24)<0.35;
+    const scaleYStable=spread(sheetFits.map(f=>f.sy))*(SHEET.heightMm-24)<0.35;
+    const rotationStable=spread(sheetFits.map(f=>f.theta))*Math.hypot(SHEET.widthMm-24,SHEET.heightMm-24)<0.35;
+    const improvement=translationResidual-fullResidual;
+    const repeated=state.observations.length===3;
+    const useScaleX=repeated && scaleXEffect>=0.5 && scaleXStable && improvement>=0.2;
+    const useScaleY=repeated && scaleYEffect>=0.5 && scaleYStable && improvement>=0.2;
+    const useRotation=repeated && rotationEffect>=0.5 && rotationStable && improvement>=0.2;
+    const model={ tx:fit.tx, ty:fit.ty, sx:useScaleX?fit.sx:0, sy:useScaleY?fit.sy:0, theta:useRotation?fit.theta:0 };
+    const correctedWorst=Math.max(...all.map(v => {
+      const m=MARKS.find(p=>p.id===v.id), predicted=predict(model,m.x,m.y);
+      return Math.hypot(v.dx-predicted.dx,v.dy-predicted.dy);
+    }));
+    const maxVariation=Math.max(...byMark.map(v=>v.variation));
+    const rulerError=Math.max(...state.observations.map(s=>Math.abs(s.rulerMm-100)));
+    const suitable=correctedWorst<=1 && rulerError<=0.5;
+    return {
+      id:`profile-${Date.now()}`, setup:{...state.setup}, sheetLayoutRevision:state.layout.revision,
+      loadingProcedureRevision:state.setup.loadingRevision, printConfiguration:[...state.printConfiguration],
+      sampleCount:state.observations.length, confidence:state.observations.length===3?'higher':'preliminary', toleranceMm:1, stableBias:{txMm:model.tx,tyMm:model.ty,sx:model.sx,sy:model.sy,rotationRadians:model.theta},
+      appliedParameters:['translation',...(useScaleX?['x-scale']:[]),...(useScaleY?['y-scale']:[]),...(useRotation?['rotation']:[])],
+      diagnostics:{translationOnlyWorstMeanResidualMm:translationResidual,fullModelWorstMeanResidualMm:fullResidual,maxPlacementVariationMm:maxVariation,worstCorrectedObservedErrorMm:correctedWorst,maxRulerErrorMm:rulerError},
+      suitable, verdict:suitable?(state.observations.length===1?'Preliminary one-sheet adjustment; repeated-feed suitability is unverified.':'Suitable for this sheet layout within observed ±1 mm evidence across three sheets.'):'Unsuitable: observed corrected error or scale check exceeds ±1 mm tolerance.',
+      evidence:state.evidence, createdAt:new Date().toISOString()
+    };
+  }
+  const average=xs=>xs.reduce((a,b)=>a+b,0)/xs.length;
+  const spread=xs=>Math.max(...xs)-Math.min(...xs);
+  function predict(m,x,y){ const X=x-SHEET.widthMm/2,Y=y-SHEET.heightMm/2; return {dx:m.tx+m.sx*X-m.theta*Y,dy:m.ty+m.sy*Y+m.theta*X}; }
+  function worstResidual(marks,m){ return Math.max(...marks.map(v=>{const p=predict(m,v.x,v.y);return Math.hypot(v.dx-p.dx,v.dy-p.dy);})); }
+  function correction(profile,x,y){
+    if(!profile)return {x,y};
+    const b=profile.stableBias;
+    const p=predict({tx:b.txMm,ty:b.tyMm,sx:b.sx,sy:b.sy,theta:b.rotationRadians},x,y);
+    return{x:x-p.dx,y:y-p.dy};
+  }
+
+  function validatePackage(pkg) {
+    const problems=[];
+    if (!pkg.revision.trim()) problems.push('Package revision is required.');
+    if (!(pkg.safeInsetMm>=0 && pkg.safeInsetMm<50.8)) problems.push('Safe-area inset must leave positive label dimensions.');
+    pkg.items.forEach((item,i) => {
+      if (/<script\b/i.test(item.html) || /\son\w+\s*=/i.test(item.html)) problems.push(`Position ${i+1} contains active HTML.`);
+      if (/(?:src|href)\s*=\s*["'](?!data:|#)/i.test(item.html)) problems.push(`Position ${i+1} references a non-isolated resource.`);
+      if (/url\(\s*["']?(?!data:)/i.test(pkg.css)) problems.push('CSS references a non-isolated resource.');
+    });
+    return {valid:problems.length===0,problems,warnings:pkg.usedPositions.length?['Refeeding a partially used label sheet is not asserted safe.']:[]};
+  }
+
+  const esc=s=>String(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[\r\n]/g,' ');
+  const fmt=n=>(Math.round(n*1000)/1000).toString();
+  const pt=mm=>mm*MM_TO_PT;
+  function pdfLine(x1,y1,x2,y2,width=.25){return `${fmt(width)} w ${fmt(pt(x1))} ${fmt(pt(SHEET.heightMm-y1))} m ${fmt(pt(x2))} ${fmt(pt(SHEET.heightMm-y2))} l S\n`;}
+  function pdfRect(x,y,w,h,width=.25){return `${fmt(width)} w ${fmt(pt(x))} ${fmt(pt(SHEET.heightMm-y-h))} ${fmt(pt(w))} ${fmt(pt(h))} re S\n`;}
+  function pdfText(x,y,size,text){return `BT /F1 ${fmt(size)} Tf 1 0 0 1 ${fmt(pt(x))} ${fmt(pt(SHEET.heightMm-y))} Tm (${esc(text)}) Tj ET\n`;}
+  const HELVETICA_BOLD_WIDTHS={32:278,48:556,49:556,50:556,51:556,52:556,53:556,54:556,55:556,56:556,57:556,65:722,66:722,67:722,68:722,69:667,70:611,71:778,72:722,73:278,74:556,75:722,76:611,77:833,78:722,79:778,80:667,81:778,82:722,83:667,84:611,85:722,86:722,87:944,88:722,89:722,90:611};
+  function boldTextWidthMm(text,size){return [...text].reduce((sum,char)=>sum+(HELVETICA_BOLD_WIDTHS[char.charCodeAt(0)]||556),0)*size/1000/MM_TO_PT;}
+  function pdfBoldText(x,y,size,text){return `BT /F2 ${fmt(size)} Tf 1 0 0 1 ${fmt(pt(x))} ${fmt(pt(SHEET.heightMm-y))} Tm (${esc(text)}) Tj ET\n`;}
+  function pdfBoldRotatedText(x,y,size,text,direction){
+    const matrix=direction==='down'?'0 -1 1 0':'0 1 -1 0';
+    return `BT /F2 ${fmt(size)} Tf ${matrix} ${fmt(pt(x))} ${fmt(pt(SHEET.heightMm-y))} Tm (${esc(text)}) Tj ET\n`;
+  }
+  const MARK_NAMES={TL:'TOP LEFT',TR:'TOP RIGHT',BL:'BOTTOM LEFT',BR:'BOTTOM RIGHT'};
+  const MARK_NUMBERS={TL:1,TR:2,BL:3,BR:4};
+  function crosshair(m){
+    return pdfLine(m.x-4,m.y,m.x+4,m.y,.7)+pdfLine(m.x,m.y-4,m.x,m.y+4,.7);
+  }
+  function positionLabels(){
+    const size=8,inset=12,sideInset=18,topY=22,bottomY=SHEET.heightMm-18;
+    const label=(id)=>`${MARK_NUMBERS[id]} ${MARK_NAMES[id]}`;
+    const rightAligned=(text)=>SHEET.widthMm-inset-boldTextWidthMm(text,size);
+    const centered=(text)=>SHEET.widthMm/2-boldTextWidthMm(text,size)/2;
+    const sideY=(text,direction)=>SHEET.heightMm/2+(direction==='down'?-1:1)*boldTextWidthMm(text,size)/2;
+    let c='';
+    c+=pdfBoldText(inset,topY,size,label('TL'));
+    c+=pdfBoldText(centered('TOP EDGE'),topY,size,'TOP EDGE');
+    c+=pdfBoldText(rightAligned(label('TR')),topY,size,label('TR'));
+    c+=pdfBoldText(inset,bottomY,size,label('BL'));
+    c+=pdfBoldText(centered('BOTTOM EDGE'),bottomY,size,'BOTTOM EDGE');
+    c+=pdfBoldText(rightAligned(label('BR')),bottomY,size,label('BR'));
+    c+=pdfBoldRotatedText(sideInset,sideY('LEFT EDGE','down'),size,'LEFT EDGE','down');
+    c+=pdfBoldRotatedText(SHEET.widthMm-sideInset,sideY('RIGHT EDGE','up'),size,'RIGHT EDGE','up');
+    return c;
+  }
+  function edgeCutoffScales(unit='metric'){
+    let c='';
+    const imperial=unit==='imperial';
+    const distances=imperial?Array.from({length:8},(_,i)=>(i+1)*25.4/16):[2,4,6,8,10,12];
+    const horizontalStart=SHEET.widthMm/2-7,horizontalEnd=SHEET.widthMm/2+7;
+    const verticalStart=SHEET.heightMm/2-7,verticalEnd=SHEET.heightMm/2+7;
+    distances.forEach(d=>{
+      c+=pdfLine(d,verticalStart,d,verticalEnd,.7);
+      c+=pdfLine(SHEET.widthMm-d,verticalStart,SHEET.widthMm-d,verticalEnd,.7);
+      c+=pdfLine(horizontalStart,d,horizontalEnd,d,.7);
+      c+=pdfLine(horizontalStart,SHEET.heightMm-d,horizontalEnd,SHEET.heightMm-d,.7);
+    });
+    c+=pdfText(15,210,8,imperial?'EDGE CUTOFF CHECK: count the short lines visible at each labeled edge. Lines are 1/16 inch apart.':'EDGE CUTOFF CHECK: count the short lines visible at each labeled edge. Lines are 2 mm apart.');
+    c+=pdfText(15,214,6,'Count lines only; a partly visible line still counts. These are separate from the four crosshairs.');
+    return c;
+  }
+
+  function calibrationCommands(edgeScaleUnit='metric') {
+    let c='0 G 0 g\n';
+    c+=pdfText(48,29,9,'CALIBRATION - PRINTED TOP EDGE');
+    MARKS.forEach(m=>c+=crosshair(m));
+    c+=positionLabels();
+    const ry=153, start=55; c+=pdfText(start,ry-4,8,'100 mm ruler - measure end to end'); c+=pdfLine(start,ry,start+100,ry,.6);
+    for(let i=0;i<=100;i++){const h=i%10===0?4:i%5===0?2.5:1.5;c+=pdfLine(start+i,ry-h,start+i,ry,.3);if(i%10===0)c+=pdfText(start+i-1.5,ry+5,6,String(i));}
+    c+=pdfText(15,166,9,'MEASURE ONLY THE 4 CORNER CROSSHAIRS - always measure to the exact CENTER');
+    c+=pdfText(15,172,7,'1 TOP LEFT: left edge to point; printed TOP EDGE to point. Targets: 12 mm / 12 mm.');
+    c+=pdfText(15,178,7,'2 TOP RIGHT: right edge to point; printed TOP EDGE to point. Targets: 12 mm / 12 mm.');
+    c+=pdfText(15,184,7,'3 BOTTOM LEFT: left edge to point; bottom edge to point. Targets: 12 mm / 12 mm.');
+    c+=pdfText(15,190,7,'4 BOTTOM RIGHT: right edge to point; bottom edge to point. Targets: 12 mm / 12 mm.');
+    c+=pdfText(15,196,7,'The sheet center is derived automatically from the four corner measurements.');
+    c+=edgeCutoffScales(edgeScaleUnit);
+    c+=pdfText(12,242,7,'ORIENTATION: compare this print with the SIDE A and FEED FIRST marks you wrote before loading.');
+    c+=pdfText(12,245,7,'Write each measured edge-to-point distance into the matching row in the calibration guide.');
+    c+=pdfText(12,248,7,'Print: Letter | portrait | Actual size/100% | headers/footers off | duplex off.');
+    return c;
+  }
+
+  function bytes(text){return new TextEncoder().encode(text);}
+  function concat(parts){const n=parts.reduce((s,p)=>s+p.length,0),out=new Uint8Array(n);let o=0;parts.forEach(p=>{out.set(p,o);o+=p.length;});return out;}
+  function streamObject(dict,data){return concat([bytes(`<< ${dict} /Length ${data.length} >>\nstream\n`),data,bytes('\nendstream')]);}
+  function buildPdf(commands,images=[]) {
+    const pageCommands=Array.isArray(commands)?commands:[commands];
+    const objects=[];
+    objects[1]=bytes('<< /Type /Catalog /Pages 2 0 R >>');
+    const pageStart=3,contentStart=pageStart+pageCommands.length,fontStart=contentStart+pageCommands.length,imageStart=fontStart+2;
+    objects[2]=bytes(`<< /Type /Pages /Kids [${pageCommands.map((_,i)=>`${pageStart+i} 0 R`).join(' ')}] /Count ${pageCommands.length} >>`);
+    const xobjs=images.map((_,i)=>`/Im${i+1} ${imageStart+i} 0 R`).join(' ');
+    pageCommands.forEach((page,i)=>{
+      objects[pageStart+i]=bytes(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${fontStart} 0 R /F2 ${fontStart+1} 0 R >> /XObject << ${xobjs} >> >> /Contents ${contentStart+i} 0 R >>`);
+      objects[contentStart+i]=streamObject('',bytes(page));
+    });
+    objects[fontStart]=bytes('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
+    objects[fontStart+1]=bytes('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>');
+    images.forEach((img,i)=>objects[imageStart+i]=streamObject(`/Type /XObject /Subtype /Image /Width ${img.width} /Height ${img.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode`,img.bytes));
+    const parts=[bytes('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n')], offsets=[0]; let offset=parts[0].length;
+    for(let i=1;i<objects.length;i++){offsets[i]=offset;const p=concat([bytes(`${i} 0 obj\n`),objects[i],bytes('\nendobj\n')]);parts.push(p);offset+=p.length;}
+    const xref=offset;let table=`xref\n0 ${objects.length}\n0000000000 65535 f \n`;
+    for(let i=1;i<objects.length;i++)table+=`${String(offsets[i]).padStart(10,'0')} 00000 n \n`;
+    parts.push(bytes(table+`trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`));
+    return concat(parts);
+  }
+
+  function calibrationPdf(edgeScaleUnit='metric'){return buildPdf(calibrationCommands(edgeScaleUnit));}
+  function paginateItems(pkg){
+    const allSlots=pkg.layout.labels.map((_,positionIndex)=>positionIndex);
+    const firstSlots=allSlots.filter(positionIndex=>!pkg.usedPositions.includes(positionIndex));
+    const pages=[];
+    let itemIndex=0;
+    if(firstSlots.length&&itemIndex<pkg.items.length){
+      pages.push(firstSlots.slice(0,pkg.items.length).map(positionIndex=>({positionIndex,itemIndex:itemIndex++})));
+    }
+    while(itemIndex<pkg.items.length){
+      pages.push(allSlots.slice(0,pkg.items.length-itemIndex).map(positionIndex=>({positionIndex,itemIndex:itemIndex++})));
+    }
+    return pages;
+  }
+  function finalCommands(profile,pkg){
+    return paginateItems(pkg).map(placements=>{
+      let c='0 G 0 g\n';
+      placements.forEach(({positionIndex,itemIndex})=>{
+      const r=pkg.layout.labels[positionIndex];
+      if(pkg.showLabelOutlines){
+        const outlineTl=correction(profile,r.x,r.y),outlineTr=correction(profile,r.x+r.width,r.y),outlineBr=correction(profile,r.x+r.width,r.y+r.height),outlineBl=correction(profile,r.x,r.y+r.height);
+        c+=pdfLine(outlineTl.x,outlineTl.y,outlineTr.x,outlineTr.y,.35)+pdfLine(outlineTr.x,outlineTr.y,outlineBr.x,outlineBr.y,.35)+pdfLine(outlineBr.x,outlineBr.y,outlineBl.x,outlineBl.y,.35)+pdfLine(outlineBl.x,outlineBl.y,outlineTl.x,outlineTl.y,.35);
+      }
+      const inset=pkg.safeInsetMm,tl=correction(profile,r.x+inset,r.y+inset),br=correction(profile,r.x+r.width-inset,r.y+r.height-inset);
+      const w=pt(br.x-tl.x),h=pt(br.y-tl.y),x=pt(tl.x),y=pt(SHEET.heightMm-br.y);
+      c+=`q ${fmt(w)} 0 0 ${fmt(h)} ${fmt(x)} ${fmt(y)} cm /Im${itemIndex+1} Do Q\n`;
+      });
+      return c;
+    });
+  }
+  function finalPdf(profile,pkg,images){return buildPdf(finalCommands(profile,pkg),images);}
+
+  return { MM_TO_PT,SHEET,LAYOUT,MARKS,MARK_NAMES,MARK_NUMBERS,requiredConfig,initialState,reduce,deriveProfile,validatePackage,calibrationPdf,finalPdf };
+})();
+
+/* Throwaway DOM shell below. */
+let state=PrototypeLogic.initialState();
+let activeTab='geometry';
+let currentUiStep=1;
+let lastCalibrationBytes=null;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const dispatch=action=>{state=PrototypeLogic.reduce(state,action);render();saveDraft();};
+const round=n=>Number.isFinite(n)?Math.round(n*1000)/1000:'—';
+
+function render(){
+  $('#last-change').textContent=friendlyStatus(state.lastChange);
+  $('#technical-last-change').textContent=state.lastChange;
+  const p=state.profile;
+  const entries=[
+    ['Stage',state.stage],['Sheet layout',state.layout?`${state.layout.id} @ ${state.layout.revision}`:'Not selected'],
+    ['Printing setup',state.setup?.name||'Not selected'],['Print configuration',`${state.printConfiguration.length}/${PrototypeLogic.requiredConfig.length} confirmed`],
+    ['Plain-paper gate',state.plainPaper.accepted?'Passed':'Not passed'],['Real-media evidence',state.observations.length?`${state.observations.length} sheet${state.observations.length===1?'':'s'} · ${state.evidence}`:'None'],
+    ['Printer profile',p?`${p.suitable?'Suitable':'Unsuitable'} · ${p.appliedParameters.join(', ')}`:'Not derived'],
+    ['Profile persistence',state.profileSaved?'Saved locally':'Not saved'],['Content package',state.validation?.valid?'Valid':state.validation?'Blocked':'Not validated'],
+    ['Final printable output',state.finalPdf?'Generated':'Not generated']
+  ];
+  $('#state-panel').innerHTML=entries.map(([k,v])=>`<div class="state-item"><b>${k}</b>${v}</div>`).join('');
+  $('#state-json').textContent=JSON.stringify(state,null,2);
+  renderProfile(); renderContentResult(); renderWalkthrough(); renderLoadingInstructions();
+}
+
+function friendlyStatus(message){
+  if(message==='Nothing has been changed yet.')return 'Start by confirming your printer and label sheet.';
+  if(message.startsWith('Refused:'))return `One more thing: ${message.slice(8)}`;
+  if(message.includes('Recorded the exact printing setup'))return 'Printer confirmed. Continue with the print settings.';
+  if(message.includes('confirmed all user-controlled'))return 'Print settings confirmed. Download the plain-paper test next.';
+  if(message.includes('Generated a Letter-size calibration'))return 'Test PDF is ready. Print it on plain paper.';
+  if(message.includes('Plain paper recorded'))return 'Loading orientation recorded. Now measure your label sheet.';
+  if(message.includes('Recorded 1 complete'))return 'Your sheet measurements are recorded.';
+  if(message.includes('Recorded 3 complete'))return 'All three sheet measurements are recorded.';
+  if(message.includes('Separated stable placement'))return 'Calculation complete. Review the result below.';
+  if(message.includes('Saved the physical-evidence'))return 'Alignment result saved in this browser.';
+  if(message.includes('Validated the isolated'))return 'Label text is ready.';
+  if(message.includes('Generated final printable'))return 'Your label PDF was downloaded. Use the same print settings.';
+  return message;
+}
+
+function highestAvailableStep(){
+  if(state.profileSaved)return 7;
+  if(state.profile)return 6;
+  if(state.plainPaper.accepted)return 5;
+  if(state.calibrationPdf)return 4;
+  if(state.printConfiguration.length===PrototypeLogic.requiredConfig.length)return 3;
+  if(state.setup)return 2;
+  return 1;
+}
+
+function showStep(step){
+  const requested=Math.max(1,Math.min(7,Number(step))),available=highestAvailableStep();
+  if(requested>available){state={...state,lastChange:'Finish the current step before moving ahead.'};render();return;}
+  currentUiStep=requested;
+  $$('.flow-step').forEach(x=>x.classList.toggle('active',Number(x.dataset.step)===currentUiStep));
+  $$('[data-go-step]').forEach(x=>{const n=Number(x.dataset.goStep);x.classList.toggle('current',n===currentUiStep);x.classList.toggle('done',n<currentUiStep);});
+  scrollTo({top:0,behavior:'smooth'});
+  saveDraft();
+}
+
+function renderProfile(){
+  const p=state.profile;
+  const save=$('#save-and-continue'),retry=$('#retry-measurements'),help=$('#profile-next-help');
+  if(!p){$('#profile-result').innerHTML='<p>No profile has been derived.</p>';save.disabled=true;retry.hidden=true;help.textContent='Complete the measurements in Step 5 first.';return;}
+  const d=p.diagnostics,b=p.stableBias;
+  const example=p.evidence!=='physical';
+  const preliminary=p.sampleCount===1;
+  const canContinue=p.suitable&&!example;
+  save.disabled=!canContinue;
+  retry.hidden=canContinue;
+  if(example)help.innerHTML='<strong>This result cannot be saved:</strong> it still contains demo data. Return to measurements and enter values from your printed sheet.';
+  else if(!p.suitable&&d.maxRulerErrorMm>0.5)help.innerHTML=`<strong>This result cannot be saved:</strong> the printed ruler differs from 100 mm by ${round(d.maxRulerErrorMm)} mm. Check that printing used Actual size or 100%, then print and measure again.`;
+  else if(!p.suitable)help.innerHTML=`<strong>This result cannot be saved:</strong> the corner measurements still disagree by as much as ${round(d.worstCorrectedObservedErrorMm)} mm after adjustment. Recheck the entered distances. If they are correct, try the three-sheet calibration to determine whether scale or rotation is repeatable.`;
+  else help.innerHTML=preliminary?'<strong>Ready to continue.</strong> This one-sheet adjustment is preliminary because repeated feeding has not been tested.':'<strong>Ready to continue.</strong> Save this result to make labels.';
+  $('#profile-result').innerHTML=`<h3 class="${example?'warn':p.suitable?(preliminary?'warn':'ok'):'bad'}">${example?'Example calculation only':preliminary&&p.suitable?'Preliminary adjustment from one sheet':p.suitable?'✓ This setup stayed within 1 mm across three sheets':'✕ This setup is not consistent enough'}</h3>
+    <p>${example?'These values were loaded by the demo. Clear the table and enter real printed measurements to get your result.':preliminary&&p.suitable?'The measured points on this sheet support an initial adjustment. Because only one sheet was tested, feed consistency is unknown. Repeat with three sheets for a higher-confidence result.':p.suitable?'All three sheets were consistent, so this browser can compensate for the repeatable shift.':'The measured points or repeated sheets differed too much for a dependable adjustment.'}</p>
+    <details class="advanced"><summary>See calculation details</summary>
+    <div class="state-grid"><div class="state-item"><b>Evidence</b>${p.evidence}</div><div class="state-item"><b>Applied parameters</b>${p.appliedParameters.join(', ')}</div>
+    <div class="state-item"><b>Correction translation</b>${round(-b.txMm)} mm X; ${round(-b.tyMm)} mm Y</div>
+    <div class="state-item"><b>Scale coefficients</b>X ${round(-b.sx)}; Y ${round(-b.sy)}</div><div class="state-item"><b>Rotation correction</b>${round(-b.rotationRadians*180/Math.PI)}°</div>
+    <div class="state-item"><b>Max placement variation</b>${round(d.maxPlacementVariationMm)} mm</div><div class="state-item"><b>Worst corrected observation</b>${round(d.worstCorrectedObservedErrorMm)} mm</div>
+    <div class="state-item"><b>Max ruler error</b>${round(d.maxRulerErrorMm)} mm</div></div></details>`;
+}
+function renderContentResult(){const v=state.validation;if(!v){$('#content-result').innerHTML='';return;}$('#content-result').innerHTML=`<p class="${v.valid?'ok':'bad'}">${v.valid?'Labels are ready.':'Fix the label text before downloading.'}</p>${v.problems.map(x=>`<p class="bad">${x}</p>`).join('')}${v.warnings.map(x=>`<p class="warn">${x}</p>`).join('')}`;}
+
+const walkthroughs={
+ geometry:{title:'Geometry before placement',text:'Proves the artifact declares exact Letter dimensions and catches print scaling before placement is discussed.',steps:[['Select layout','select-layout'],['Select setup','select-setup'],['Generate PDF','generate-calibration'],['Accept measured ruler/orientation','record-plain']]},
+ calibration:{title:'Calibration calculation',text:'Uses illustrative data only to show how translation is separated from feed variation. Replace it with real ruler measurements before saving.',steps:[['Load illustrative stable data','load-example'],['Derive candidate profile','derive-profile'],['Try to save (correctly refused)','save-profile']]},
+ rejection:{title:'Unstable feed must not be hidden',text:'A printer profile cannot conceal run-to-run variation. This scenario should end with an unsuitable verdict.',steps:[['Load illustrative unstable data','load-unstable'],['Derive profile','derive-profile']]},
+ output:{title:'Isolated content to printable output',text:'Validates package isolation and used positions. Final output stays locked until real physical evidence yields a suitable saved profile.',steps:[['Validate package','validate-content'],['Try final PDF','generate-final']]}
+};
+function renderWalkthrough(){const w=walkthroughs[activeTab];$('#walkthrough').innerHTML=`<h3>${w.title}</h3><p>${w.text}</p><div class="steps">${w.steps.map(([label,a],i)=>`${i?'<span>→</span>':''}<button class="ghost" data-action="${a}">${i+1}. ${label}</button>`).join('')}</div>`;}
+
+function setupFromInputs(){return{name:$('#setup-name').value.trim(),browser:$('#browser-build').value.trim(),driver:$('#driver').value.trim(),loadingRevision:$('#loading-revision').value.trim()};}
+function escapeHtml(value){return value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function renderLoadingInstructions(){
+  const selectedLoadedFace=$('#loaded-face').value;
+  $('#plain-face-direction').textContent=selectedLoadedFace;
+  const loadedFace=state.plainPaper.loadedFace||selectedLoadedFace;
+  const printedOnSideA=state.plainPaper.printableFace==='face-up';
+  const printableFace=printedOnSideA?loadedFace:(loadedFace==='up'?'down':'up');
+  const top=Number($('#layout-top').value),bottom=Number($('#layout-bottom').value);
+  const sameMargins=Number.isFinite(top)&&Number.isFinite(bottom)&&Math.abs(top-bottom)<0.05;
+  const pdfTopAtFeedFirst=state.plainPaper.leadingEdge!=='opposite-short-edge';
+  const firstEdge=pdfTopAtFeedFirst?'top':'bottom';
+  const firstMargin=pdfTopAtFeedFirst?top:bottom;
+  const oppositeMargin=pdfTopAtFeedFirst?bottom:top;
+  const edgeDirection=sameMargins
+    ?`The top and bottom margins are both ${round(top)} mm, so <strong>either 8½-inch edge may go into the manual feed slot first</strong>.`
+    :`Put the sheet’s <strong>${firstEdge} 8½-inch edge into the manual feed slot first</strong>. This is the edge with the ${round(firstMargin)} mm blank margin; the opposite edge has a ${round(oppositeMargin)} mm margin.`;
+  const faceDirection=state.plainPaper.accepted
+    ?`Keep the <strong>label side facing ${printableFace}</strong>. Your plain-paper test showed that this is the side the printer prints on.`
+    :'<strong>Complete Step 4 first</strong> so the test can determine whether the label side must face up or down.';
+  const html=`<strong>How to feed each label sheet</strong><br>${edgeDirection}<br>${faceDirection}`;
+  $('#label-loading-instructions').innerHTML=html;
+  $('#final-loading-instructions').innerHTML=html;
+}
+function layoutFromInputs(){
+  const read=id=>Number($(id).value),top=read('#layout-top'),bottom=read('#layout-bottom'),left=read('#layout-left'),right=read('#layout-right'),vGap=read('#layout-v-gap'),hGap=read('#layout-h-gap'),rows=read('#layout-rows'),count=read('#layout-count');
+  const columns=count/rows,width=(PrototypeLogic.SHEET.widthMm-left-right-hGap*(columns-1))/columns,height=(PrototypeLogic.SHEET.heightMm-top-bottom-vGap*(rows-1))/rows;
+  const labels=Array.from({length:count},(_,index)=>{const row=Math.floor(index/columns),column=index%columns;return{x:left+column*(width+hGap),y:top+row*(height+vGap),width,height};});
+  return{id:'step-1-calculated-layout',revision:`custom-${[top,bottom,left,right,vGap,hGap,rows,count].join('-')}`,sheet:PrototypeLogic.SHEET,safeInsetMm:3,labels};
+}
+function updateLayoutCalculator(){
+  const read=id=>Number($(id).value),top=read('#layout-top'),bottom=read('#layout-bottom'),left=read('#layout-left'),right=read('#layout-right'),vGap=read('#layout-v-gap'),hGap=read('#layout-h-gap'),rows=read('#layout-rows'),count=read('#layout-count');
+  const values=[top,bottom,left,right,vGap,hGap,rows,count],error=$('#layout-error'),output=$('#layout-output'),preview=$('#layout-preview-grid');
+  let message='';
+  if(values.some(value=>!Number.isFinite(value)||value<0)||rows<1||count<1)message='Enter non-negative measurements and at least one row and label.';
+  else if(!Number.isInteger(rows)||!Number.isInteger(count))message='Rows and total labels must be whole numbers.';
+  else if(count%rows!==0)message=`${count} labels cannot be divided evenly across ${rows} rows.`;
+  const columns=message?0:count/rows;
+  const width=message?0:(215.9-left-right-hGap*(columns-1))/columns;
+  const height=message?0:(279.4-top-bottom-vGap*(rows-1))/rows;
+  if(!message&&(width<=0||height<=0))message='Margins and gaps leave no room for positive label dimensions.';
+  error.hidden=!message;error.textContent=message;
+  output.innerHTML=message?'':`<div class="state-item"><b>Columns</b>${columns}</div><div class="state-item"><b>Label width</b>${round(width)} mm</div><div class="state-item"><b>Label height</b>${round(height)} mm</div><div class="state-item"><b>Grid</b>${columns} across × ${rows} down</div>`;
+  preview.innerHTML='';
+  $$('.used-label-position').forEach(element=>element.hidden=Number(element.dataset.labelPosition)>=Math.max(0,count||0));
+  if(message){preview.style.cssText='';return;}
+  preview.style.left=`${left/215.9*100}%`;preview.style.right=`${right/215.9*100}%`;preview.style.top=`${top/279.4*100}%`;preview.style.bottom=`${bottom/279.4*100}%`;preview.style.gridTemplateColumns=`repeat(${columns},1fr)`;preview.style.gridTemplateRows=`repeat(${rows},1fr)`;preview.style.columnGap=`${hGap/215.9*230}px`;preview.style.rowGap=`${vGap/279.4*(230*11/8.5)}px`;
+  for(let i=0;i<count;i++){const cell=document.createElement('span');cell.className='layout-preview-label';cell.title=`Label ${i+1}`;preview.appendChild(cell);}
+  renderLoadingInstructions();
+}
+function labelCssFromInput(){return $('#content-css').value.replace(/background(?:-color)?\s*:\s*[^;}]+;?/gi,'');}
+function selectedPrintLabelCount(){return Math.min(8,Math.max(1,Number($('#print-label-count-input').value)||1));}
+function updatePrintLabelCount(nextCount=selectedPrintLabelCount()){
+  const count=Math.min(8,Math.max(1,nextCount));
+  $('#print-label-count-input').value=String(count);
+  $('#print-label-count').textContent=String(count);
+  $('#remove-print-label').disabled=count===1;
+  $('#add-print-label').disabled=count===8;
+  $$('.label-position').forEach(element=>element.hidden=Number(element.dataset.labelPosition)>=count);
+  const capacity=layoutFromInputs().labels.length;
+  const used=$$('.used-position:checked').filter(input=>Number(input.value)<capacity).length;
+  const firstSheetCapacity=capacity-used;
+  const sheets=firstSheetCapacity>0?1+Math.ceil(Math.max(0,count-firstSheetCapacity)/capacity):Math.ceil(count/capacity);
+  $('#print-label-count-help').textContent=`${count} actual label${count===1?'':'s'} · ${sheets} PDF page${sheets===1?'':'s'}`;
+  saveDraft();
+}
+function packageFromInputs(){const layout=layoutFromInputs(),count=selectedPrintLabelCount();return{revision:$('#content-revision').value.trim(),css:labelCssFromInput(),layout,showLabelOutlines:$('#show-label-outlines').checked,items:$$('.content-text').slice(0,count).map((x,position)=>({position,html:`<div class="label">${escapeHtml(x.value).replace(/\n/g,'<br>')}</div>`})),usedPositions:$$('.used-position:checked').map(x=>Number(x.value)).filter(position=>position<layout.labels.length),safeInsetMm:Number($('#safe-inset').value),fonts:[],assets:[]};}
+function inputNumber(element){return element.value.trim()===''?NaN:Number(element.value);}
+function distancesToDisplacement(mark,horizontal,vertical){
+  const right=mark.id==='TR'||mark.id==='BR',bottom=mark.id==='BL'||mark.id==='BR';
+  return{id:mark.id,dx:right?12-horizontal:horizontal-12,dy:bottom?12-vertical:vertical-12};
+}
+function displacementToDistances(mark,dx,dy){
+  const right=mark.id==='TR'||mark.id==='BR',bottom=mark.id==='BL'||mark.id==='BR';
+  return{horizontal:right?12-dx:12+dx,vertical:bottom?12-dy:12+dy};
+}
+function selectedSheetCount(){return Number($('#sheet-count').value);}
+function validateMeasurementInputs(){
+  const missing=[];
+  for(let sheet=1;sheet<=selectedSheetCount();sheet++){
+    const ruler=$(`[data-sheet="${sheet}"][data-field="ruler"]`);
+    if(!Number.isFinite(inputNumber(ruler)))missing.push({element:ruler,label:`Sheet ${sheet} printed ruler length`});
+    PrototypeLogic.MARKS.forEach(mark=>['horizontal','vertical'].forEach(field=>{
+      const element=$(`[data-sheet="${sheet}"][data-mark="${mark.id}"][data-field="${field}"]`);
+      if(!Number.isFinite(inputNumber(element)))missing.push({element,label:`Sheet ${sheet}, ${PrototypeLogic.MARK_NAMES[mark.id]}, ${field} distance`});
+    }));
+  }
+  $$('#measurements input').forEach(input=>input.removeAttribute('aria-invalid'));
+  missing.forEach(item=>item.element.setAttribute('aria-invalid','true'));
+  const error=$('#measurement-error');
+  if(!missing.length){error.hidden=true;error.textContent='';return true;}
+  const first=missing[0];
+  error.textContent=`Enter ${first.label}${missing.length>1?` and ${missing.length-1} other missing measurement${missing.length===2?'':'s'}`:''}, then calculate again.`;
+  error.hidden=false;
+  first.element.focus();
+  first.element.scrollIntoView({block:'center'});
+  return false;
+}
+function selectedEdgeScaleUnit(){return $('#edge-scale-units').value;}
+function updateEdgeScaleUnit(){
+  const imperial=selectedEdgeScaleUnit()==='imperial';
+  const lineCount=imperial?8:6;
+  $('#cutoff-help').innerHTML=imperial
+    ?'At each labeled paper edge, count the short lines that are at least partly visible. There are <strong>8 possible lines</strong>, spaced 1/16 inch apart. Do not use nearby text to infer a missing line.'
+    :'At each labeled paper edge, count the short lines that are at least partly visible. There are <strong>6 possible lines</strong>, spaced 2 mm apart. Do not use nearby text to infer a missing line.';
+  const choices=Array.from({length:lineCount+1},(_,count)=>({value:`${count}-of-${lineCount}`,label:`${count} line${count===1?'':'s'} visible`}));
+  const options=[{value:'unverified',label:'Not checked'},...choices];
+  $$('.cutoff-observation').forEach(select=>{const previous=select.value;select.innerHTML=options.map(option=>`<option value="${option.value}">${option.label}</option>`).join('');if(options.some(option=>option.value===previous))select.value=previous;});
+}
+function readObservations(){return Array.from({length:selectedSheetCount()},(_,index)=>index+1).map(sheet=>({sheet,rulerMm:inputNumber($(`[data-sheet="${sheet}"][data-field="ruler"]`)),marks:PrototypeLogic.MARKS.map(m=>distancesToDisplacement(m,inputNumber($(`[data-sheet="${sheet}"][data-mark="${m.id}"][data-field="horizontal"]`)),inputNumber($(`[data-sheet="${sheet}"][data-mark="${m.id}"][data-field="vertical"]`))))}));}
+function fillObservations(kind){
+  $('#sheet-count').value='3';updateSheetCount();
+  const stable=[{tx:1.25,ty:-.72},{tx:1.18,ty:-.66},{tx:1.30,ty:-.79}],unstable=[{tx:-.2,ty:1.8},{tx:1.9,ty:-.8},{tx:-1.4,ty:1.1}],set=kind==='stable'?stable:unstable;
+  set.forEach((s,i)=>{const sheet=i+1;$(`[data-sheet="${sheet}"][data-field="ruler"]`).value=kind==='stable'?[100,100.1,99.9][i]:[100,100.2,99.8][i];PrototypeLogic.MARKS.forEach((m,j)=>{const wiggle=kind==='stable'?((i+j)%3-1)*.06:((i+j)%3-1)*.35,d=displacementToDistances(m,s.tx+wiggle,s.ty-wiggle);$(`[data-sheet="${sheet}"][data-mark="${m.id}"][data-field="horizontal"]`).value=d.horizontal.toFixed(2);$(`[data-sheet="${sheet}"][data-mark="${m.id}"][data-field="vertical"]`).value=d.vertical.toFixed(2);});});
+  $('#measurements tbody').dataset.source='illustrative';
+  dispatch({type:'RECORD_OBSERVATIONS',observations:readObservations(),evidence:'illustrative'});
+}
+function clearMeasurements(){
+  $$('#measurements input').forEach(x=>x.value='');
+  $('#measurements tbody').dataset.source='physical';
+  state={...state,observations:[],profile:null,profileSaved:false,evidence:'none',stage:'plain-paper-passed',lastChange:`Cleared illustrative values. Enter measurements from ${selectedSheetCount()===1?'one physical sheet':'three consecutive physical sheets'}.`};
+  render();
+}
+function measureSafeAreaOverflow(pkg){
+  const problems=[];
+  const availableFirst=pkg.layout.labels.map((_,index)=>index).filter(index=>!pkg.usedPositions.includes(index));
+  pkg.items.forEach((item,i)=>{
+    const host=document.createElement('div');host.style.cssText='position:fixed;left:-10000px;top:0;visibility:hidden';document.body.appendChild(host);
+    const root=host.attachShadow({mode:'closed'}),box=document.createElement('div'),style=document.createElement('style');
+    const firstPageCount=availableFirst.length;
+    const positionIndex=i<firstPageCount?availableFirst[i]:(i-firstPageCount)%pkg.layout.labels.length;
+    const label=pkg.layout.labels[positionIndex],pxPerMm=96/25.4;
+    box.style.cssText=`width:${(label.width-2*pkg.safeInsetMm)*pxPerMm}px;height:${(label.height-2*pkg.safeInsetMm)*pxPerMm}px;overflow:auto`;
+    style.textContent=`*{box-sizing:border-box}html,body{margin:0}${pkg.css}`;box.innerHTML=item.html;root.append(style,box);
+    if(box.scrollWidth>box.clientWidth+1||box.scrollHeight>box.clientHeight+1)problems.push(`Position ${i+1} overflows its ${pkg.safeInsetMm} mm safe area.`);
+    host.remove();
+  });
+  return problems;
+}
+function download(bytes,name){const url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);}
+
+function fakeQrSvg(index,width,height){
+  const cells=21,module=6,size=cells*module,x=width-size-42,y=height-size-42;
+  const finderOrigins=[[0,0],[cells-7,0],[0,cells-7]];
+  const inFinder=(column,row)=>finderOrigins.some(([fx,fy])=>column>=fx&&column<fx+7&&row>=fy&&row<fy+7);
+  const finderOn=(column,row)=>finderOrigins.some(([fx,fy])=>{
+    const dx=column-fx,dy=row-fy;
+    return dx>=0&&dx<7&&dy>=0&&dy<7&&(dx===0||dx===6||dy===0||dy===6||(dx>=2&&dx<=4&&dy>=2&&dy<=4));
+  });
+  let modules='';
+  for(let row=0;row<cells;row++)for(let column=0;column<cells;column++){
+    const decorative=((column*11+row*7+index*13+(column*row)%5)%9)<4;
+    if(finderOn(column,row)||(!inFinder(column,row)&&decorative))modules+=`<rect x="${x+column*module}" y="${y+row*module}" width="${module}" height="${module}" fill="#111"/>`;
+  }
+  return `<g aria-label="Decorative fake QR code">${modules}<path d="M${x+9*module} ${y+9*module}h${3*module}v${3*module}h-${3*module}z" fill="white"/><text x="${x+10.5*module}" y="${y+11.1*module}" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" font-weight="700" fill="#111">DEMO</text></g>`;
+}
+
+async function renderPackageImages(pkg){
+  const width=900,height=1125;
+  return Promise.all(pkg.items.map(async (item,itemIndex)=>{
+    const decoder=document.createElement('textarea');
+    decoder.innerHTML=item.html.replace(/<br\s*\/?\s*>|<\/(?:div|p|h[1-6])>/gi,'\n').replace(/<[^>]+>/g,'');
+    const lines=decoder.value.split(/\n+/).map(x=>x.trim()).filter(Boolean).slice(0,6);
+    const xml=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const color=pkg.css.match(/(?:^|[;{])\s*color\s*:\s*(#[0-9a-f]{3,8}|[a-z]+)/i)?.[1]||'#17221d';
+    const lineHeight=66,start=height/2-((lines.length-1)*lineHeight)/2;
+    const text=lines.map((line,i)=>`<text x="50%" y="${start+i*lineHeight}" text-anchor="middle" font-family="Arial,sans-serif" font-size="${i?34:50}" font-weight="${i?500:700}" fill="${color}">${xml(line)}</text>`).join('');
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">${text}${fakeQrSvg(itemIndex,width,height)}</svg>`;
+    const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));
+    try { const image=new Image();image.src=url;await image.decode();const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;const ctx=canvas.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,width,height);ctx.drawImage(image,0,0);const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.94));return{width,height,bytes:new Uint8Array(await blob.arrayBuffer())}; } finally { URL.revokeObjectURL(url); }
+  }));
+}
+
+async function handleAction(name){
+  if(name==='select-layout') dispatch({type:'SELECT_LAYOUT'});
+  else if(name==='select-setup') dispatch({type:'SELECT_SETUP',setup:setupFromInputs()});
+  else if(name==='start-setup') {dispatch({type:'SELECT_LAYOUT'});dispatch({type:'SELECT_SETUP',setup:setupFromInputs()});if(state.setup)showStep(2);}
+  else if(name==='generate-calibration') { const edgeScaleUnit=selectedEdgeScaleUnit();dispatch({type:'GENERATE_CALIBRATION',edgeScaleUnit});if(state.calibrationPdf){lastCalibrationBytes=PrototypeLogic.calibrationPdf(edgeScaleUnit);download(lastCalibrationBytes,`PROTOTYPE-townstix-us4-calibration-${edgeScaleUnit}.pdf`);} }
+  else if(name==='printed-test') {if(!state.calibrationPdf)dispatch({type:'GENERATE_CALIBRATION',edgeScaleUnit:selectedEdgeScaleUnit()});if(state.calibrationPdf)showStep(4);}
+  else if(name==='record-plain') {dispatch({type:'RECORD_PLAIN',result:{rulerMm:null,printableFace:$('#printable-face').value,leadingEdge:$('#leading-edge').value,outputPath:$('#output-path').value,loadedFace:$('#loaded-face').value,edgeCutoff:{unit:selectedEdgeScaleUnit(),leading:$('#cutoff-leading').value,left:$('#cutoff-left').value,right:$('#cutoff-right').value,trailing:$('#cutoff-trailing').value}}});if(state.plainPaper.accepted)showStep(5);}
+  else if(name==='record-measurements') dispatch({type:'RECORD_OBSERVATIONS',observations:readObservations(),evidence:$('#measurements tbody').dataset.source==='illustrative'?'illustrative':'physical'});
+  else if(name==='record-and-derive') {if(!validateMeasurementInputs())return;dispatch({type:'RECORD_OBSERVATIONS',observations:readObservations(),evidence:$('#measurements tbody').dataset.source==='illustrative'?'illustrative':'physical'});if(state.observations.length===selectedSheetCount()){dispatch({type:'DERIVE_PROFILE'});showStep(6);}}
+  else if(name==='load-example') fillObservations('stable');
+  else if(name==='load-unstable') fillObservations('unstable');
+  else if(name==='clear-measurements') clearMeasurements();
+  else if(name==='derive-profile') dispatch({type:'DERIVE_PROFILE'});
+  else if(name==='save-profile') {dispatch({type:'SAVE_PROFILE'});if(state.profileSaved)localStorage.setItem('PROTOTYPE-diy-labels-profile',JSON.stringify(state.profile));}
+  else if(name==='save-and-continue') {dispatch({type:'SAVE_PROFILE'});if(state.profileSaved){localStorage.setItem('PROTOTYPE-diy-labels-profile',JSON.stringify(state.profile));showStep(7);}}
+  else if(name==='validate-content') {const pkg=packageFromInputs(),validation=PrototypeLogic.validatePackage(pkg);validation.problems.push(...measureSafeAreaOverflow(pkg));validation.valid=validation.problems.length===0;dispatch({type:'SET_CONTENT',package:pkg,validation});}
+  else if(name==='validate-and-generate') {const pkg=packageFromInputs(),validation=PrototypeLogic.validatePackage(pkg);validation.problems.push(...measureSafeAreaOverflow(pkg));validation.valid=validation.problems.length===0;dispatch({type:'SET_CONTENT',package:pkg,validation});if(validation.valid)await handleAction('generate-final');}
+  else if(name==='generate-final') {
+    if(!state.validation?.valid){const pkg=packageFromInputs(),validation=PrototypeLogic.validatePackage(pkg);validation.problems.push(...measureSafeAreaOverflow(pkg));validation.valid=validation.problems.length===0;dispatch({type:'SET_CONTENT',package:pkg,validation});}
+    dispatch({type:'FINAL_PDF'});
+    if(state.finalPdf){try{const images=await renderPackageImages(state.contentPackage);download(PrototypeLogic.finalPdf(state.profile,state.contentPackage,images),'PROTOTYPE-townstix-us4-final.pdf');}catch(error){state={...state,stage:'profile-derived',finalPdf:null,lastChange:`Rendering failed: ${error.message}`};render();}}
+  }
+  else if(name==='reset') dispatch({type:'RESET'});
+}
+
+document.addEventListener('click',e=>{const action=e.target.closest('[data-action]')?.dataset.action;if(action)handleAction(action);const step=e.target.closest('[data-go-step]')?.dataset.goStep;if(step)showStep(step);const tab=e.target.closest('[data-tab]')?.dataset.tab;if(tab){activeTab=tab;$$('[data-tab]').forEach(x=>x.setAttribute('aria-selected',String(x.dataset.tab===tab)));renderWalkthrough();}});
+$('#select-all-config').addEventListener('click',()=>{$$('.config-check').forEach(x=>x.checked=true);state={...state,lastChange:'All eight settings selected. Confirm them against the print window, then continue.'};render();});
+$$('.layout-value').forEach(input=>input.addEventListener('input',updateLayoutCalculator));
+$('#reset-layout').addEventListener('click',()=>{const defaults={'#layout-top':12.7,'#layout-bottom':12.7,'#layout-left':4.318,'#layout-right':4.318,'#layout-v-gap':0,'#layout-h-gap':4.064,'#layout-rows':2,'#layout-count':4};Object.entries(defaults).forEach(([id,value])=>$(id).value=value);updateLayoutCalculator();});
+$('#confirm-config').addEventListener('click',()=>{dispatch({type:'CONFIRM_CONFIG',values:$$('.config-check:checked').map(x=>x.value)});if(state.printConfiguration.length===PrototypeLogic.requiredConfig.length)showStep(3);});
+function applyDistanceToAll(field,inputId){
+  const value=$(inputId).value;
+  if(value.trim()===''||!Number.isFinite(Number(value)))return;
+  $$(`#measurements input[data-field="${field}"]`).filter(input=>Number(input.dataset.sheet)<=selectedSheetCount()).forEach(input=>input.value=value);
+  tbody.dataset.source='physical';
+  state={...state,lastChange:`Applied ${value} mm to every visible ${field} distance.`};
+  render();
+  saveDraft();
+}
+$('#apply-horizontal').addEventListener('click',()=>applyDistanceToAll('horizontal','#apply-horizontal-value'));
+$('#apply-vertical').addEventListener('click',()=>applyDistanceToAll('vertical','#apply-vertical-value'));
+$('#inspect-pdf').addEventListener('click',()=>{if(!lastCalibrationBytes){state={...state,lastChange:'Generate the calibration PDF before inspecting it.'};render();return;}const text=new TextDecoder().decode(lastCalibrationBytes.slice(0,1200));state={...state,lastChange:`PDF inspection: ${lastCalibrationBytes.length} bytes; MediaBox ${text.includes('/MediaBox [0 0 612 792]')?'is exactly 612 × 792 pt':'was not found'}.`};render();});
+$('#load-profile').addEventListener('click',()=>{const raw=localStorage.getItem('PROTOTYPE-diy-labels-profile');if(!raw){state={...state,lastChange:'No browser-local prototype profile exists.'};render();return;}dispatch({type:'LOAD_PROFILE',profile:JSON.parse(raw)});});
+$('#clear-profile').addEventListener('click',()=>{localStorage.removeItem('PROTOTYPE-diy-labels-profile');state={...state,profileSaved:false,lastChange:'Cleared the browser-local prototype profile.'};render();});
+$('#remove-print-label').addEventListener('click',()=>updatePrintLabelCount(selectedPrintLabelCount()-1));
+$('#add-print-label').addEventListener('click',()=>updatePrintLabelCount(selectedPrintLabelCount()+1));
+$$('.used-position').forEach(input=>input.addEventListener('change',()=>updatePrintLabelCount()));
+
+const tbody=$('#measurements tbody');
+tbody.addEventListener('input',e=>{if(e.target.matches('input')){tbody.dataset.source='physical';e.target.removeAttribute('aria-invalid');if(!$$('#measurements input[aria-invalid="true"]').length)$('#measurement-error').hidden=true;}});
+const markEdges={TL:'left · printed top',TR:'right · printed top',BL:'left · printed bottom',BR:'right · printed bottom'};
+for(let sheet=1;sheet<=3;sheet++) PrototypeLogic.MARKS.forEach((m,i)=>{const number=PrototypeLogic.MARK_NUMBERS[m.id],name=PrototypeLogic.MARK_NAMES[m.id],tr=document.createElement('tr');tr.dataset.sheetRow=String(sheet);tr.innerHTML=`${i===0?`<th rowspan="4">${sheet}</th><td rowspan="4"><input type="number" step="0.1" data-sheet="${sheet}" data-field="ruler" placeholder="100.0" aria-label="Sheet ${sheet} printed ruler length in millimetres"> mm</td>`:''}<td><strong>${number} · ${name}</strong><br><small>${markEdges[m.id]} edges</small></td><td><input type="number" step="0.1" data-sheet="${sheet}" data-mark="${m.id}" data-field="horizontal" placeholder="12.0" aria-label="Sheet ${sheet} point ${number} ${name} horizontal edge distance in millimetres"> mm</td><td><input type="number" step="0.1" data-sheet="${sheet}" data-mark="${m.id}" data-field="vertical" placeholder="12.0" aria-label="Sheet ${sheet} point ${number} ${name} vertical edge distance in millimetres"> mm</td>`;tbody.appendChild(tr);});
+function updateSheetCount(resetState=true){
+  const count=selectedSheetCount();
+  $$('[data-sheet-row]').forEach(row=>row.hidden=Number(row.dataset.sheetRow)>count);
+  $('#sheet-count-help').innerHTML=count===1?'<strong>One sheet is enough to calculate an initial adjustment.</strong> It cannot show whether the printer feeds each sheet consistently. Choose three when alignment matters or before trusting the saved result for repeated printing.':'<strong>Three sheets provide the higher-confidence check.</strong> They show whether the same adjustment works repeatedly and whether sheet feeding stays within the 1 mm target.';
+  if(resetState)state={...state,observations:[],profile:null,profileSaved:false,evidence:'none',lastChange:state.setup?`Using the ${count}-sheet calibration mode.`:state.lastChange};
+  render();
+}
+$('#sheet-count').addEventListener('change',updateSheetCount);
+$('#edge-scale-units').addEventListener('change',()=>{updateEdgeScaleUnit();lastCalibrationBytes=null;if(state.calibrationPdf){state={...state,calibrationPdf:null,lastChange:'Edge scale units changed. Download the updated calibration PDF before continuing.'};render();}});
+
+const DRAFT_KEY='PROTOTYPE-diy-labels-calibration-draft-v1';
+function inputStorageKey(element,index){
+  if(element.id)return `id:${element.id}`;
+  if(element.dataset.sheet)return `measurement:${element.dataset.sheet}:${element.dataset.mark||''}:${element.dataset.field}`;
+  if(element.classList.contains('config-check'))return `config:${element.value}`;
+  if(element.classList.contains('content-text'))return `content:${$$('.content-text').indexOf(element)}`;
+  if(element.classList.contains('used-position'))return `used:${element.value}`;
+  return `field:${element.tagName}:${element.type||''}:${index}`;
+}
+function saveDraft(){
+  const inputs={};
+  $$('input,select,textarea').forEach((element,index)=>{inputs[inputStorageKey(element,index)]=element.type==='checkbox'?element.checked:element.value;});
+  localStorage.setItem(DRAFT_KEY,JSON.stringify({state,currentUiStep,inputs}));
+}
+function restoreDraft(){
+  const raw=localStorage.getItem(DRAFT_KEY);
+  if(!raw)return;
+  try{
+    const draft=JSON.parse(raw);
+    if(draft.state)state=draft.state;
+    currentUiStep=Number(draft.currentUiStep)||highestAvailableStep();
+    $$('input,select,textarea').forEach((element,index)=>{
+      const key=inputStorageKey(element,index);
+      if(!draft.inputs||!(key in draft.inputs))return;
+      if(element.type==='checkbox')element.checked=Boolean(draft.inputs[key]);else element.value=draft.inputs[key];
+    });
+  }catch(error){localStorage.removeItem(DRAFT_KEY);}
+}
+document.addEventListener('input',saveDraft);
+document.addEventListener('change',saveDraft);
+$('#loaded-face').addEventListener('change',renderLoadingInstructions);
+$('#clear-saved-inputs').addEventListener('click',()=>{localStorage.removeItem(DRAFT_KEY);localStorage.removeItem('PROTOTYPE-diy-labels-profile');location.reload();});
+
+restoreDraft();
+$('#content-css').value=labelCssFromInput();
+updateSheetCount(false);
+updateEdgeScaleUnit();
+updateLayoutCalculator();
+updatePrintLabelCount();
+render();
+showStep(Math.min(currentUiStep,highestAvailableStep()));
+saveDraft();
+</script>
+</body>
+</html>
