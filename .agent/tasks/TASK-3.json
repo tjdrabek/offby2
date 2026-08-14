@@ -1,0 +1,52 @@
+{
+  "id": "TASK-3",
+  "title": "Manage minimal label projects",
+  "category": "functional",
+  "description": "Provide the visible minimal `LabelProject` lifecycle: create with a name, list, open, rename, and delete only after explicit confirmation.",
+  "acceptanceCriteria": [
+    "A user can create a project with a stable identity and non-empty name",
+    "Created projects appear in a visible project list and can be opened",
+    "A user can rename a project without changing its identity",
+    "Deletion requires an explicit confirmation and cancellation preserves the project",
+    "Confirmed deletion removes the project from the list without showing false success on failure",
+    "Verify in browser using Playwright"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define minimal project actions",
+      "details": "Introduce typed create, open, rename, list, and delete action boundaries using `LabelProject` identity and name; keep storage behind an injected repository contract.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Build create and list controls",
+      "details": "Add a labeled project-name input, native create button, empty state, and project list whose entries expose stable open actions.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Add rename behavior",
+      "details": "Provide a labeled rename control for the open or selected project, validate a non-empty name, and preserve the existing project identity.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Add explicit deletion confirmation",
+      "details": "Use an accessible confirmation dialog with distinct cancel and destructive confirm actions; keep focus behavior predictable and update the list only after success.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Verify the visible lifecycle",
+      "details": "Exercise create, list, open, rename, cancel-delete, and confirm-delete through public UI controls and assert names and state transitions.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-2"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Project names are private local user data and must not be transmitted or logged unnecessarily.",
+    "Do not conflate the minimal project lifecycle with later content authoring."
+  ]
+}

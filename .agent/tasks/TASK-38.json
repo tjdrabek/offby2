@@ -1,0 +1,45 @@
+{
+  "id": "TASK-38",
+  "title": "Persist validated local image assets",
+  "category": "integration",
+  "description": "Validate imported image files, copy supported bytes into IndexedDB as durable asset records, and resolve content references offline without external URLs.",
+  "acceptanceCriteria": [
+    "Supported image imports are checked for declared type, decoded type, dimensions, byte limit, and integrity before persistence",
+    "Accepted bytes are copied into an AssetRecord with durable identity, media type, dimensions, integrity data, and timestamps",
+    "Image nodes persist only durable asset identity and never an external or object URL",
+    "An imported asset resolves after reload while offline",
+    "Missing, mismatched, executable, malformed, or oversized assets return named diagnostics without partial persistence"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define image asset validation",
+      "details": "Select the supported raster formats and conservative size/dimension limits, then validate file signature, decoded metadata, and integrity before storage.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Extend the asset repository",
+      "details": "Reuse the existing IndexedDB transaction layer to atomically store immutable copied bytes and metadata under an application-owned durable identifier.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Resolve durable references",
+      "details": "Resolve image node asset IDs to validated local bytes for scene generation and return element-specific missing/integrity diagnostics without network fallback.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify offline persistence",
+      "details": "Import a small fixture, reload in an offline browser context, verify identical bytes resolve, and cover malformed, missing, oversized, and unsupported fixtures.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-35", "TASK-4"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Timebox to one supported image import path plus refusal fixtures; bounded downsampling or additional formats require separate work.",
+    "Never decode SVG or another executable-capable format as a trusted durable image in this slice."
+  ]
+}

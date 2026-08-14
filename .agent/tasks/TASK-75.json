@@ -1,0 +1,46 @@
+{
+  "id": "TASK-75",
+  "title": "Audit compatibility in print preparations",
+  "category": "data-model",
+  "description": "Extend immutable PrintPreparation records with the exact compatibility result, confirmations, setup attestation, configuration, optional profile, and uncalibrated status used at generation.",
+  "acceptanceCriteria": [
+    "A preparation snapshots the exact CompatibilityRequest/Result identity shown immediately before generation",
+    "The record references exact setup attestation, loading/configuration revisions, consumed confirmations, and optional profile identity",
+    "Uncalibrated preparations explicitly record zero correction and uncalibrated status",
+    "Later setup/profile edits cannot change historical preparation audit data",
+    "Keyboard browser tests verify explanation, confirmation, refusal, generation, and detail inspection"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Extend preparation schema",
+      "details": "Add versioned immutable compatibility audit fields to TASK-32 preparation inputs, including exact identities, ordered reasons, confirmations, and mode.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Consume current confirmations",
+      "details": "Require exact setup attestation and final reconfirmation records, then atomically snapshot them with the evaluated result at generation.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Render audit details",
+      "details": "Show persistent compatible/incompatible/uncalibrated text and reason-by-reason actions using semantic headings and lists.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify audit equivalence",
+      "details": "Assert displayed and saved results match, stale/missing confirmations refuse generation, historical records remain immutable, and zero-correction artifact checks pass.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-32", "TASK-66", "TASK-70", "TASK-74"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; extend the existing immutable preparation audit and focused browser path.",
+    "The record audits software decisions and operator statements; it does not prove physical printing or placement.",
+    "Store normalized serializable values, not UI strings as decision state."
+  ]
+}

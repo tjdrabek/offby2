@@ -1,0 +1,45 @@
+{
+  "id": "TASK-36",
+  "title": "Lay out constrained flow containers",
+  "category": "functional",
+  "description": "Add pure row, column, and stack layout contracts for millimetre, percentage, flexible, and intrinsic sizing with deterministic gaps, alignment, and typography constraints inside physical bounds.",
+  "acceptanceCriteria": [
+    "Row, column, and stack resolve physical, percentage, flexible, and intrinsic child sizing deterministically",
+    "Gap and alignment values are applied in millimetres within the declared physical content region",
+    "Constrained typography uses bundled metrics and never browser viewport measurements",
+    "Impossible sizing and overflow return structured node-specific diagnostics",
+    "Changing preview zoom or viewport leaves normalized layout coordinates unchanged"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define sizing contracts",
+      "details": "Add serializable sizing, gap, alignment, and typography constraint values to the rich node contracts with finite bounded validation.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Implement pure axis resolution",
+      "details": "Extend the existing scene layout seam to resolve fixed and percentage space first, intrinsic measurements next, and remaining flexible space in a documented stable order.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Handle bounds and overflow",
+      "details": "Constrain row, column, and stack results to the physical parent region and emit diagnostics naming the container and offending child when constraints cannot be satisfied.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify mixed sizing",
+      "details": "Add focused contract cases for each sizing mode, mixed modes, alignment, gaps, typography, overflow, and zoom-independent normalized results.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-35"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Timebox this task to one pure layout increment and its focused tests; defer editor controls and full workflow coverage.",
+    "Pure layout modules must not import React, DOM, storage, PDF, or QR APIs."
+  ]
+}

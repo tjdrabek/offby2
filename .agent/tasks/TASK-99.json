@@ -1,0 +1,44 @@
+{
+  "id": "TASK-99",
+  "title": "Record physical observation provenance",
+  "category": "data-model",
+  "description": "Record operator-entered physical observations with complete provenance, sample identity, exact assumptions, units, raw values, and diagnostics while explicitly retaining an unvalidated status.",
+  "acceptanceCriteria": [
+    "Physical-provenance records require operator entry source, stable sample identity, exact setup/loading/configuration/layout assumptions, units, and raw values",
+    "Validation rejects missing provenance, duplicate sample identity, non-finite values, unsupported units, and assumption mismatches",
+    "Stored diagnostics distinguish entry validity from evidence sufficiency or physical suitability",
+    "Saving an observation never marks it validated and never creates or updates a usable profile"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define physical provenance",
+      "details": "Add a versioned physical provenance variant with required source, sample, assumption, unit, raw-value, diagnostic, and unvalidated-status fields.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Validate observation input",
+      "details": "Normalize allowed units and return field-associated reasons for incomplete, duplicate, malformed, non-finite, or mismatched input.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Persist unvalidated records",
+      "details": "Store accepted records locally without deriving correction, confidence, suitability, or profile state.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test provenance invariants",
+      "details": "Cover complete records, every required field, sample uniqueness, layout binding, round trip, and absence of profile side effects.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-95", "TASK-97", "TASK-98"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; add the record contract, validator, and repository round-trip only.",
+    "Operator-entered physical provenance records what was reported; it does not prove validity or suitability."
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "id": "TASK-43",
+  "title": "Verify rich-content parity and recovery",
+  "category": "functional",
+  "description": "Verify nested rich content, mixed sizing, overflow, missing and offline assets, QR geometry, overlays, reload recovery, and normalized scene parity across preview and PDF adapters.",
+  "acceptanceCriteria": [
+    "Contract fixtures cover nested row, column, stack, mixed sizing, overflow, and bounded or escaped overlays",
+    "Asset fixtures cover valid offline recovery, integrity mismatch, removal, unsupported type, and no network fallback",
+    "QR fixtures are deterministic and independently decode to their supplied payloads",
+    "A mixed label survives reload with an identical normalized content tree and printable scene",
+    "Preview and PDF adapter inputs normalize to the same scene geometry at multiple zooms and viewports",
+    "Focused Playwright coverage completes keyboard authoring through PDF generation",
+    "Build, lint, unit/integration, artifact, and focused browser checks pass without physical claims"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Assemble canonical rich fixtures",
+      "details": "Create one mixed nested valid fixture and focused overflow, escaped-overlay, missing-asset, offline-asset, and invalid-QR fixtures with expected stable diagnostics.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Compare normalized adapter inputs",
+      "details": "Resolve each valid fixture once, feed the same scene to preview and PDF adapters, and compare node identities, geometry, resources, and diagnostics rather than screenshots alone.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Verify persistence and offline recovery",
+      "details": "Save the mixed project, reload offline, assert equivalent content and assets, then remove one asset and assert element-specific refusal with no external request.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Run focused production checks",
+      "details": "Run build, lint, focused contracts/artifact tests, and Playwright keyboard flow; verify visible language makes no physical scale, placement, containment, or printing claim.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-42"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Keep execution under ten minutes by using a compact canonical fixture matrix and focused test filters.",
+    "Digital parity and QR decoding do not prove physical print quality, alignment, or scan performance."
+  ]
+}

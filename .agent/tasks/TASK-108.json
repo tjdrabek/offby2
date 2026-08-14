@@ -1,0 +1,45 @@
+{
+  "id": "TASK-108",
+  "title": "Refuse unsafe profile creation and application",
+  "category": "functional",
+  "description": "Centralize structured refusal for profile creation and calibrated generation when physical evidence is insufficient, assumptions are incompatible, or loading and print-configuration confirmations are missing.",
+  "acceptanceCriteria": [
+    "Current unresolved physical prerequisites always prevent profile creation and calibrated generation",
+    "Insufficient evidence, incompatible exact assumptions, stale fingerprints, missing loading confirmation, and missing configuration confirmation have distinct stable reasons",
+    "Refusal preserves draft, profile, preparation, and artifact state and identifies corrective action",
+    "UI exposes reasons and restores focus without implying that software confirmation proves physical suitability"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define refusal catalog",
+      "details": "Add stable reason codes, affected assumptions, evidence-safe messages, and corrective actions for every PRD 26 refusal class.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Compose gate checks",
+      "details": "Evaluate physical gate, policy qualification, exact compatibility, loading confirmation, and configuration confirmation before any write or render effect.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Present accessible refusal",
+      "details": "Disable or refuse actions with semantic text, linked details, announced status, and focus restoration.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test no-effect refusals",
+      "details": "Cover each reason independently plus combined failures and assert no profile, preparation, or calibrated artifact is created.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-75", "TASK-102", "TASK-105", "TASK-107"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; centralize reasons and run focused no-effect tests only.",
+    "BLOCKED: only refusal behavior is currently implementable; successful physical paths cannot be claimed.",
+    "Operator confirmation records assumptions and does not verify printer behavior."
+  ]
+}

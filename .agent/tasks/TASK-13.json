@@ -1,0 +1,59 @@
+{
+  "id": "TASK-13",
+  "title": "Refuse invalid or unsupported sheet geometry",
+  "category": "functional",
+  "description": "Validate normalized uniform-grid geometry and return structured, field-associated refusals for every invalid or unsupported condition without coercion, clamping, or hidden adjustment.",
+  "acceptanceCriteria": [
+    "Negative and non-finite values are refused with named fields",
+    "Contradictory extents, overlapping labels, and labels outside the sheet are refused",
+    "Corner radius greater than half the smaller label dimension is refused",
+    "Non-uniform, non-rectangular, roll, continuous, duplex, circular, oval, arbitrary die-cut, or otherwise unsupported media are refused",
+    "No invalid input is saved through coercion, clamping, hidden rounding, or automatic correction",
+    "Refusals contain stable codes, affected fields, and actionable messages",
+    "Verify in browser using Playwright"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define refusal taxonomy",
+      "details": "Create stable refusal codes and payloads for numeric, extent, overlap, bounds, radius, uniformity, and unsupported-media failures, including affected field paths.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Validate numeric and radius constraints",
+      "details": "Reject negative or non-finite dimensions and enforce radius less than or equal to half the smaller label dimension while preserving unknown radius as valid disclosure.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Validate grid extents",
+      "details": "Compute each label boundary from normalized values and refuse contradictory totals, overlap, reversed extents, or any boundary outside sheet coordinates.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Refuse unsupported media",
+      "details": "Keep the validator's supported-media discriminator closed to rectangular sheets with uniform axis-aligned square or rounded-rectangle grids and return explicit reasons for other shapes or feed models.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Associate errors and block save",
+      "details": "Render refusal summaries and field-level associations, disable or reject save while refusals exist, and retain the user's source text for correction.",
+      "pass": false
+    },
+    {
+      "step": 6,
+      "description": "Verify refusal coverage",
+      "details": "Add contract fixtures for every refusal class and a browser scenario proving invalid geometry remains unsaved and visibly actionable.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-10", "TASK-11", "TASK-12"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Do not use floating-point tolerance to excuse visibly contradictory geometry; document any comparison epsilon narrowly.",
+    "Refusal reasons are shared domain values for later compatibility and UI consistency."
+  ]
+}

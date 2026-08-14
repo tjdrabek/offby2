@@ -1,0 +1,59 @@
+{
+  "id": "TASK-101",
+  "title": "Persist and verify calibration drafts",
+  "category": "functional",
+  "description": "Register calibration drafts and observations in local persistence, workspace portability, migration, reference-aware deletion, and focused browser/artifact tests for the complete evidence-safe workflow.",
+  "acceptanceCriteria": [
+    "Drafts and observations autosave, restore, migrate, export, import, and delete through established registries",
+    "Portability preserves exact references, artifacts, diagnostics, and demo versus physical provenance",
+    "Import and deletion failures are atomic and leave last-known-good state intact",
+    "Keyboard browser tests cover valid transitions, refusals, restoration invalidation, generation, provenance, completion, and focus/status behavior",
+    "Artifact tests parse calibration geometry while making no physical placement claim"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Register durable types",
+      "details": "Add calibration drafts and observations to repository, migration, portability, reference, and deletion registries with supported schema versions.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Wire resumable workflow UI",
+      "details": "Expose earlier assumptions, semantic progress, associated errors, announced refusals/status, persistent provenance labels, and focus-safe restoration.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Verify portability and failure",
+      "details": "Round-trip small fixtures and inject import, persistence, and deletion failures to verify atomic last-known-good behavior.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Run focused workflow tests",
+      "details": "Exercise the keyboard journey and parsed artifact checks for valid, refused, stale, demo, physical-provenance, and completion states.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Run bounded quality checks",
+      "details": "Run focused unit and Playwright filters plus type, lint, and build checks relevant to calibration changes.",
+      "pass": false
+    }
+  ],
+  "dependencies": [
+    "TASK-1",
+    "TASK-91",
+    "TASK-94",
+    "TASK-96",
+    "TASK-98",
+    "TASK-99",
+    "TASK-100"
+  ],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; use intentionally small fixtures and focused browser filters.",
+    "This verifies software state and artifact structure only; PRD 26 remains blocked by unavailable physical evidence."
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "id": "TASK-31",
+  "title": "Return structured PDF generation diagnostics",
+  "category": "functional",
+  "description": "Return stable structured diagnostics for missing resources, unsupported scene nodes, overflow, and renderer failures, and make unsuccessful generation incapable of creating a downloadable success or audit record.",
+  "acceptanceCriteria": [
+    "Diagnostics use stable codes, severity, affected page/position/node/resource identifiers, and actionable messages",
+    "Missing fonts and assets produce named resource diagnostics",
+    "Unsupported scene nodes and content overflow produce distinct diagnostics",
+    "Unexpected renderer failures are contained and reported without exposing private content or stack traces in user messages",
+    "Any error-severity diagnostic or renderer failure returns no successful PDF bytes, download action, or print preparation",
+    "The prior durable project draft remains unchanged after failure",
+    "Verify in browser using Playwright"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define PDF diagnostic values",
+      "details": "Create application-owned diagnostic codes and payloads for resource missing/invalid, unsupported node, overflow, invalid geometry, renderer failure, and cancellation.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Validate before rendering",
+      "details": "Walk canonical renderer inputs, collect stable ordered diagnostics, and refuse invocation when required resources, node support, bounds, or resource limits fail.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Contain renderer exceptions",
+      "details": "Catch adapter/library failures at the boundary, map them to a safe diagnostic with internal logging that excludes private label text and binary bytes, and discard partial output.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Gate success effects",
+      "details": "Model generation as success or failure so download URL creation and print-preparation persistence are reachable only from a complete successful result.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Render actionable diagnostics",
+      "details": "Show an accessible diagnostic summary and detailed list with corrective actions, while preserving editor state and providing retry after correction.",
+      "pass": false
+    },
+    {
+      "step": 6,
+      "description": "Verify each failure class",
+      "details": "Exercise missing font, missing asset, unsupported node, overflow, and thrown renderer fixtures, asserting named diagnostics and absence of bytes, download controls, and success records.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-27", "TASK-29"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Warnings may accompany success only when the contract explicitly classifies them as non-fatal.",
+    "Revoke any temporary object URL when superseded or on cleanup."
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "TASK-80",
+  "title": "Require fresh sheet reuse confirmation",
+  "category": "functional",
+  "description": "Require a new operator inspection confirmation, exact loading-procedure revision, and leading-edge confirmation for every partially used sheet preparation attempt.",
+  "acceptanceCriteria": [
+    "Reuse preparation is blocked until inspection, loading revision, and leading-edge confirmations are explicitly supplied",
+    "Confirmation defaults false and binds the instance state/version plus unique preparation attempt",
+    "Changing used positions, loading revision, or leading edge invalidates the pending confirmation",
+    "A confirmation consumed by one preparation cannot authorize another attempt"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define reuse confirmation",
+      "details": "Add a serializable SheetReuseConfirmation with attempt ID, instance/version, used-position snapshot identity, loading revision, leading edge, disclosure, and timestamp.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Validate freshness",
+      "details": "Return structured stale/missing reasons whenever the current instance or selected loading assumptions differ from the confirmation.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Build confirmation flow",
+      "details": "Prompt for physical inspection and exact orientation through accessible unchecked controls with clear operator responsibility and focus restoration.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test per-attempt gating",
+      "details": "Cover missing confirmation, success, cancellation, state change, changed loading/edge, consumed confirmation, and keyboard-only operation.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-61", "TASK-66", "TASK-77"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; add one per-attempt confirmation value and preparation gate.",
+    "Inspection is an operator assertion, not browser observation or a safety determination.",
+    "Do not persist a reusable boolean such as sheetIsSafe."
+  ]
+}

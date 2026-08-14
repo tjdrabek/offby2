@@ -1,0 +1,45 @@
+{
+  "id": "TASK-106",
+  "title": "Limit correction to whole-sheet translation",
+  "category": "data-model",
+  "description": "Constrain the initial correction model to finite whole-sheet horizontal and vertical translations in millimetres, with actual derived values still unavailable behind the unresolved physical-policy gate.",
+  "acceptanceCriteria": [
+    "The correction value contains only translationXMillimetres and translationYMillimetres",
+    "Values must be finite millimetre quantities and serialize without implicit unit conversion",
+    "Scale, rotation, skew, warping, and per-label parameters are unrepresentable",
+    "No nonzero production correction can be constructed from demo, synthetic, prototype, or unresolved-policy input"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define translation value",
+      "details": "Add a versioned two-axis millimetre value with finite-number validation and explicit zero representation.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Exclude unsupported freedoms",
+      "details": "Keep scale, rotation, skew, warping, per-label offsets, and implicit matrices outside all correction and profile schemas.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Gate nonzero construction",
+      "details": "Require a successful approved derivation result before constructing nonzero production translation; current calls return TASK-102 refusal.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test model boundaries",
+      "details": "Cover finite x/y serialization, invalid numbers/units, unsupported keys, zero software fixtures, and blocked nonzero construction.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-102", "TASK-105"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; define the narrow value object and gate tests only.",
+    "BLOCKED: physically derived x/y values do not exist and must not be fabricated.",
+    "Zero test fixtures verify software behavior only and are not calibrated profiles."
+  ]
+}

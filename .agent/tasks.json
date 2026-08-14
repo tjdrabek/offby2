@@ -1,1 +1,877 @@
-[]
+[
+  {
+    "id": "TASK-1",
+    "title": "Verify project prerequisites and access",
+    "category": "setup",
+    "specFilePath": ".agent/tasks/TASK-1.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-2",
+    "title": "Expose stable application destinations",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-2.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-3",
+    "title": "Manage minimal label projects",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-3.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-4",
+    "title": "Persist versioned project records in IndexedDB",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-4.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-5",
+    "title": "Offer actionable project recovery",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-5.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-6",
+    "title": "Enable PWA installation and offline startup",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-6.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-7",
+    "title": "Activate updates through controlled reload",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-7.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-8",
+    "title": "Make shell workflows keyboard operable",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-8.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-9",
+    "title": "Verify the browser project lifecycle",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-9.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-10",
+    "title": "Capture complete uniform-grid geometry",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-10.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-11",
+    "title": "Parse measurements into finite millimetres",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-11.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-12",
+    "title": "Derive one uniquely solvable dimension",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-12.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-13",
+    "title": "Refuse invalid or unsupported sheet geometry",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-13.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-14",
+    "title": "Save immutable sheet-layout revisions",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-14.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-15",
+    "title": "Fingerprint canonical sheet geometry",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-15.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-16",
+    "title": "Separate identity, provenance, and verification",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-16.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-17",
+    "title": "Preview validated sheet-layout geometry",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-17.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-18",
+    "title": "Verify geometry contracts and revision workflow",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-18.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-19",
+    "title": "Reference an exact sheet-layout revision",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-19.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-20",
+    "title": "Model serializable constrained text templates",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-20.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-21",
+    "title": "Assign a text template to a sheet position",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-21.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-22",
+    "title": "Resolve text assignments into a printable scene",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-22.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-23",
+    "title": "Render label and sheet previews from one scene",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-23.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-24",
+    "title": "Keep text layout physical and zoom independent",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-24.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-25",
+    "title": "Autosave edits with session undo and redo",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-25.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-26",
+    "title": "Verify text authoring and shared-scene previews",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-26.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-27",
+    "title": "Define the isolated PDF renderer boundary",
+    "category": "integration",
+    "specFilePath": ".agent/tasks/TASK-27.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-28",
+    "title": "Create exact PDF page geometry",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-28.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-29",
+    "title": "Embed deterministic bundled font glyphs",
+    "category": "integration",
+    "specFilePath": ".agent/tasks/TASK-29.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-30",
+    "title": "Produce byte-identical PDF output and hashes",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-30.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-31",
+    "title": "Return structured PDF generation diagnostics",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-31.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-32",
+    "title": "Save immutable print preparations",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-32.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-33",
+    "title": "Separate PDF access from physical printing",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-33.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-34",
+    "title": "Verify deterministic PDF artifacts and workflow",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-34.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-35",
+    "title": "Define the rich content node schema",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-35.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-36",
+    "title": "Lay out constrained flow containers",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-36.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-37",
+    "title": "Bound free positioning to overlays",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-37.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-38",
+    "title": "Persist validated local image assets",
+    "category": "integration",
+    "specFilePath": ".agent/tasks/TASK-38.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-39",
+    "title": "Generate deterministic QR geometry",
+    "category": "integration",
+    "specFilePath": ".agent/tasks/TASK-39.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-40",
+    "title": "Unify bundled font behavior",
+    "category": "integration",
+    "specFilePath": ".agent/tasks/TASK-40.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-41",
+    "title": "Reject executable and raw-style content",
+    "category": "security",
+    "specFilePath": ".agent/tasks/TASK-41.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-42",
+    "title": "Integrate every rich component workflow",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-42.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-43",
+    "title": "Verify rich-content parity and recovery",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-43.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-44",
+    "title": "Define typed template inputs",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-44.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-45",
+    "title": "Store template assignments by reference",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-45.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-46",
+    "title": "Support independent position content",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-46.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-47",
+    "title": "Define one stable sheet position order",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-47.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-48",
+    "title": "Select sparse available positions",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-48.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-49",
+    "title": "Build deterministic pagination plans",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-49.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-50",
+    "title": "Re-resolve instances after template edits",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-50.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-51",
+    "title": "Preserve template relationships and generation state",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-51.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-52",
+    "title": "Compute requested rounded safe areas",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-52.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-53",
+    "title": "Apply additive content insets",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-53.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-54",
+    "title": "Validate scene elements against rounded content regions",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-54.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-55",
+    "title": "Display safe-region overlays and violations",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-55.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-56",
+    "title": "Handle unknown corner radius without safety claims",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-56.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-57",
+    "title": "Refuse PDF preparation for unresolved violations",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-57.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-58",
+    "title": "Confirm a one-preparation violation override",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-58.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-59",
+    "title": "Audit safe-region refusals and overrides",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-59.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-60",
+    "title": "Create printing setups with explicit unknowns",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-60.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-61",
+    "title": "Revision loading procedures",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-61.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-62",
+    "title": "Revision print configurations",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-62.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-63",
+    "title": "Refine setup metadata without contradiction",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-63.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-64",
+    "title": "Refuse silent contradictory setup changes",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-64.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-65",
+    "title": "Capture explicit setup attestation",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-65.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-66",
+    "title": "Reconfirm setup before preparation",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-66.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-67",
+    "title": "Verify printing responsibility boundaries",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-67.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-68",
+    "title": "Bind profiles to exact assumptions",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-68.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-69",
+    "title": "Centralize pure profile compatibility",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-69.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-70",
+    "title": "Use compatibility consistently across workflows",
+    "category": "integration",
+    "specFilePath": ".agent/tasks/TASK-70.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-71",
+    "title": "Reject exact-assumption profile mismatches",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-71.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-72",
+    "title": "Treat unknown compatibility fields explicitly",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-72.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-73",
+    "title": "Evaluate refined setup metadata honestly",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-73.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-74",
+    "title": "Generate zero-correction uncalibrated output",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-74.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-75",
+    "title": "Audit compatibility in print preparations",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-75.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-76",
+    "title": "Manage physical sheet instance records",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-76.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-77",
+    "title": "Bind instances to exact layouts and positions",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-77.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-78",
+    "title": "Refuse incompatible sheet instance selection",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-78.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-79",
+    "title": "Omit used positions deterministically",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-79.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-80",
+    "title": "Require fresh sheet reuse confirmation",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-80.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-81",
+    "title": "Persistently disclose refeeding limitations",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-81.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-82",
+    "title": "Audit sheet reuse in preparations",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-82.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-83",
+    "title": "Verify sheet-instance claim boundaries",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-83.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-84",
+    "title": "Define the complete versioned workspace bundle",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-84.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-85",
+    "title": "Export a complete workspace offline",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-85.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-86",
+    "title": "Validate imports before durable mutation",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-86.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-87",
+    "title": "Report import migrations and incompatibilities",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-87.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-88",
+    "title": "Commit workspace imports transactionally",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-88.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-89",
+    "title": "Reproduce a workspace in a clean browser",
+    "category": "integration",
+    "specFilePath": ".agent/tasks/TASK-89.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-90",
+    "title": "Delete dependent records or all local data",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-90.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-91",
+    "title": "Verify workspace portability and recovery",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-91.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-92",
+    "title": "Define calibration draft states",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-92.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-93",
+    "title": "Validate calibration draft transitions",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-93.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-94",
+    "title": "Revalidate restored calibration drafts",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-94.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-95",
+    "title": "Bind one layout revision through calibration",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-95.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-96",
+    "title": "Generate the calibration PDF structure",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-96.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-97",
+    "title": "Define inspection and loading fields",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-97.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-98",
+    "title": "Separate demo calibration observations",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-98.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-99",
+    "title": "Record physical observation provenance",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-99.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-100",
+    "title": "Complete drafts without deriving profiles",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-100.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-101",
+    "title": "Persist and verify calibration drafts",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-101.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-102",
+    "title": "Gate profile derivation on physical prerequisites",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-102.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-103",
+    "title": "Qualify observations using resolved policy",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-103.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-104",
+    "title": "Keep one-sheet evidence preliminary",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-104.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-105",
+    "title": "Define auditable translation profile records",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-105.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-106",
+    "title": "Limit correction to whole-sheet translation",
+    "category": "data-model",
+    "specFilePath": ".agent/tasks/TASK-106.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-107",
+    "title": "Apply one translation sign convention",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-107.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-108",
+    "title": "Refuse unsafe profile creation and application",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-108.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-109",
+    "title": "Exclude non-translation correction models",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-109.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-110",
+    "title": "Provide keyboard paths for every primary action",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-110.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-111",
+    "title": "Establish semantic structure and focus order",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-111.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-112",
+    "title": "Restore focus after workflow changes",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-112.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-113",
+    "title": "Announce errors and dynamic workflow status",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-113.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-114",
+    "title": "Make warnings independent of color",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-114.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-115",
+    "title": "Expose measurement semantics programmatically",
+    "category": "ui-ux",
+    "specFilePath": ".agent/tasks/TASK-115.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-116",
+    "title": "Run automated accessibility checks",
+    "category": "integration",
+    "specFilePath": ".agent/tasks/TASK-116.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-117",
+    "title": "Verify keyboard, screen-reader, and zoom journeys",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-117.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-118",
+    "title": "Support the core workflow offline",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-118.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-119",
+    "title": "Activate updates only after durable consent",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-119.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-120",
+    "title": "Recover from interrupted storage writes",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-120.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-121",
+    "title": "Recover from missing assets and PDF failures",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-121.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-122",
+    "title": "Recover transactionally from failed imports",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-122.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-123",
+    "title": "Verify complete fresh-browser recovery",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-123.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-124",
+    "title": "Run the production recovery acceptance journey",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-124.json",
+    "passes": false
+  },
+  {
+    "id": "TASK-125",
+    "title": "Document release evidence and run quality gates",
+    "category": "functional",
+    "specFilePath": ".agent/tasks/TASK-125.json",
+    "passes": false
+  }
+]

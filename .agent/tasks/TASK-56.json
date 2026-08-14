@@ -1,0 +1,45 @@
+{
+  "id": "TASK-56",
+  "title": "Handle unknown corner radius without safety claims",
+  "category": "functional",
+  "description": "Permit editing and output when corner radius is unknown while returning a persistent visible diagnostic and explicitly withholding any corner-containment conclusion.",
+  "acceptanceCriteria": [
+    "Unknown radius remains distinct from zero, known, and estimated radius in domain and UI state",
+    "Editing, preview, and PDF preparation may continue when no other blocking violation exists",
+    "A visible diagnostic states that corner containment cannot be concluded from unknown geometry",
+    "No validator, preview mask, success message, or preparation labels unknown corners as safe, contained, verified, or calibrated",
+    "The unknown-radius assumption and diagnostic are retained in the print preparation"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Propagate unknown confidence",
+      "details": "Carry the TASK-52 unknown-radius result through content-region validation, diagnostics, and preparation input without substituting zero or an estimated value.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Classify the diagnostic",
+      "details": "Add a non-blocking but persistent corner-uncertainty diagnostic that is separate from known geometric violations and uses evidence-safe wording.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Expose uncertainty consistently",
+      "details": "Show the diagnostic beside geometry controls, in label/sheet diagnostics, during PDF preparation, and in preparation inspection.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify allowed output and withheld conclusion",
+      "details": "Generate from an unknown-radius fixture, assert output is available absent other violations, and inspect persisted assumptions/copy for prohibited safety claims.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-52", "TASK-55", "TASK-32"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Timebox to propagating one confidence state and one diagnostic through existing seams.",
+    "Allowing output is not an override and does not establish corner safety."
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "TASK-46",
+  "title": "Support independent position content",
+  "category": "data-model",
+  "description": "Allow a sheet position assignment to reference independent serializable rich content instead of a shared template while preserving one explicit assignment union.",
+  "acceptanceCriteria": [
+    "PositionAssignment discriminates template-instance and independent-content variants",
+    "Independent assignments reference or contain only versioned serializable application-owned content",
+    "Independent content requires no template identity or template data map",
+    "Template and independent assignments can coexist in one project without ambiguous resolution",
+    "Malformed mixed variants are refused with assignment-specific diagnostics"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Extend the assignment union",
+      "details": "Add an independent-content variant to PositionAssignment using the existing rich content identity/schema and mutually exclusive discriminants.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Resolve independent content",
+      "details": "Route the independent variant directly through rich-content validation and shared scene resolution without inventing a template or data binding.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Preserve mixed projects",
+      "details": "Update project parsing and persistence so both assignment variants retain stable identities and reject records containing fields from both variants.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify mixed assignment fixtures",
+      "details": "Round-trip a project containing one template instance and one independent assignment and assert deterministic resolution and malformed-union diagnostics.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-45"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Keep this task under ten minutes by reusing TASK-35 rich content validation and adding only the assignment variant.",
+    "Do not flatten template instances to implement coexistence."
+  ]
+}

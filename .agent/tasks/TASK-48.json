@@ -1,0 +1,46 @@
+{
+  "id": "TASK-48",
+  "title": "Select sparse available positions",
+  "category": "ui-ux",
+  "description": "Let users select any currently available positions and skip unavailable ones through a semantic keyboard-operable grid or list without implicit reassignment or reordering.",
+  "acceptanceCriteria": [
+    "Available positions can be selected individually in canonical TASK-47 order",
+    "Unavailable positions are identified by stable label and reason and cannot be selected",
+    "Sparse selection preserves exact position identities and does not compact assignments",
+    "Selection supports keyboard operation, visible focus, associated status, and non-coordinate labels",
+    "Reload preserves the same selected position identities and order",
+    "Verify in browser using Playwright"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Model explicit sparse selection",
+      "details": "Store selected stable position identities separately from assignment content and validate each identity against canonical positions and current availability.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Build semantic selection controls",
+      "details": "Reuse the sheet preview/list seam to expose checkbox-like position controls with row/column names, availability reason, visible focus, and announced count/status.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Prevent implicit compaction",
+      "details": "Ensure toggling or encountering an unavailable position never moves another assignment; report stale selections instead of silently substituting positions.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify sparse browser behavior",
+      "details": "Select non-adjacent positions by keyboard, attempt an unavailable position, reload, and assert identities, labels, order, and assignments remain unchanged.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-47"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Keep the ten-minute UI increment to existing semantic controls and one sparse-selection flow.",
+    "Unavailable means unavailable in the current software plan; persistent physical sheet usage is deferred to PRD 23."
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "id": "TASK-12",
+  "title": "Derive one uniquely solvable dimension",
+  "category": "functional",
+  "description": "Derive exactly one missing dimensional field when the relevant uniform-grid axis equation has one valid solution, and disclose the field, equation, and normalized value.",
+  "acceptanceCriteria": [
+    "Derivation runs only when exactly one eligible dimensional field is missing",
+    "The horizontal or vertical grid equation yields exactly one finite valid solution",
+    "The result identifies the derived field, substituted equation, and normalized millimetre value",
+    "Zero missing values, multiple missing values, contradictory values, or invalid solutions are not presented as successful derivations",
+    "Derived values remain distinguishable from user-entered source values in saved disclosures",
+    "Verify in browser using Playwright"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define derivation disclosures",
+      "details": "Create a pure discriminated result for no derivation, successful single-field derivation, and refusal, including field ID, axis, equation text, operands, and normalized value.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Implement axis equations",
+      "details": "Solve the documented sheet extent equation for each eligible width or height, margin, label-size, or gap field while treating row and column counts as provided integers.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Enforce unique solvability",
+      "details": "Count missing eligible dimensions before solving and reject multiple gaps, zero unknowns, non-finite results, negative results, and equations that do not reconcile within numeric precision.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Expose derivation in the editor",
+      "details": "Display the derived field, readable equation, unit-normalized value, and its derived status adjacent to the affected input without silently replacing source text.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Verify unique and refused cases",
+      "details": "Test one valid missing field on each axis plus zero-missing, two-missing, contradictory, negative-result, and non-finite cases at contract and browser levels.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-10", "TASK-11"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Derivation is disclosure, not silent correction.",
+    "Use one documented coordinate and extent equation consistently across validation and preview."
+  ]
+}

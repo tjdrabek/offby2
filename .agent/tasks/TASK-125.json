@@ -1,0 +1,53 @@
+{
+  "id": "TASK-125",
+  "title": "Document release evidence and run quality gates",
+  "category": "functional",
+  "description": "Document tested software behavior separately from untested browser/platform combinations and unavailable physical claims, then run the complete bounded release quality-gate set for the final non-physical release.",
+  "acceptanceCriteria": [
+    "Release documentation names tested software workflows, browser/platform versions, fixture scope, and dates",
+    "Untested browser/platform combinations are clearly identified rather than implied supported",
+    "Documentation disclaims physical suitability, validated tolerance, feed consistency, safe refeeding, supported-printer coverage, and physically validated calibration",
+    "Diff validation confirms no secrets, generated clutter, unrelated files, or unsupported claims",
+    "Type checking, linting, unit/contract tests, focused Playwright, accessibility, offline, recovery, and production build gates pass",
+    "Any unavailable manual or physical prerequisite is reported as a blocker rather than marked passed"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Write the release evidence matrix",
+      "details": "Record tested software combinations and workflows, automated/manual method, versions, fixture limits, dates, and results without broad compatibility claims.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Document explicit exclusions",
+      "details": "List untested combinations and unavailable physical suitability, tolerance, consistency, refeeding, printer-support, and calibrated-profile claims in user-facing release notes.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Validate the final diff",
+      "details": "Review changed paths for scope, secrets, artifacts, generic accessibility suppressions, external runtime dependencies, and evidence-inflating language.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Run software quality gates",
+      "details": "Run type, lint, unit/contract, focused Playwright, automated accessibility, offline/recovery, and production build commands documented by the repository.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Report release blockers",
+      "details": "Summarize pass/fail results with actionable owners; keep release blocked for failed software gates or required unavailable manual checks and keep PRD 26 physically blocked.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-116", "TASK-117", "TASK-124"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; run the repository's bounded release commands and focused acceptance filters.",
+    "PRD 26 remains blocked: no physical evidence exists, and release documentation must not imply otherwise.",
+    "A passing non-physical release does not validate printer behavior or a universal browser matrix."
+  ]
+}

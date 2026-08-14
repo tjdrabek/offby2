@@ -1,0 +1,52 @@
+{
+  "id": "TASK-21",
+  "title": "Assign a text template to a sheet position",
+  "category": "functional",
+  "description": "Let a user assign one saved text template to a selected label position in stable sheet order and recover that exact relationship after reload.",
+  "acceptanceCriteria": [
+    "Positions have stable identifiers derived from row-major sheet order",
+    "The UI exposes a semantic keyboard-operable position selector",
+    "Assigning a template stores exact template identity and position identity on the project",
+    "Out-of-range, duplicate, missing-template, or stale-position assignments are refused with actionable reasons",
+    "The same template-position relationship is visible after browser reload",
+    "Verify in browser using Playwright"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define stable position identity",
+      "details": "Derive row-major position IDs from the exact layout revision and expose row, column, ordinal, and physical boundary metadata without using array index as durable identity alone.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Define assignment records",
+      "details": "Add serializable project assignments linking exact position ID to exact template ID, with validation against the resolved project revision and template repository.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Build accessible assignment controls",
+      "details": "Render positions as a labeled list, grid with keyboard alternative, or native selection control that communicates ordinal, row, column, and assigned template.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Persist assignment changes",
+      "details": "Save assignment add/change/remove operations atomically with the project draft and display success or refusal without losing current selection.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Verify assignment recovery",
+      "details": "Assign a text template using keyboard controls, reload the browser, and assert the same template and stable position are selected and described.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-19", "TASK-20"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Stable sheet order is row-major unless the domain contract documents another order.",
+    "Changing the referenced layout revision requires explicit assignment compatibility handling."
+  ]
+}

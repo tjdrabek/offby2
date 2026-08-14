@@ -1,0 +1,51 @@
+{
+  "id": "TASK-120",
+  "title": "Recover from interrupted storage writes",
+  "category": "functional",
+  "description": "Handle interrupted writes and storage or quota failures with bounded structured explanations while preserving last-known-good records and the user's in-memory authoring state.",
+  "acceptanceCriteria": [
+    "Interrupted transactions, quota exhaustion, unavailable storage, and serialization failures return distinct recoverable results",
+    "Failed writes leave the prior committed record and related indexes/references intact",
+    "The UI retains unsaved in-memory work, identifies affected work, and offers retry, export, or discard actions where safe",
+    "Retries are bounded and no failed save is reported as durable",
+    "Failure and recovery controls are announced and keyboard operable"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Normalize storage failures",
+      "details": "Map transaction abort, quota, unavailable database, serialization, and unexpected write errors to stable results and safe corrective actions.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Protect last-known-good state",
+      "details": "Keep related writes in one transaction and update durability markers only after the transaction completes successfully.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Expose recovery actions",
+      "details": "Retain the failed draft in memory and present contextual retry, backup/export, or discard choices without destructive defaults.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Inject write failures",
+      "details": "Abort writes at bounded transaction points and simulate quota/unavailable storage to compare committed pre-state and status outcomes.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Verify accessible recovery",
+      "details": "Exercise keyboard recovery, focus restoration, announcement deduplication, bounded retry, and absence of false saved status.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-7", "TASK-8", "TASK-113", "TASK-118"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; inject failures into one representative repository transaction.",
+    "Do not clear an in-memory draft merely because its persistence attempt failed."
+  ]
+}

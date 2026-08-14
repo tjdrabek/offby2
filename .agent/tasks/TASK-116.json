@@ -1,0 +1,58 @@
+{
+  "id": "TASK-116",
+  "title": "Run automated accessibility checks",
+  "category": "integration",
+  "description": "Add a documented automated accessibility checker and scan representative primary screens and states, resolving serious findings rather than suppressing rules generically.",
+  "acceptanceCriteria": [
+    "The selected checker and official usage documentation are recorded in the repository",
+    "Automated scans cover representative project, geometry, content, preparation, calibration, backup, recovery, offline, dialog, error, and empty states",
+    "No serious automated violations remain in tested states",
+    "Any targeted exception documents exact rule, element, rationale, owner, and resolution plan",
+    "No rule is disabled globally merely to make scans pass"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Integrate the checker",
+      "details": "Select a maintained checker compatible with the existing browser/component tests, install it, and cite official setup and rule documentation.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Create representative state fixtures",
+      "details": "Reuse public workflows and small fixtures to reach the named normal, warning, error, dialog, empty, and offline states.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Add focused scans",
+      "details": "Run scans after each state is stable and report rule, impact, selector, and help URL without broad exclusions.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Resolve serious findings",
+      "details": "Fix serious findings in the bounded state set and document any precise unresolved exception rather than suppressing a rule.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Run accessibility filter",
+      "details": "Execute the focused scan suite and confirm tested primary states have no serious violations.",
+      "pass": false
+    }
+  ],
+  "dependencies": [
+    "TASK-1",
+    "TASK-111",
+    "TASK-112",
+    "TASK-113",
+    "TASK-114",
+    "TASK-115"
+  ],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; scan an intentionally bounded representative state matrix.",
+    "Automated checks complement keyboard and manual assistive-technology validation."
+  ]
+}

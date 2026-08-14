@@ -1,0 +1,45 @@
+{
+  "id": "TASK-104",
+  "title": "Keep one-sheet evidence preliminary",
+  "category": "functional",
+  "description": "Encode evidence-language rules that keep one-sheet results preliminary and reserve placement-variation, suitability, and higher-confidence language for policy-defined repeated physical samples; the current unresolved policy must refuse those claims.",
+  "acceptanceCriteria": [
+    "One physical sample can never produce validated suitability, variation, or higher-confidence language",
+    "Demo, synthetic, or PDF-structure samples produce no physical evidence language",
+    "Repeated-sample language requires an explicit approved policy version and its defined qualifying sample count",
+    "With current blockers unresolved, all validated or suitability language requests are refused"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define evidence language levels",
+      "details": "Model software-only, demo, preliminary physical observation, and policy-authorized repeated-evidence language without inventing numeric thresholds.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Implement conservative selection",
+      "details": "Select only language permitted by provenance, approved policy, and qualifying sample status; default to blocked or preliminary wording.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Prevent inflated claims",
+      "details": "Reject suitability, variation, confidence, guarantee, and validation wording when policy or repeated samples are absent.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test language boundaries",
+      "details": "Cover zero, demo, synthetic, one physical, mixed, and unresolved repeated-sample fixtures with exact allowed/refused language classes.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-102", "TASK-103"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; implement conservative language classification and fixtures only.",
+    "BLOCKED: policy-authorized repeated-evidence language cannot be completed or enabled until physical policy and qualifying observations exist.",
+    "Placement bias and placement variation are distinct and must not be conflated."
+  ]
+}

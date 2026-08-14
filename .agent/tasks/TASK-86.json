@@ -1,0 +1,46 @@
+{
+  "id": "TASK-86",
+  "title": "Validate imports before durable mutation",
+  "category": "functional",
+  "description": "Parse an untrusted WorkspaceBundle, validate the complete candidate, and present an actionable ImportPlan before any IndexedDB or cache mutation.",
+  "acceptanceCriteria": [
+    "File type, bundle shape, schema versions, counts/sizes, integrity hashes, records, assets, and references are validated before mutation",
+    "No durable write or cache change occurs while selecting, parsing, validating, or reviewing a candidate",
+    "ImportPlan reports proposed counts, migrations, conflicts, errors, and warnings grouped by affected type/record",
+    "Commit remains disabled until the full plan is valid and the user explicitly confirms",
+    "Validation is keyboard operable with progress, cancellation, and announced completion/failure"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Bound untrusted parsing",
+      "details": "Validate file/container type and enforce documented count, byte, nesting, and asset bounds before materializing expensive structures or paths.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Build pure import planning",
+      "details": "Parse schema metadata, run migrations in memory, validate every registered type/hash/reference, and return a serializable ImportPlan without repository writes.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Present pre-commit report",
+      "details": "Render semantic headings/lists with affected identities, counts, warnings/errors, progress, safe default cancellation, and explicit commit confirmation.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Prove no pre-commit mutation",
+      "details": "Snapshot durable state before candidate selection and assert byte/logical equivalence after valid review, invalid input, cancellation, and parser failure.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-84"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; implement bounded planning and one pre-commit report path only.",
+    "Imported bundles are hostile input: reject executable content, unsafe paths, malformed binaries, and resource-exhaustion shapes.",
+    "Planning may transform an in-memory candidate but must not touch durable stores."
+  ]
+}

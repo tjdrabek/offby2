@@ -1,0 +1,60 @@
+{
+  "id": "TASK-117",
+  "title": "Verify keyboard, screen-reader, and zoom journeys",
+  "category": "functional",
+  "description": "Cover all named primary flows with keyboard-driven Playwright tests and document manual screen-reader plus 200% zoom/reflow checks for the release browser set without implying physical print validation.",
+  "acceptanceCriteria": [
+    "Keyboard Playwright journeys cover project creation, geometry, content ordering/positioning, safe-area refusal/override, setup attestation, calibration draft, PDF preparation, backup import/export, and recovery",
+    "Tests assert visible focus, semantic alternatives, associated errors, announcements, and focus restoration at critical transitions",
+    "A manual checklist records browser, operating system, assistive-technology version, result, issue, and tester/date fields",
+    "At 200% zoom/reflow primary actions avoid two-dimensional page scrolling except inherently spatial previews",
+    "Release evidence explicitly excludes physical printing validation"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define the journey matrix",
+      "details": "Map each PRD 27 named workflow to keyboard actions, expected semantics, focus checkpoints, statuses, and reusable fixtures.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Add keyboard browser journeys",
+      "details": "Use only public UI and keyboard input to exercise the matrix, including non-drag alternatives and refusal/confirmation paths.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Document manual checks",
+      "details": "Create a release checklist for supported screen-reader/browser combinations, keyboard exploration, 200% zoom, reflow, forced colors, and reduced motion.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Record bounded evidence",
+      "details": "Record tested software combinations and outcomes while explicitly separating untested combinations and unavailable physical evidence.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Run focused validation",
+      "details": "Run keyboard journeys, automated accessibility filters, type, lint, and build checks relevant to the accessibility slice.",
+      "pass": false
+    }
+  ],
+  "dependencies": [
+    "TASK-1",
+    "TASK-110",
+    "TASK-111",
+    "TASK-112",
+    "TASK-113",
+    "TASK-114",
+    "TASK-115",
+    "TASK-116"
+  ],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; use small fixtures and focused journey filters, with manual execution documented separately.",
+    "Manual assistive-technology results are release software evidence, not evidence of physical print placement."
+  ]
+}

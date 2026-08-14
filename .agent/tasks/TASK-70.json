@@ -1,0 +1,45 @@
+{
+  "id": "TASK-70",
+  "title": "Use compatibility consistently across workflows",
+  "category": "integration",
+  "description": "Route restored drafts, profile selection, preview, and PDF preparation through the same compatibility operation and render equivalent outcomes.",
+  "acceptanceCriteria": [
+    "All four workflow surfaces invoke the central operation with equivalent normalized inputs",
+    "The same request displays the same status, reason codes, confirmations, and recalibration requirement on every surface",
+    "Restored drafts are re-evaluated rather than trusting a stale saved display status",
+    "No consumer independently infers or broadens compatibility"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Create one request adapter",
+      "details": "Normalize project, setup, revision, layout, profile, and attestation data into CompatibilityRequest through one shared adapter.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Connect all consumers",
+      "details": "Replace local compatibility decisions in restore, selection, preview, and preparation with the authoritative evaluator and shared presenter.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Handle restored state",
+      "details": "Recompute results after validated restoration and show stale/missing input reasons rather than reusing persisted presentation state.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test cross-surface equivalence",
+      "details": "Use one fixture across all four paths and assert identical serialized results and accessible reason text.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-5", "TASK-23", "TASK-34", "TASK-69"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; route existing consumers through one adapter without redesigning their UI.",
+    "Persisted compatibility audit data may be displayed as history but must not replace current evaluation.",
+    "The PDF renderer consumes an authorized preparation; it must not decide compatibility."
+  ]
+}

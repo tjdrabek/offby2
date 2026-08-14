@@ -1,0 +1,44 @@
+{
+  "id": "TASK-92",
+  "title": "Define calibration draft states",
+  "category": "data-model",
+  "description": "Define a versioned, serializable CalibrationDraft state machine covering layout selection, setup identification, configuration confirmation, artifact generation, plain-paper inspection, observation entry, diagnostics, and completion without creating a printer profile.",
+  "acceptanceCriteria": [
+    "Every PRD 25 state and allowed next action has a stable serializable identifier",
+    "Draft data records schema version, identity, current state, references, diagnostics, and timestamps",
+    "Initial and terminal states do not imply physical validation or create a usable printer profile",
+    "Schema parsing refuses unknown states and malformed state-specific data"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Model draft states",
+      "details": "Define discriminated serializable states and stable action identifiers for each PRD 25 workflow stage.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Define the draft envelope",
+      "details": "Add versioned draft identity, current state, exact references, artifact metadata, inspections, observations, diagnostics, and timestamps.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Declare allowed actions",
+      "details": "Map each state to explicit next actions while excluding profile derivation and correction application.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test serialization boundaries",
+      "details": "Round-trip every state and refuse unknown versions, unknown states, and incomplete state-specific payloads.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-34", "TASK-67", "TASK-75"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; define contracts and focused serialization tests only.",
+    "Completion means workflow completion, not physical calibration or profile validity."
+  ]
+}

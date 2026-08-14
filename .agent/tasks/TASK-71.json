@@ -1,0 +1,45 @@
+{
+  "id": "TASK-71",
+  "title": "Reject exact-assumption profile mismatches",
+  "category": "functional",
+  "description": "Return specific refusal reasons for layout identity, revision, fingerprint, contradictory setup, loading-procedure, and print-configuration mismatches and prevent profile reuse.",
+  "acceptanceCriteria": [
+    "Each mismatch class returns its own stable machine-readable reason and clear next action",
+    "One request can report all applicable reasons in canonical order",
+    "Any listed mismatch prevents profile correction from being applied",
+    "Layout fingerprint mismatch is refused even when human-readable layout names match"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Enumerate mismatch codes",
+      "details": "Define stable reason codes and actions for every identity, revision, fingerprint, and contradictory setup/configuration field in the PRD.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Evaluate every mismatch",
+      "details": "Extend the central evaluator to accumulate mismatches deterministically and set incompatible/recalibration outcomes without early ambiguous exit.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Enforce correction refusal",
+      "details": "Guard preparation inputs so an incompatible profile contributes no translation or other correction data.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Run mismatch matrix",
+      "details": "Add table-driven tests for every single mismatch, combined mismatches, same-name/different-fingerprint layouts, and stable actions/order.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-69"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; extend the central reason matrix and correction guard only.",
+    "A mismatch describes recorded assumptions; it does not establish physical behavior.",
+    "Never fall back to stale correction when evaluation fails."
+  ]
+}

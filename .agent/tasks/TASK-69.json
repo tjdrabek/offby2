@@ -1,0 +1,45 @@
+{
+  "id": "TASK-69",
+  "title": "Centralize pure profile compatibility",
+  "category": "functional",
+  "description": "Implement one authoritative pure compatibility operation returning a versioned status, ordered structured reasons, required confirmations, and recalibration requirement.",
+  "acceptanceCriteria": [
+    "Equivalent normalized requests return deeply equivalent CompatibilityResult values without side effects",
+    "The result includes versioned status, stable ordered reason codes, required confirmations, and recalibration flag",
+    "Exact assumptions produce the documented compatible outcome and no mismatch reason",
+    "No UI, repository, preview, or renderer-specific state is read by the operation"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define compatibility values",
+      "details": "Add versioned serializable CompatibilityRequest, CompatibilityStatus, CompatibilityReason, required-confirmation, and CompatibilityResult contracts.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Implement pure evaluation",
+      "details": "Compare normalized current assumptions with the profile in a deterministic field order and derive status, reasons, confirmations, and recalibration requirement.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Stabilize reason ordering",
+      "details": "Use explicit reason codes and canonical ordering so UI and persisted results do not depend on object or traversal order.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify purity and exact match",
+      "details": "Add contract tests for exact assumptions, repeated calls, input immutability, serialization, and stable ordering.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-65", "TASK-68"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; keep the evaluator to exact normalized comparison and focused contracts.",
+    "Compatibility is a software comparison of recorded assumptions, never a printer query or suitability proof.",
+    "Keep this operation framework-neutral and side-effect-free."
+  ]
+}

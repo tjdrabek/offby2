@@ -1,0 +1,52 @@
+{
+  "id": "TASK-22",
+  "title": "Resolve text assignments into a printable scene",
+  "category": "functional",
+  "description": "Implement a pure layout operation that resolves a validated text template, physical label dimensions, and a valid position assignment into the authoritative framework-neutral `PrintableScene`.",
+  "acceptanceCriteria": [
+    "Scene generation accepts only validated template, exact validated layout revision, and valid assignment values",
+    "The scene uses the documented millimetre coordinate system and contains physical bounds, text runs, diagnostics, and stable position metadata",
+    "Equivalent normalized inputs produce structurally equivalent scenes",
+    "Missing templates, invalid assignments, unsupported nodes, and layout failures return structured diagnostics",
+    "The pure operation imports no React, DOM, IndexedDB, SVG-renderer, or PDF APIs",
+    "The derived scene is not persisted as authoring truth"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define scene value types",
+      "details": "Create versioned framework-neutral scene, text-run, physical-bound, position-metadata, and diagnostic types using finite millimetre coordinates.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Define layout inputs",
+      "details": "Create a narrow validated input contract containing resolved template, bundled font metrics, exact label boundary/content region, and assignment metadata.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Implement pure scene resolution",
+      "details": "Lay out constrained text into deterministic runs and bounds, preserving stable ordering and returning diagnostics rather than partial exceptions for expected failures.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Connect project resolution",
+      "details": "Resolve project references and assignments before invoking layout, then expose the resulting scene or named refusal to presentation adapters.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Verify scene contracts",
+      "details": "Assert fixed scene output for a canonical fixture, equivalent output for equivalent normalized inputs, and structured diagnostics for each invalid dependency.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-19", "TASK-20", "TASK-21"],
+  "estimatedComplexity": "high",
+  "technicalNotes": [
+    "The printable scene is the single layout authority shared by preview and PDF.",
+    "Font metrics must come from the same bundled font resources later used by the PDF renderer."
+  ]
+}

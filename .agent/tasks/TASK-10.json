@@ -1,0 +1,52 @@
+{
+  "id": "TASK-10",
+  "title": "Capture complete uniform-grid geometry",
+  "category": "data-model",
+  "description": "Define and expose sheet-layout inputs for rectangular sheets with uniform square or rounded-rectangle labels, including every dimension and the four-state corner-radius disclosure.",
+  "acceptanceCriteria": [
+    "Inputs include sheet width and height, row and column counts, label width and height, four independent margins, and horizontal and vertical gaps",
+    "Corner radius is represented as `zero`, `known`, `estimated`, or `unknown` rather than a nullable number",
+    "Each dimensional input carries an explicit unit and retains its source text until validation",
+    "Rows and columns accept only bounded positive integers",
+    "Unsupported non-uniform or non-rectangular media cannot be represented as valid input",
+    "Verify in browser using Playwright"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define source-input types",
+      "details": "Create serializable source-input types for every PRD field and a discriminated corner-radius state whose known and estimated variants carry a source dimension.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Define normalized geometry types",
+      "details": "Create a separate millimetre-based validated geometry value for sheet, grid, labels, margins, gaps, and radius disclosure; prevent unvalidated source strings from satisfying it.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Build the measurement form",
+      "details": "Render labeled controls for all dimensions, counts, independent margins, gaps, radius state, and radius value when applicable, with units exposed in text.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Validate representable states",
+      "details": "Add schema checks for required fields, bounded integer counts, and corner-radius variant payloads while preserving invalid source text for correction.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Verify form semantics",
+      "details": "Exercise every input and radius state by accessible name and confirm unsupported media choices are absent or explicitly refused.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-9"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Use millimetres only for normalized domain geometry; source fields retain user-entered units.",
+    "Unknown radius is semantically different from zero radius."
+  ]
+}

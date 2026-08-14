@@ -1,0 +1,45 @@
+{
+  "id": "TASK-68",
+  "title": "Bind profiles to exact assumptions",
+  "category": "data-model",
+  "description": "Define a versioned PrinterProfile identity that binds exact setup, loading revision, configuration revision, sheet-layout identity/revision, and canonical geometry fingerprint without adding physical correction claims.",
+  "acceptanceCriteria": [
+    "A profile stores every exact identity and the canonical geometry fingerprint required by PRD 22",
+    "Profile references are schema validated and resolve to immutable revisions",
+    "The initial profile shape contains no inferred physical validity or synthetic correction evidence",
+    "Serialization and reload preserve exact assumptions"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define profile schema",
+      "details": "Add a versioned serializable PrinterProfile with stable profile ID and exact setup, loading, configuration, layout, revision, and fingerprint references.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Validate exact references",
+      "details": "Reject missing, malformed, mismatched, or mutable references before persistence and preserve explicit version metadata.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Persist profile identities",
+      "details": "Add local repository round-trip behavior without introducing calibration observations or nonzero correction fields.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test profile contracts",
+      "details": "Cover valid exact bindings, each invalid reference, fingerprint stability, serialization, and reload with focused tests.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-15", "TASK-18", "TASK-61", "TASK-62"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; define identity bindings and repository round-trip only.",
+    "This profile is a compatibility-assumption container, not a physically validated calibration profile.",
+    "Nonzero translation and physical evidence remain unavailable in this PRD."
+  ]
+}

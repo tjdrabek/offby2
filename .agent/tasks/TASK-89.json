@@ -1,0 +1,46 @@
+{
+  "id": "TASK-89",
+  "title": "Reproduce a workspace in a clean browser",
+  "category": "integration",
+  "description": "Verify that current export imported into a clean browser reproduces all implemented records, assets, relationships, normalized scenes, preparation audits, and known deterministic PDF hashes.",
+  "acceptanceCriteria": [
+    "A clean context import reproduces projects, layouts, templates/data/assignments, snapshots, assets, setups, profiles, sheet instances, and preparations implemented by this release",
+    "All internal references resolve and normalized scene inputs are deeply equivalent after round trip",
+    "Regenerated PDFs for canonical preparations retain their known deterministic hashes",
+    "Binary asset bytes and integrity hashes are identical",
+    "Any later registered durable type, including calibration drafts when implemented, participates automatically or fails completeness checks"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Create complete round-trip fixture",
+      "details": "Build a bounded workspace fixture containing at least one of every registered durable type, relationships, named snapshot, binary asset, instance omission, and preparation mode.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Export and clean context",
+      "details": "Export offline, open an isolated empty browser context/database, and verify no preexisting application records or caches affect the import.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Import and compare state",
+      "details": "Review/confirm the plan, commit, then compare canonical records, references, scene inputs, assets, compatibility/reuse audits, and counts.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Regenerate artifact hashes",
+      "details": "Regenerate canonical prepared outputs and assert known PDF hashes plus used-position omissions match the source workspace.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-85", "TASK-88"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; use one bounded canonical workspace fixture and focused hash comparisons.",
+    "Compare normalized logical state where IndexedDB-internal ordering is irrelevant and exact bytes where assets/PDFs require it.",
+    "Do not fabricate calibration drafts before their later PRD is implemented."
+  ]
+}

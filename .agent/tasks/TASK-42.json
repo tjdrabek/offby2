@@ -1,0 +1,55 @@
+{
+  "id": "TASK-42",
+  "title": "Integrate every rich component workflow",
+  "category": "functional",
+  "description": "Wire each supported rich node through semantic editing, persistence, autosave, undo/redo, scene generation, previews, PDF output, backup registration, and structured diagnostics.",
+  "acceptanceCriteria": [
+    "Each rich node can be added, named, configured, removed, and reordered with semantic keyboard-operable controls",
+    "All node edits persist through autosave and reload and participate in session undo/redo",
+    "Every supported node resolves through the shared scene into label preview, sheet preview, and PDF adapters",
+    "Asset references are registered for future complete-workspace backup without embedding transient URLs",
+    "Unsupported, missing-resource, and overflow failures identify the component and block partial PDF success",
+    "Verify in browser using Playwright"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Extend rich authoring controls",
+      "details": "Reuse the existing editor state seam to expose add, hierarchy, property, remove, reorder, and keyboard overlay-position controls for all supported nodes.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Connect project history and storage",
+      "details": "Route rich-tree edits through existing autosave and undo/redo commands and register durable asset identities in project serialization.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Connect scene and output adapters",
+      "details": "Map every node to application-owned scene nodes and diagnostics consumed unchanged by label preview, sheet preview, and the isolated PDF renderer.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Smoke test the public workflow",
+      "details": "Build one mixed nested label by keyboard, preview it, undo/redo, reload, generate PDF, and assert missing/overflow states are announced and atomic.",
+      "pass": false
+    }
+  ],
+  "dependencies": [
+    "TASK-1",
+    "TASK-35",
+    "TASK-36",
+    "TASK-37",
+    "TASK-38",
+    "TASK-39",
+    "TASK-40",
+    "TASK-41"
+  ],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Keep the implementation pass to one thin vertical wiring increment under ten minutes; use existing generic editor and adapter registries rather than bespoke UI per node.",
+    "Backup registration is metadata wiring only; complete export/import behavior belongs to PRD 24."
+  ]
+}

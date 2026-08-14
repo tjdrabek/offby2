@@ -1,0 +1,45 @@
+{
+  "id": "TASK-63",
+  "title": "Refine setup metadata without contradiction",
+  "category": "functional",
+  "description": "Allow explicit unknown setup identity fields to gain non-contradictory known detail while retaining provenance and the previous unknown state in history.",
+  "acceptanceCriteria": [
+    "An unknown field can be refined to a known value through an explicit action",
+    "Refinement records prior state, new value, source/provenance, and timestamp",
+    "An unchanged known value may gain provenance without creating a contradiction",
+    "Refinement does not assert compatibility, calibration, suitability, or automatic verification"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define refinement comparison",
+      "details": "Add a pure comparison that classifies proposed metadata as unchanged, unknown-to-known refinement, or known contradiction per field.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Record refinement provenance",
+      "details": "Persist accepted refinement events or revisions so the previous unknown state and disclosed source remain inspectable after reload.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Expose explicit refinement",
+      "details": "Add a keyboard-operable refinement action that previews changed fields and states that compatibility is not inferred.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test allowed refinements",
+      "details": "Cover unknown-to-known, same-known provenance, multi-field refinement, reload, and rejected contradictory input with focused tests.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-60"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; add only refinement classification, provenance, and focused coverage.",
+    "Unknown is not a wildcard and refinement is not proof that two physical conditions are the same.",
+    "Contradictory known changes are handled by TASK-64."
+  ]
+}

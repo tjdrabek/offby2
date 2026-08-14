@@ -1,0 +1,45 @@
+{
+  "id": "TASK-73",
+  "title": "Evaluate refined setup metadata honestly",
+  "category": "functional",
+  "description": "Re-evaluate non-contradictory newly supplied setup detail without automatically invalidating prior observations or inventing compatibility.",
+  "acceptanceCriteria": [
+    "Unknown-to-known refinement is represented distinctly from unchanged, contradiction, and exact historical match",
+    "Refinement triggers central compatibility re-evaluation with provenance-aware reasons or confirmations",
+    "Existing observation references remain intact unless an explicit incompatibility rule applies",
+    "No refinement alone yields physical validity, suitability, or automatic compatibility"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Add refinement context",
+      "details": "Include normalized refinement provenance and prior unknown state in the compatibility request where needed for explanation.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Derive refinement outcomes",
+      "details": "Return a stable refinement reason/confirmation while preserving any independent mismatch and avoiding blanket invalidation.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Present provenance-aware action",
+      "details": "Explain the newly known field and required operator action in shared compatibility UI without claiming observation verification.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test refinement matrix",
+      "details": "Cover one/multiple refinements, unchanged provenance, unrelated mismatch, contradiction, retained observation identity, and repeat evaluation.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-63", "TASK-69", "TASK-72"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; reuse refinement provenance and compatibility presentation seams.",
+    "Refinement preserves history; it does not retroactively rewrite the assumptions under which data was recorded.",
+    "Physical observation validity remains evidence-gated."
+  ]
+}

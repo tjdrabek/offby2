@@ -1,0 +1,44 @@
+{
+  "id": "TASK-97",
+  "title": "Define inspection and loading fields",
+  "category": "data-model",
+  "description": "Define one production contract for plain-paper inspection, loading, and observation-entry fields so domain validation and accessible UI use identical required, diagnostic, and optional classifications.",
+  "acceptanceCriteria": [
+    "Each field has a stable ID, classification, type, unit where applicable, constraints, and help text",
+    "Domain and UI derive required, diagnostic, and optional behavior from one contract",
+    "Asymmetric loading guidance is textual and tied to exact setup/loading/configuration assumptions",
+    "Invalid numeric, unit, or missing required values return field-associated reasons"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Inventory production fields",
+      "details": "Translate PRD 25 inspection, loading, sample, measurement, and assumption needs into stable field definitions without prototype-only gates.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Define field metadata",
+      "details": "Specify classification, value type, allowed units, finite numeric constraints, accessible instructions, and diagnostic purpose.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Create shared validation",
+      "details": "Return normalized values or structured field reasons from one pure validator consumed by domain and forms.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test contract parity",
+      "details": "Verify UI-required indicators and domain validation agree for complete, missing, malformed, non-finite, and unsupported-unit fixtures.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-67", "TASK-92"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; define and test the field registry only.",
+    "Required entry fields are not evidence-sufficiency thresholds."
+  ]
+}

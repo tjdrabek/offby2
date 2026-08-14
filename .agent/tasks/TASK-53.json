@@ -1,0 +1,45 @@
+{
+  "id": "TASK-53",
+  "title": "Apply additive content insets",
+  "category": "functional",
+  "description": "Apply a uniform or independent top, right, bottom, and left content inset as a second inward reduction after requested tolerance, keeping it distinct from sheet margins and tolerance.",
+  "acceptanceCriteria": [
+    "Content inset supports one uniform value or explicit top/right/bottom/left finite non-negative millimetre values",
+    "Content region is derived from the TASK-52 safe area, so inset adds clearance after requested tolerance",
+    "Sheet-layout margins, requested tolerance, and content inset remain separately named and persisted",
+    "Extreme or contradictory inset values return side-specific diagnostics and no invalid content region",
+    "Normalization produces equivalent sides for equivalent uniform and four-side input"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define content inset values",
+      "details": "Add discriminated uniform and per-side inset input, normalize to four named millimetre sides, and reject negative or non-finite values.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Reduce the safe area",
+      "details": "Inset the TASK-52 safe region a second time while preserving separate requested-tolerance and content-inset fields in SafeRegionResult.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Refuse impossible regions",
+      "details": "Detect collapsed width/height or incompatible rounded geometry and return side- and constraint-specific diagnostics rather than clamping silently.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify additive behavior",
+      "details": "Cover uniform, asymmetric, zero, extreme, negative, and non-finite insets and assert content clearance equals requested tolerance plus the applicable inset.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-52"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Timebox to normalization and one second-offset operation with focused geometry tests.",
+    "Additional inset is a user choice and does not transform requested tolerance into a physically established safe margin."
+  ]
+}

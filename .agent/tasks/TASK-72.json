@@ -1,0 +1,45 @@
+{
+  "id": "TASK-72",
+  "title": "Treat unknown compatibility fields explicitly",
+  "category": "functional",
+  "description": "Ensure unknown setup fields never match as wildcards and allow exact operator attestation only when no known contradiction exists.",
+  "acceptanceCriteria": [
+    "Every unknown required field produces a stable required-confirmation or unresolved reason instead of an automatic match",
+    "A matching attestation references exact current assumptions and can satisfy only listed unknown sameness confirmations",
+    "Any known contradiction remains incompatible regardless of generic or stale attestation",
+    "Changing referenced assumptions invalidates the attestation for compatibility"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Model unknown-field reasons",
+      "details": "Add per-field unknown reason and confirmation requirements to compatibility results, preserving canonical order.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Validate attestation applicability",
+      "details": "Accept only attestations whose setup/loading/configuration identities and disclosure version match the current request and whose scope covers the unknown field.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Prioritize contradictions",
+      "details": "Ensure known contradictions cannot be removed or downgraded by any attestation path.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test unknown and stale cases",
+      "details": "Cover each unknown field, exact attestation, missing scope, changed revision, stale disclosure, known contradiction, and generic confirmation refusal.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-63", "TASK-65", "TASK-71"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; implement unknown and attestation rules as focused evaluator cases.",
+    "Attestation confirms an operator assertion only; it does not turn unknown metadata into browser-observed fact.",
+    "Known contradictions are never overrideable through this task."
+  ]
+}

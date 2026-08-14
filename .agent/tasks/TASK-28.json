@@ -1,0 +1,46 @@
+{
+  "id": "TASK-28",
+  "title": "Create exact PDF page geometry",
+  "category": "functional",
+  "description": "Convert millimetres to PDF points only inside the renderer boundary and create explicit page boxes that match the selected normalized sheet dimensions.",
+  "acceptanceCriteria": [
+    "The renderer documents and uses exactly 72 PDF points per inch and 25.4 millimetres per inch",
+    "Millimetre-to-point conversion occurs only at the PDF adapter boundary",
+    "MediaBox and any intentionally set page boxes equal normalized sheet width and height within renderer precision",
+    "Scene coordinates use one documented origin and axis transform into PDF coordinates",
+    "No browser default paper size, orientation, margins, scaling, or print CSS determines page geometry",
+    "A parsed artifact check verifies page count and page boxes"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Document coordinate conversion",
+      "details": "Define the conversion constant `points = millimetres * 72 / 25.4`, numeric precision policy, scene origin, PDF origin, and y-axis transform in the renderer module.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Create explicit pages",
+      "details": "Construct each PDF page with width and height converted from validated normalized sheet geometry; set page boxes explicitly where supported by the selected library.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Transform scene coordinates",
+      "details": "Map millimetre scene bounds and text origins to PDF points using the documented axis transform and optional compatible whole-sheet translation at this boundary only.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Parse and verify the artifact",
+      "details": "Generate a one-page fixture, parse its page dictionary with an independent inspection path, and assert page count and boxes match expected converted dimensions.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-27"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "PDF page geometry is software evidence and does not prove physical output scale.",
+    "Keep conversion out of reusable geometry and printable-scene modules."
+  ]
+}

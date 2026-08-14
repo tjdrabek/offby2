@@ -1,0 +1,53 @@
+{
+  "id": "TASK-51",
+  "title": "Preserve template relationships and generation state",
+  "category": "functional",
+  "description": "Carry templates, assignments, independent content, sparse selections, and resolved generation state through autosave, snapshots, undo/redo, export registration, and immutable print preparations without silent flattening.",
+  "acceptanceCriteria": [
+    "Autosave and reload preserve template identities, input definitions, assignments, values, overrides, and independent-content variants",
+    "Named snapshots and undo/redo restore relationships rather than only resolved trees",
+    "Export registration includes every referenced template, independent content record, and local asset identity",
+    "A print preparation records exact source identities, normalized values, overrides, PaginationPlan, resolved scene identity, and diagnostics needed to reproduce generation",
+    "No persistence path silently replaces a template assignment with flattened content",
+    "Template creation, assignment, data entry, sparse selection, pagination preview, and generation are keyboard operable and verified using Playwright"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Extend durable project records",
+      "details": "Add relationship-preserving template, assignment, selection, and independent-content fields to existing autosave, reload, snapshot, and history serialization seams.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Register the export graph",
+      "details": "Expose stable references for every template, content record, and asset required by the project without implementing the later PRD-24 bundle format.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Capture resolved preparation state",
+      "details": "Extend immutable preparation inputs with source identities/versions, normalized assignment values, overrides, exact PaginationPlan, scene identity, and generation diagnostics.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify recovery and audit",
+      "details": "Create a mixed sparse multi-page project, snapshot, edit/undo/redo, reload, generate, and assert relationships remain unflattened and preparation page order matches preview.",
+      "pass": false
+    }
+  ],
+  "dependencies": [
+    "TASK-1",
+    "TASK-46",
+    "TASK-48",
+    "TASK-49",
+    "TASK-50",
+    "TASK-32"
+  ],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Keep this ten-minute increment to wiring existing generic persistence/history/preparation serializers; complete workspace export/import remains PRD 24.",
+    "A preparation records software generation assumptions only and must not imply that printing occurred."
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "TASK-115",
+  "title": "Expose measurement semantics programmatically",
+  "category": "ui-ux",
+  "description": "Make geometry, inset, positioning, and calibration measurement controls expose units, constraints, source-versus-derived status, allowed ranges, and associated errors to assistive technology.",
+  "acceptanceCriteria": [
+    "Each measurement input has a programmatic name, current value, unit, constraint/range, and instructions",
+    "Read-only derived values are distinguishable from editable source values without color",
+    "Invalid values expose field-associated reasons and allowed bounds where a real bound exists",
+    "Controls do not present prototype calibration thresholds or unsupported physical tolerance ranges"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Inventory measurement controls",
+      "details": "List source and derived controls for layout geometry, safe areas, content positioning, and calibration observation entry.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Define shared measurement semantics",
+      "details": "Create label, unit, source/derived, constraint, help, and error metadata consumed by visible and accessible descriptions.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Repair representative controls",
+      "details": "Apply native numeric/text patterns, described-by links, readonly semantics, and explicit unit text without ambiguous placeholder-only labels.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test programmatic values",
+      "details": "Query names, values, descriptions, bounds, readonly status, units, and error associations for valid and invalid fixtures.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-18", "TASK-97", "TASK-111", "TASK-113"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; establish one shared pattern and representative control coverage.",
+    "Only expose ranges justified by software geometry or input representation, never invented physical tolerances."
+  ]
+}

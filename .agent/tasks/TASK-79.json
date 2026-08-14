@@ -1,0 +1,52 @@
+{
+  "id": "TASK-79",
+  "title": "Omit used positions deterministically",
+  "category": "functional",
+  "description": "Apply the SheetInstance used-position set to preview, pagination, and PDF planning through the canonical position order so every output omits exactly the same positions.",
+  "acceptanceCriteria": [
+    "Available positions equal canonical layout positions minus the validated used-position set",
+    "Preview, PaginationPlan, printable scene, and parsed PDF contain the same remaining positions in the same order",
+    "Sparse and all-used cases are deterministic and return structured empty-capacity behavior",
+    "Equivalent normalized inputs produce equivalent plans without mutating the instance"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define omission operation",
+      "details": "Add a pure function that filters TASK-47 canonical position IDs by a validated immutable used-position snapshot.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Integrate pagination planning",
+      "details": "Feed the filtered ordered positions into TASK-48/TASK-49 selection and pagination rather than creating a second ordering rule.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Integrate preview and PDF",
+      "details": "Use the same resulting PaginationPlan for preview scene and PDF preparation, including explicit no-capacity diagnostics.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify artifact parity",
+      "details": "Test sparse edges, interior gaps, all-used, repeat runs, preview IDs, plan IDs, and parsed PDF placement IDs/order.",
+      "pass": false
+    }
+  ],
+  "dependencies": [
+    "TASK-1",
+    "TASK-47",
+    "TASK-48",
+    "TASK-49",
+    "TASK-77",
+    "TASK-78"
+  ],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; reuse canonical ordering and pagination plans rather than adding a new planner.",
+    "Omission avoids intentionally rendering recorded-used positions; it does not assert the sheet is safe to refeed.",
+    "Never derive a new row/column traversal for this feature."
+  ]
+}

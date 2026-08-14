@@ -1,0 +1,46 @@
+{
+  "id": "TASK-85",
+  "title": "Export a complete workspace offline",
+  "category": "functional",
+  "description": "Generate and download a complete WorkspaceBundle entirely in the browser while reporting included counts, schema versions, progress, and integrity outcome.",
+  "acceptanceCriteria": [
+    "Export works with network access disabled and never uploads workspace data",
+    "The downloaded bundle includes every registered current record, named snapshot, and referenced asset",
+    "A pre-download summary reports per-type counts, versions, asset bytes/counts, and integrity success",
+    "Dangling references or integrity failures block download with actionable errors",
+    "Progress and completion are announced and cancellation/failure leaves durable state unchanged"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Collect a consistent snapshot",
+      "details": "Read every registered repository and asset in a consistent export snapshot, then canonicalize records without mutating IndexedDB.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Build and verify bundle",
+      "details": "Construct the versioned manifest, calculate integrity metadata over canonical records/assets, and reject unresolved references before download.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Expose offline export",
+      "details": "Add a labeled keyboard-operable export action with progress/status announcements, inspectable summary, safe filename, and local Blob download.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test export outcomes",
+      "details": "Cover complete/empty workspaces, assets, integrity block, cancellation/failure, offline mode, summary counts, and no network requests.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-84"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; connect the existing registry to one focused offline export path.",
+    "A downloaded backup remains user-owned and outside application storage control.",
+    "Use bounded/chunked work where existing APIs permit; numeric limits await profiling."
+  ]
+}

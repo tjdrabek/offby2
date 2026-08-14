@@ -1,0 +1,52 @@
+{
+  "id": "TASK-15",
+  "title": "Fingerprint canonical sheet geometry",
+  "category": "data-model",
+  "description": "Produce a deterministic geometry fingerprint from canonical normalized geometry while ensuring an independent catalog-data edit creates a new sheet-layout identity.",
+  "acceptanceCriteria": [
+    "Canonicalization includes every normalized geometry field that changes label boundaries",
+    "Equivalent imperial and metric inputs produce identical canonical geometry and fingerprints",
+    "Source formatting, display units, timestamps, provenance, and verification labels do not affect the geometry fingerprint",
+    "Any canonical geometry change changes the fingerprint",
+    "Editing catalog identity or provenance independently creates a new `SheetLayout` identity rather than rewriting the existing identity",
+    "Fingerprint output uses a documented stable algorithm and encoding"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define canonical geometry encoding",
+      "details": "Specify field order, numeric representation, radius-state treatment, UTF-8 encoding, and exclusions for a versioned canonical geometry payload.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Implement pure fingerprinting",
+      "details": "Serialize only validated normalized geometry with the canonical encoder and hash it using one stable browser-supported algorithm behind a domain-facing function.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Persist fingerprint metadata",
+      "details": "Store fingerprint algorithm/version and value on each revision and verify the value when records are decoded or imported later.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Separate catalog identity editing",
+      "details": "Route independent product/catalog identity changes through a clone-as-new-layout operation rather than changing the existing stable identity or geometry history.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Verify deterministic cases",
+      "details": "Test equivalent-unit inputs, reordered source object keys, disclosure-only edits, each geometry-field edit, and catalog identity edits against expected fingerprint and identity behavior.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-11", "TASK-14"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Do not fingerprint JavaScript's incidental object key order or locale-formatted numbers.",
+    "Version the canonical encoding so future schema migrations can preserve auditability."
+  ]
+}

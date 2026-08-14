@@ -1,0 +1,54 @@
+{
+  "id": "TASK-84",
+  "title": "Define the complete versioned workspace bundle",
+  "category": "data-model",
+  "description": "Define one inspectable WorkspaceBundle containing every implemented durable record, named snapshot, referenced binary asset, schema metadata, integrity manifest, and export metadata.",
+  "acceptanceCriteria": [
+    "The bundle schema registers every durable repository/type implemented through TASK-83",
+    "Records are grouped by versioned type and all referenced records/assets resolve within the bundle",
+    "Integrity metadata covers canonical record data and exact binary asset bytes",
+    "Export metadata is deterministic where required and excludes secrets, transient undo state, zoom, caches, and executable content",
+    "An unregistered durable record type causes a blocking completeness error"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Inventory durable data",
+      "details": "Enumerate projects, drafts, named snapshots, layouts/revisions, templates/data/assignments, assets, setups/revisions/attestations, profiles, preparations, and sheet instances implemented by this release.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Define bundle and manifest",
+      "details": "Add versioned serializable WorkspaceBundle groups, schema/export metadata, deterministic integrity entries, and internal reference identities.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Create portability registry",
+      "details": "Require each application-owned durable repository to register export, import validation, migration, and deletion participation; fail closed for omissions.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test completeness and integrity",
+      "details": "Verify full inventory inclusion, missing registration failure, dangling reference failure, asset-byte hashing, and transient/secret exclusion.",
+      "pass": false
+    }
+  ],
+  "dependencies": [
+    "TASK-1",
+    "TASK-14",
+    "TASK-38",
+    "TASK-51",
+    "TASK-67",
+    "TASK-75",
+    "TASK-83"
+  ],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; inventory current registries and define contracts without implementing export UI.",
+    "Keep this task to contracts and registry completeness; download generation follows in TASK-85.",
+    "Later durable types such as calibration drafts must register when implemented, without pretending they exist in the current release."
+  ]
+}

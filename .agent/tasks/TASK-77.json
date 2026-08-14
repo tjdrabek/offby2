@@ -1,0 +1,45 @@
+{
+  "id": "TASK-77",
+  "title": "Bind instances to exact layouts and positions",
+  "category": "data-model",
+  "description": "Bind every SheetInstance to one immutable sheet-layout revision and persist only used-position identifiers valid for that exact revision.",
+  "acceptanceCriteria": [
+    "Each instance references one exact layout identity and immutable revision",
+    "Every used-position identifier validates against that revision's canonical position set",
+    "Duplicate, unknown, or out-of-range position identifiers are rejected atomically",
+    "Layout binding cannot be silently changed after creation and used positions survive reload"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Extend instance contract",
+      "details": "Add exact SheetLayout/Revision references and a canonical set/list of used-position IDs to the versioned SheetInstance schema.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Validate used positions",
+      "details": "Resolve the exact immutable revision and reject duplicate, malformed, missing, or foreign position IDs before mutation.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Edit used positions",
+      "details": "Provide semantic keyboard-operable used/not-used controls with equivalent text for visual sheet markings.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test exact binding",
+      "details": "Cover valid sparse positions, duplicates, foreign revisions, immutable binding, reload, and accessible selected-state behavior.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-18", "TASK-47", "TASK-76"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; add exact binding and used-position validation to the existing instance record.",
+    "Used means user-recorded consumption, not browser-observed physical state.",
+    "Store stable position identifiers rather than display indices."
+  ]
+}

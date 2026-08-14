@@ -1,0 +1,46 @@
+{
+  "id": "TASK-90",
+  "title": "Delete dependent records or all local data",
+  "category": "functional",
+  "description": "Explain dependents before individual deletion, apply an explicit deletion policy, and provide confirmed complete removal of application-owned IndexedDB and cache data without claiming downloaded backups are deleted.",
+  "acceptanceCriteria": [
+    "Individual deletion lists dependent record identities/types and the explicit block or cascade policy before confirmation",
+    "Cancelled or blocked deletion leaves all durable state unchanged",
+    "Confirmed complete deletion removes every application-owned IndexedDB database/store and Cache Storage entry",
+    "Complete deletion clearly states it is recoverable only from a user-owned export and cannot delete downloaded backup files",
+    "Both confirmation flows default safe, require explicit action, restore focus, and announce results"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Resolve deletion dependencies",
+      "details": "Use the portability registry/reference graph to produce a pure DeletePlan with dependents, explicit block/cascade policy, consequences, and affected counts.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Apply individual policy",
+      "details": "Present the plan before mutation and execute the confirmed policy atomically without dangling references or silent cascading.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Implement complete local deletion",
+      "details": "After strong explicit confirmation, remove all application-owned IndexedDB and cache data, then return to a clean recoverable shell state.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify consequences and scope",
+      "details": "Test blocked/cascade/cancel/failure paths, complete cleanup, focus/status behavior, offline operation, and copy that downloaded exports remain untouched.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-6", "TASK-84", "TASK-85"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; reuse the portability reference graph and current storage cleanup boundaries.",
+    "Deletion owns application storage only; browsers cannot reliably erase arbitrary user downloads.",
+    "Do not delete service-worker infrastructure needed to render the clean-state explanation unless the established cache policy requires it."
+  ]
+}

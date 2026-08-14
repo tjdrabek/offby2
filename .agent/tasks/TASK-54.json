@@ -1,0 +1,46 @@
+{
+  "id": "TASK-54",
+  "title": "Validate scene elements against rounded content regions",
+  "category": "functional",
+  "description": "Validate authoritative shared-scene geometry, including nested and overlay content, against each derived rounded content region and return stable assignment- and element-specific violations.",
+  "acceptanceCriteria": [
+    "Validation consumes the authoritative normalized scene rather than DOM, preview pixels, or editor boxes",
+    "Every violation identifies page, position assignment, stable scene element, and violated boundary or corner reason",
+    "Nested groups, text bounds, paths, images, QR geometry, and overlay children participate in validation",
+    "Known rounded-corner intersections are detected rather than approximated only by an axis-aligned rectangle",
+    "Equivalent normalized scenes produce identical ordered violations",
+    "Validation diagnostics make no physical-containment or printing claim"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define SceneViolation",
+      "details": "Add a serializable violation with stable page, assignment, position, element path/identity, geometric reason, and referenced SafeRegionResult identity.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Traverse authoritative geometry",
+      "details": "Walk scene groups in stable order, resolve transformed element geometry, and compare supported text/path/image/QR bounds against straight and rounded region segments.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Report precise violations",
+      "details": "Emit one deterministic violation per offending element/reason without clipping, dropping, or mutating printable scene nodes.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify geometry cases",
+      "details": "Cover square, rounded-corner, nested, overlay, tangent, outside-edge, multiple-assignment, and repeated-run ordering fixtures.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-51", "TASK-53"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Keep this under ten minutes by validating existing scene primitives through their established application-owned bounds contracts.",
+    "A clean software validation result only means geometry fits the requested model; it does not prove ink will land inside a physical label."
+  ]
+}

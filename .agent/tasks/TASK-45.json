@@ -1,0 +1,45 @@
+{
+  "id": "TASK-45",
+  "title": "Store template assignments by reference",
+  "category": "data-model",
+  "description": "Model a template position assignment as template identity plus per-label typed data and optional allow-listed overrides, never as a copied component tree.",
+  "acceptanceCriteria": [
+    "A template assignment stores template identity, input values, and optional constrained overrides only",
+    "The persisted assignment contains no duplicate of the referenced template content tree",
+    "Template identity must resolve to a compatible version or produce a structured assignment diagnostic",
+    "Overrides target stable node/property identities and reject structural, executable, or unsupported changes",
+    "Two assignments can reference one template with distinct valid values"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define reference assignment data",
+      "details": "Add a discriminated template-assignment value with assignment identity, template identity/version, typed data map, and optional allow-listed override records.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Validate references and overrides",
+      "details": "Resolve the template, validate input names/values, and permit overrides only for documented stable node properties without copying or restructuring the tree.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Resolve an assignment purely",
+      "details": "Create a pure resolution result containing generation-ready values plus assignment/input/property diagnostics while leaving stored template and assignment unchanged.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify non-duplication",
+      "details": "Serialize two assignments to one template, assert no content tree appears in either record, and cover missing template, stale version, invalid value, and forbidden override cases.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-44"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Timebox to one assignment union and resolver seam; authoring UI belongs to later tasks.",
+    "Resolved content is derived generation state, not authoring truth or an incidental save format."
+  ]
+}

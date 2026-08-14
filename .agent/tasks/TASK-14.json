@@ -1,0 +1,52 @@
+{
+  "id": "TASK-14",
+  "title": "Save immutable sheet-layout revisions",
+  "category": "data-model",
+  "description": "Persist validated geometry changes as immutable `SheetLayoutRevision` records under a stable `SheetLayout` identity while retaining every prior revision.",
+  "acceptanceCriteria": [
+    "Creating a sheet layout creates a stable layout identity and revision 1",
+    "Saving changed validated geometry appends a new monotonically numbered immutable revision",
+    "Prior revisions remain readable and unchanged after later saves",
+    "Saving is rejected while structured geometry refusals exist",
+    "A project or caller can reference an exact revision rather than a mutable latest value",
+    "Revision records include schema version, timestamps, normalized geometry, source disclosures, derivation disclosures, and radius state"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define identity and revision records",
+      "details": "Separate stable `SheetLayout` identity/provenance from immutable `SheetLayoutRevision` geometry and disclosure fields with explicit schema and revision numbers.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Create revision repository operations",
+      "details": "Add atomic create-layout, append-revision, get-revision, and list-revisions operations; reject overwrite of an existing layout ID plus revision number.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Gate saves on validation",
+      "details": "Accept only validated normalized geometry and its source/derivation disclosures at the repository boundary; do not let form-state types satisfy the save API.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Connect create and revise actions",
+      "details": "Make first save create revision 1 and subsequent geometry save append the next revision while preserving stable layout identity.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Verify immutability and reload",
+      "details": "Create two revisions, reload from IndexedDB, and assert revision 1 is byte-for-byte equivalent to its original durable value while revision 2 contains the edit.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-9", "TASK-13"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Never update a revision in place; corrections are new revisions.",
+    "Use a transaction that cannot advance revision numbering without storing the corresponding record."
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "TASK-96",
+  "title": "Generate the calibration PDF structure",
+  "category": "functional",
+  "description": "Generate a deterministic calibration scene and PDF with explicit physical page geometry, documented measurement marks, and persistent software-only labeling, without presenting the artifact as physical evidence.",
+  "acceptanceCriteria": [
+    "Calibration output uses the exact TASK-95 layout binding and explicit page boxes",
+    "Measurement marks have documented identities, coordinates, units, and reading instructions",
+    "Scene, PDF, and UI metadata label the artifact as software-generated structure rather than physical evidence",
+    "Equivalent normalized inputs produce equivalent scene data and byte-identical PDF output",
+    "Parsed PDF tests verify page boxes and marks without asserting ink placement"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define calibration marks",
+      "details": "Create framework-neutral mark primitives with stable IDs, millimetre coordinates, units, and textual measurement instructions.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Build the calibration scene",
+      "details": "Use the shared scene boundary and exact layout binding to produce page geometry, marks, and visible software-only evidence disclosure.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Render deterministically",
+      "details": "Route the scene through the isolated PDF renderer with explicit page boxes and stable metadata/order.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify artifact structure",
+      "details": "Parse focused fixtures to check page boxes, mark coordinates, disclosure text, deterministic bytes, and no physical-success wording.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-34", "TASK-95"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; support one small deterministic calibration fixture.",
+    "PDF geometry and marks are software evidence only and cannot prove where ink lands."
+  ]
+}

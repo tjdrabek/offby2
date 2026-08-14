@@ -1,0 +1,45 @@
+{
+  "id": "TASK-107",
+  "title": "Apply one translation sign convention",
+  "category": "functional",
+  "description": "Document and implement one coordinate/sign convention for whole-sheet translation across calibration marks, label preview scenes, and final PDF content, using software fixtures only while physical derivation remains blocked.",
+  "acceptanceCriteria": [
+    "One documented origin, axis direction, and positive/negative x/y meaning is shared by all render paths",
+    "Positive and negative software fixtures move calibration marks and label scene coordinates identically",
+    "Parsed PDF coordinates agree with the shared scene after millimetre-to-point boundary conversion",
+    "Applying translation requires a compatible gated profile; fixture transforms cannot authorize calibrated output"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Document coordinate signs",
+      "details": "Define origin, x/y axis direction, translation order, page relationship, and millimetre-to-point conversion at the renderer boundary.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Create one scene transform",
+      "details": "Apply the narrow TASK-106 translation at the framework-neutral scene root shared by calibration and final content.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Guard production application",
+      "details": "Require a compatible profile and successful physical gate before production use; allow isolated software fixtures only in tests.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify sign consistency",
+      "details": "Compare positive, negative, and zero fixture coordinates across calibration scenes, label previews, and parsed PDF operators.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-96", "TASK-106"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; add one transform and three small coordinate fixtures.",
+    "BLOCKED: tests may prove software sign consistency but cannot prove physical correction or ink placement.",
+    "PDF points appear only at the renderer boundary."
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "TASK-65",
+  "title": "Capture explicit setup attestation",
+  "category": "ui-ux",
+  "description": "Require an accessible operator action that attests exact setup and revision identities while listing every relevant condition the browser cannot inspect.",
+  "acceptanceCriteria": [
+    "Attestation is unchecked by default and requires an explicit operator action",
+    "The disclosure names the selected setup, loading revision, configuration revision, and unobservable assumptions",
+    "The saved attestation records exact identities, disclosure version, action, and timestamp",
+    "Completing or cancelling restores focus and status is announced without relying on color"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define attestation record",
+      "details": "Add a serializable SetupAttestation referencing exact setup/loading/configuration identities, disclosure version, acknowledged assumptions, action, and timestamp.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Build attestation disclosure",
+      "details": "Create a semantic dialog or equivalent flow listing printer selection, media loading, print-dialog values, and other conditions the browser cannot inspect.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Require explicit confirmation",
+      "details": "Keep confirmation false by default, persist only after affirmative action, and restore focus on confirm or cancel.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify accessible attestation",
+      "details": "Add focused contract and Playwright keyboard tests for exact references, disclosure content, cancellation, focus restoration, and reload.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-61", "TASK-62"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; reuse the established modal, disclosure, and focus-management patterns.",
+    "Attestation records an operator statement; it is not automated verification or physical evidence.",
+    "Avoid coercive defaults and suitability language."
+  ]
+}

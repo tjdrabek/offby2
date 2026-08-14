@@ -1,0 +1,45 @@
+{
+  "id": "TASK-103",
+  "title": "Qualify observations using resolved policy",
+  "category": "functional",
+  "description": "Define a policy-driven observation qualification boundary that currently refuses all derivation because no approved physical policy exists; once genuinely unblocked, it may consume only qualifying physical-provenance observations.",
+  "acceptanceCriteria": [
+    "Absent or unresolved physical policy returns a blocked result before examining values for derivation",
+    "Demo, synthetic, software-artifact, malformed, incompatible, and policy-insufficient observations are excluded with structured reasons",
+    "No prototype constant or task fixture acts as an evidence threshold",
+    "The contract requires an explicit versioned approved policy before a qualifying result is possible"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define policy input contract",
+      "details": "Require a versioned approved policy reference covering provenance, sample requirements, diagnostics, thresholds, and correction rules from resolved source issues.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Implement blocked adapter",
+      "details": "Return the TASK-102 gate refusal while policy is absent and do not embed fallback thresholds or synthetic defaults.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Define qualification outcomes",
+      "details": "Model future qualifying and refused outcomes with source observation IDs, policy version, incompatibilities, exclusions, and stable reasons.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test fail-closed behavior",
+      "details": "Verify missing policy, demo-only, synthetic, one-sample, mixed, and incompatible fixtures cannot produce qualifying observations today.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-99", "TASK-102"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; define the boundary and current blocked tests, not a derivation algorithm.",
+    "BLOCKED: implementation of a successful qualification path awaits real physical evidence and approved policy from issues 13, 07, and 09.",
+    "Do not claim policy or qualifying observations exist."
+  ]
+}

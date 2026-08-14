@@ -1,0 +1,51 @@
+{
+  "id": "TASK-4",
+  "title": "Persist versioned project records in IndexedDB",
+  "category": "data-model",
+  "description": "Store minimal `LabelProject` records as versioned durable values through a feature-oriented IndexedDB repository so identities, names, and timestamps survive browser restart.",
+  "acceptanceCriteria": [
+    "A versioned minimal project record contains identity, name, schema version, created timestamp, and updated timestamp",
+    "Project UI operations use a feature-oriented repository rather than direct IndexedDB calls",
+    "Create and rename transactions persist complete records atomically",
+    "Persisted projects reappear with the same identity and name after a browser-context restart",
+    "IndexedDB failures return an actionable error and never produce a false success state"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define the durable record schema",
+      "details": "Create the versioned minimal `LabelProject` record and validation boundary, including stable ID, normalized name, schema version, and deterministic timestamp fields.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Create the project repository",
+      "details": "Implement a feature-oriented repository with list, get, put, and delete operations over one IndexedDB object store; contain browser API details inside the adapter.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Connect project actions to persistence",
+      "details": "Route create, open, rename, list, and delete behavior through the repository and update visible state only after the durable operation succeeds.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify restart durability",
+      "details": "Create and rename a project, close the browser context without clearing storage, reopen it, and assert the same ID and name are loaded from IndexedDB.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Verify storage failure handling",
+      "details": "Inject or simulate an IndexedDB rejection and assert an actionable error is shown while the prior visible and durable state remains truthful.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-3"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Use IndexedDB, not localStorage, as the durable boundary.",
+    "Keep migration metadata explicit even though the first schema has no prior migration."
+  ]
+}

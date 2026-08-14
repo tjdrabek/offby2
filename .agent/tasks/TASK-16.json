@@ -1,0 +1,53 @@
+{
+  "id": "TASK-16",
+  "title": "Separate identity, provenance, and verification",
+  "category": "data-model",
+  "description": "Store and present product identity, source provenance, and physical-verification status as independent values so catalog inclusion or published dimensions never imply measurement evidence.",
+  "acceptanceCriteria": [
+    "Product identity fields are stored independently from source provenance",
+    "Source provenance identifies origin and citation details without changing physical-verification state",
+    "Physical-verification status is explicit and defaults to unverified when no qualifying evidence exists",
+    "Catalog inclusion never sets or labels a layout as physically verified",
+    "The editor displays identity, provenance, and physical verification as three separately labeled groups",
+    "Unknown, unverified, and verified states are not communicated by color alone",
+    "Verify in browser using Playwright"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define independent value types",
+      "details": "Create separate serializable types for product identifiers, source provenance, and physical-verification status; require evidence references only for a verified variant.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Add persistence fields",
+      "details": "Store identity and provenance on the stable sheet layout and verification disclosure at its defined ownership boundary without deriving one field from another.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Render separate editor sections",
+      "details": "Display descriptive headings and values for Product identity, Source provenance, and Physical verification, including text labels for unknown or unverified states.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Prevent evidence inflation",
+      "details": "Ensure catalog import/create paths assign provenance but leave physical verification unverified unless a later evidence workflow supplies qualifying records.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Verify independent edits",
+      "details": "Test combinations of catalog/manual provenance and missing verification, then assert UI labels and durable values remain independent after reload.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-14"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Published product dimensions are source data, not physical evidence.",
+    "No current physical materials can support a verified status under TASK-1."
+  ]
+}

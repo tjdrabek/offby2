@@ -1,0 +1,53 @@
+{
+  "id": "TASK-33",
+  "title": "Separate PDF access from physical printing",
+  "category": "ui-ux",
+  "description": "Provide download and open actions for successful printable output while keeping both actions explicitly separate from physical printing and incapable of creating a physical-print assertion.",
+  "acceptanceCriteria": [
+    "Download and open controls appear only for a complete successful generation with a durable print preparation",
+    "The actions are named as downloading or opening a PDF, never as confirming or completing printing",
+    "Using either action creates no physical-print event, printed status, stock usage, calibration evidence, or printer metadata",
+    "Visible copy states that PDF geometry is software evidence only and does not prove physical scale, placement, or printing",
+    "The preparation inspector labels output as uncalibrated and distinguishes preparation timestamp from any physical event",
+    "Controls and disclosures are keyboard operable, announced, and not color-dependent",
+    "Verify in browser using Playwright"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Model non-physical output actions",
+      "details": "Define download and open as host-layer effects over successful PDF bytes and preparation identity, with no domain transition for printed, used, verified, or calibrated state.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Add uncalibrated disclosures",
+      "details": "Place persistent plain-language software-evidence and uncalibrated notices in Prepare PDF, success, download/open, and preparation-inspection states.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Implement download and open",
+      "details": "Create and revoke local object URLs safely, use a deterministic filename derived from non-secret project/preparation metadata, and expose separate semantic controls.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Build preparation inspection",
+      "details": "Show immutable snapshot identity, hash, layout revision/fingerprint, positions, timestamp, overrides, diagnostics, and uncalibrated status without a physical-print status field.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Verify the evidence boundary",
+      "details": "Use download and open controls in a browser, inspect durable state, and assert no physical-print, calibration, verification, stock-use, or printer assertion is created.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-32"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "The browser cannot inspect print-dialog choices or confirm that printing occurred.",
+    "Opening a PDF may invoke external software; that is still not evidence of physical output."
+  ]
+}

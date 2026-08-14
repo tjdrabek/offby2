@@ -1,0 +1,44 @@
+{
+  "id": "TASK-93",
+  "title": "Validate calibration draft transitions",
+  "category": "functional",
+  "description": "Implement pure calibration-draft transitions that recheck prerequisites, return structured actionable refusals, and preserve the exact prior state whenever an action is rejected.",
+  "acceptanceCriteria": [
+    "Each allowed action validates all prerequisites for its current state",
+    "Out-of-order, incomplete, or incompatible actions return stable reason codes and corrective actions",
+    "Rejected transitions return no effects and leave the input draft deeply unchanged",
+    "Accepted transitions return the next state and an explicit bounded effect request"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define transition results",
+      "details": "Add accepted and refused result variants with stable reason codes, affected fields, corrective actions, and optional effect requests.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Implement pure transitions",
+      "details": "Handle each TASK-92 action as a pure operation that validates state-specific prerequisites before constructing a new draft.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Separate effects",
+      "details": "Represent persistence and artifact generation as requests emitted only by accepted transitions; do not execute effects in the state machine.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test acceptance and refusal",
+      "details": "Cover valid paths, every out-of-order action, missing prerequisites, stable reasons, immutability, and absence of effects on refusal.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-92"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; implement the transition table and focused contract tests only.",
+    "Do not encode suitability thresholds or correction policy in transition guards."
+  ]
+}

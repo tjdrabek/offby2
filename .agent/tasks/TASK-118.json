@@ -1,0 +1,51 @@
+{
+  "id": "TASK-118",
+  "title": "Support the core workflow offline",
+  "category": "functional",
+  "description": "After one successful installation, make startup, project access, content editing, sheet preview, uncalibrated PDF preparation, and workspace export work with the network blocked using bundled application assets and fonts.",
+  "acceptanceCriteria": [
+    "A previously installed production build starts with the network blocked",
+    "Opening projects, editing content, previewing sheets, preparing uncalibrated PDFs, and exporting backups complete offline",
+    "Core workflows make no external asset, image, font, API, telemetry, or service request",
+    "Offline status is persistent, semantic, keyboard accessible, and does not imply cloud recovery",
+    "IndexedDB remains authoritative and user data is not stored as a service-worker cache substitute"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Inventory core runtime resources",
+      "details": "Trace production startup and the named flow to identify application chunks, workers, fonts, icons, and other resources required after installation.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Define application-shell caching",
+      "details": "Precache or safely runtime-cache only versioned application assets needed by the core flow while excluding user records and generated artifacts.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Bundle durable dependencies",
+      "details": "Remove external runtime font/asset dependencies from core paths and ensure durable content references local IndexedDB assets.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Expose offline state",
+      "details": "Present understandable offline status and limitations without blocking local actions or promising server recovery.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Run focused offline smoke",
+      "details": "Install the production build, block network, reload, exercise the named flow, and assert no unexpected network dependency or user-data cache entry.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-9", "TASK-91", "TASK-101", "TASK-117"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; use one small project and a focused installed-build offline smoke.",
+    "Offline support begins after successful initial installation and does not promise every browser/platform combination."
+  ]
+}

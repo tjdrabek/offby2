@@ -1,0 +1,63 @@
+{
+  "id": "TASK-18",
+  "title": "Verify geometry contracts and revision workflow",
+  "category": "functional",
+  "description": "Verify pure geometry contracts and the visible create, revise, preview, reload, refusal, provenance, and immutable-history workflow required by PRD 15.",
+  "acceptanceCriteria": [
+    "Contract checks cover unit parsing, bounded fractions, unique derivation, each refusal class, canonical fingerprints, and label-boundary coordinates",
+    "Equivalent metric and imperial fixtures produce equivalent normalized geometry and fingerprints",
+    "A browser flow creates a layout, discloses a derivation, saves it, revises geometry, and retains both revisions",
+    "Browser coverage proves invalid geometry is refused without a durable revision",
+    "Preview geometry and separate identity, provenance, and verification labels survive reload",
+    "All assertions use public pure contracts or user-visible browser behavior",
+    "Build, lint, unit/integration, and focused Playwright checks pass"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Assemble canonical geometry fixtures",
+      "details": "Create compact fixtures for valid metric and imperial equivalents, each derivation outcome, each refusal class, radius states, and changed/unchanged fingerprint cases.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Verify pure contracts",
+      "details": "Assert parser, derivation, validator, canonical encoder, fingerprint, and preview-primitive outputs without importing React or browser storage.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Verify visible create and refusal",
+      "details": "Create a layout through accessible controls, inspect derivation disclosure and preview, then enter invalid geometry and assert save refusal and associated errors.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify revision history and reload",
+      "details": "Save a valid edit as a second revision, restart the browser context, and assert both immutable revisions, selected preview, fingerprint behavior, and disclosure labels.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Run production checks",
+      "details": "Run build/type checking, lint, unit/integration tests, and the focused Playwright workflow; fix failures without weakening refusal or durability assertions.",
+      "pass": false
+    }
+  ],
+  "dependencies": [
+    "TASK-1",
+    "TASK-10",
+    "TASK-11",
+    "TASK-12",
+    "TASK-13",
+    "TASK-14",
+    "TASK-15",
+    "TASK-16",
+    "TASK-17"
+  ],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Keep browser assertions centered on labels, errors, headings, SVG outputs, and durable revision behavior.",
+    "Physical verification remains unproven even when software geometry contracts pass."
+  ]
+}

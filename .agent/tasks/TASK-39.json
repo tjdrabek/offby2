@@ -1,0 +1,45 @@
+{
+  "id": "TASK-39",
+  "title": "Generate deterministic QR geometry",
+  "category": "integration",
+  "description": "Select an offline QR encoder and convert validated payloads into deterministic application-owned scene geometry at supported physical sizes.",
+  "acceptanceCriteria": [
+    "The selected QR library and redistribution license are documented",
+    "Validated payload, error-correction setting, quiet zone, and physical size produce real QR modules",
+    "Equivalent normalized inputs produce identical QR scene geometry",
+    "Unsupported payload length or size returns a QR-node-specific diagnostic",
+    "Generated fixtures decode to the original payload at every declared supported size"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Select the QR boundary",
+      "details": "Choose and document a browser-compatible offline QR encoder whose output can be normalized into application-owned module data.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Validate QR inputs",
+      "details": "Bound payload bytes and physical sizing, define quiet-zone and error-correction defaults, and reject combinations that cannot produce readable integral modules.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Create scene geometry",
+      "details": "Convert the encoder matrix into stable millimetre path or rectangle nodes without persisting library objects or illustrative placeholders.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify determinism and decoding",
+      "details": "Compare repeated normalized geometry and decode generated fixtures with an independent decoder for supported and refused boundary cases.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-35", "TASK-36"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Limit this ten-minute increment to one encoder adapter, one geometry form, and small boundary fixtures.",
+    "QR decode tests establish digital symbol correctness, not successful physical scanning after printing."
+  ]
+}

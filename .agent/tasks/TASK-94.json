@@ -1,0 +1,44 @@
+{
+  "id": "TASK-94",
+  "title": "Revalidate restored calibration drafts",
+  "category": "functional",
+  "description": "Restore persisted calibration drafts through current schemas and invariants, explicitly invalidating stale layout, setup, loading, or print-configuration assumptions before continuation.",
+  "acceptanceCriteria": [
+    "Restoration parses and migrates supported draft versions before use",
+    "Every immutable reference and fingerprint is resolved against current durable records",
+    "Missing, changed, or incompatible assumptions produce structured invalidation reasons before continuation",
+    "Invalid restoration preserves the stored draft for review and performs no workflow effect"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Load through current schema",
+      "details": "Parse a stored draft, run supported migrations, and retain source-version and migration diagnostics.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Resolve exact assumptions",
+      "details": "Resolve layout revision, fingerprint, setup, loading revision, and configuration revision without silently substituting newer records.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Return restoration outcome",
+      "details": "Produce resumable or invalidated results with stable reasons and corrective actions while preserving the original record.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test stale restoration",
+      "details": "Cover supported migration, missing records, changed fingerprints, incompatible revisions, malformed input, and no-effect refusal.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-93"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; limit work to restoration validation and fixtures.",
+    "Never reinterpret stale assumptions as current operator confirmation."
+  ]
+}

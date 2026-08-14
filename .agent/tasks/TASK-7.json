@@ -1,0 +1,52 @@
+{
+  "id": "TASK-7",
+  "title": "Activate updates through controlled reload",
+  "category": "functional",
+  "description": "Announce a waiting service-worker update and activate it only after open changes are durable and the user explicitly accepts a controlled reload.",
+  "acceptanceCriteria": [
+    "A waiting service worker produces a visible and programmatically announced update notice",
+    "The application never reloads automatically over a non-durable open change",
+    "Accepting an update first verifies or completes draft durability",
+    "The waiting worker activates and the page reloads only after durability succeeds",
+    "A failed save blocks activation and provides an actionable retry path",
+    "Verify in browser using Playwright"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Expose waiting-worker state",
+      "details": "Translate service-worker lifecycle events into typed host state for no update, update waiting, activation requested, and activation failed.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Render the update notice",
+      "details": "Show a non-color-only status message with explicit Update now and Later actions; announce availability without stealing focus.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Gate activation on durability",
+      "details": "Before messaging the waiting worker to activate, await the project repository's durable-draft operation; keep the current page open if persistence rejects.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Perform one controlled reload",
+      "details": "After the new worker controls the page, reload exactly once and clear transient activation state to prevent loops.",
+      "pass": false
+    },
+    {
+      "step": 5,
+      "description": "Verify safe and blocked paths",
+      "details": "Simulate a waiting worker with both successful and failed durability, asserting that only the successful explicit path activates and reloads.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-5", "TASK-6"],
+  "estimatedComplexity": "medium",
+  "technicalNotes": [
+    "Keep service-worker messaging in the host layer rather than domain modules.",
+    "Treat a pending write as non-durable even if current UI state looks complete."
+  ]
+}

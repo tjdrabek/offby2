@@ -1,0 +1,45 @@
+{
+  "id": "TASK-40",
+  "title": "Unify bundled font behavior",
+  "category": "integration",
+  "description": "Document a redistributable bundled font set and make shared metrics and bytes the sole typography source for rich scene layout, SVG preview, and PDF output.",
+  "acceptanceCriteria": [
+    "Every bundled font file, supported weight/style, source, and redistribution license is documented",
+    "Scene layout, SVG preview, and PDF rendering resolve the same font identity and metrics",
+    "Unsupported font, weight, style, or glyph requests return structured diagnostics",
+    "No system-font fallback can silently alter printable geometry",
+    "A mixed-text fixture has matching normalized positions in preview and parsed PDF"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Audit the existing font boundary",
+      "details": "Review TASK-29 font resources and licenses, then define the minimal rich-content font registry without adding a second metrics source.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Share font resolution",
+      "details": "Route scene layout, preview registration, and PDF embedding through one application-owned font identity, metrics, glyph-coverage, and bytes contract.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Refuse unsupported typography",
+      "details": "Return node-specific diagnostics for unavailable family, style, weight, or glyphs instead of allowing browser or PDF fallbacks.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Verify adapter parity",
+      "details": "Render one mixed rich-text fixture through SVG and PDF adapters and compare normalized text positions and selected font resources.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-29", "TASK-35", "TASK-36"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Keep this increment under ten minutes by reusing the TASK-29 font set and adding only rich-content registry coverage.",
+    "Font parity is software evidence and does not prove physical printed scale or placement."
+  ]
+}

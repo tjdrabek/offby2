@@ -1,0 +1,44 @@
+{
+  "id": "TASK-112",
+  "title": "Restore focus after workflow changes",
+  "category": "ui-ux",
+  "description": "Centralize predictable focus restoration after dialogs, navigation, refusals, imports, update prompts, and PDF generation so focus returns to the initiating or next logical available control.",
+  "acceptanceCriteria": [
+    "Closing or cancelling a dialog returns focus to its surviving initiator",
+    "Removed initiators fall back to a documented next logical heading or control",
+    "Navigation, refusal, import, update, and generation outcomes never leave focus in hidden or removed content",
+    "Focus movement occurs once, is visible, and does not steal focus during ordinary editing"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "description": "Define restoration policy",
+      "details": "Specify initiator capture, successful-action targets, refusal targets, removed-element fallback, and route-heading behavior.",
+      "pass": false
+    },
+    {
+      "step": 2,
+      "description": "Create shared focus helper",
+      "details": "Implement a small presentation utility that restores focus after committed UI changes without coupling to domain rules.",
+      "pass": false
+    },
+    {
+      "step": 3,
+      "description": "Apply to named transitions",
+      "details": "Wire dialogs, navigation, refusals, imports, update prompts, and PDF generation to explicit focus outcomes.",
+      "pass": false
+    },
+    {
+      "step": 4,
+      "description": "Test focus outcomes",
+      "details": "Assert active-element targets for success, cancellation, refusal, async completion, initiator removal, and repeated status updates.",
+      "pass": false
+    }
+  ],
+  "dependencies": ["TASK-1", "TASK-110", "TASK-111"],
+  "estimatedComplexity": "low",
+  "technicalNotes": [
+    "Maximum execution scope is ten minutes; add one helper and focused named-transition tests.",
+    "Status announcement and focus movement are separate; do not focus every live-region update."
+  ]
+}
