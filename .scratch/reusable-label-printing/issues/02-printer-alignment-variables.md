@@ -14,3 +14,5 @@ A profile can defensibly correct only errors that repeated measurements show are
 Run-to-run feed variation, inconsistent loading, changing skew, unsupported or changing media, worn or dirty mechanics, altered dialog settings, non-printable regions, and layout/product mismatch cannot be repaired by saved browser calibration. Experiments must separate systematic error from variation across repeated load cycles and sheet positions. No reviewed primary source supports a universal numeric consumer-printer tolerance, so this effort must derive any claim from its own test matrix.
 
 Detailed findings: [Printer alignment variables](../research/printer-alignment-variables.md)
+
+Research context: branch `research/printer-alignment-variables` at `ae89770`.

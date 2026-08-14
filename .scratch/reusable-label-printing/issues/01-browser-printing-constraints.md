@@ -14,3 +14,5 @@ The portable browser surface is CSS-centric: the package can describe page and l
 The package may own preview, calibration guidance, and serializable corrections. The host application and human operator must identify the intended printing setup, choose the printer and dialog settings, measure output, and persist profiles through the package abstraction.
 
 Detailed findings: [Browser printing constraints](../research/browser-printing-constraints.md)
+
+Research context: branch `research/browser-printing-constraints` at `ae89770`.
