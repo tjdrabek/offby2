@@ -111,6 +111,19 @@
   color: #b3261e;
 }
 
+.sheet-layout-error-summary p {
+  margin: 0;
+}
+
+/* Each refused condition stands on its own line so several can be read apart. */
+.sheet-layout-error-summary ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
 /* Stays mounted so messages are announced, but out of flow while empty so it
    does not consume a flex gap. */
 .sheet-layout-status:empty {

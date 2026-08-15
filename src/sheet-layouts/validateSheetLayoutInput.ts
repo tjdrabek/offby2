@@ -14,6 +14,7 @@ import {
   parseGridCountText,
 } from "./SheetGeometry";
 import type { DerivationRefusalCode } from "./deriveDimension";
+import type { SheetGeometryRefusalCode } from "./validateSheetGeometry";
 import {
   REQUIRED_MESSAGE,
   parseMeasurement,
@@ -44,7 +45,10 @@ export type SheetLayoutIssueCode =
   | MeasurementParseErrorCode
   // Attached by resolveSheetLayout.ts when a missing value could not be
   // derived; the field it belongs to reports it like any other refusal.
-  | DerivationRefusalCode;
+  | DerivationRefusalCode
+  // Attached by validateSheetGeometry.ts when every entry was readable but the
+  // sheet they describe cannot exist. Same association, different phase.
+  | SheetGeometryRefusalCode;
 
 export interface SheetLayoutIssue {
   field: SheetLayoutFieldId;

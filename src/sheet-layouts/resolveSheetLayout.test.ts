@@ -44,6 +44,17 @@ function sheet(
   };
 }
 
+/** The consistent sheet with a radius state that carries its own measurement. */
+function withRadius(
+  state: "known" | "estimated",
+  text: string,
+): SheetLayoutSourceInput {
+  return {
+    ...withCornerRadiusState(sheet(), state, "mm"),
+    cornerRadius: { state, value: { text, unit: "mm" } },
+  };
+}
+
 describe("resolveSheetLayout", () => {
   it("resolves a fully entered layout without deriving anything", () => {
     const result = resolveSheetLayout(sheet());
@@ -176,5 +187,79 @@ describe("resolveSheetLayout", () => {
       field: "marginLeft",
       code: "derivation-negative",
     });
+  });
+
+  it("restates a resolved layout as normalized geometry", () => {
+    const result = resolveSheetLayout(withRadius("known", "2"));
+    if (result.status !== "resolved") {
+      throw new Error("Expected the complete sheet to resolve.");
+    }
+
+    expect(result.layout.geometry).toEqual({
+      sheet: { widthMm: 210, heightMm: 297 },
+      grid: { rows: 7, columns: 3 },
+      label: { widthMm: 60, heightMm: 38 },
+      margins: { topMm: 9.5, rightMm: 10, bottomMm: 9.5, leftMm: 10 },
+      gaps: { horizontalMm: 5, verticalMm: 2 },
+      cornerRadius: { state: "known", radiusMm: 2 },
+    });
+  });
+
+  it("keeps an unknown radius distinct from zero in the geometry", () => {
+    for (const state of ["zero", "unknown"] as const) {
+      const result = resolveSheetLayout(
+        withCornerRadiusState(sheet(), state, "mm"),
+      );
+      if (result.status !== "resolved") {
+        throw new Error(`Expected a ${state} radius to resolve.`);
+      }
+
+      expect(result.layout.geometry.cornerRadius).toEqual({ state });
+    }
+  });
+
+  it("refuses readable entries that describe an impossible sheet", () => {
+    const result = resolveSheetLayout(sheet({ marginRight: "20" }));
+    if (result.status !== "refused") {
+      throw new Error("Expected contradictory extents to be refused.");
+    }
+
+    expect(result.refusals).toHaveLength(1);
+    expect(result.refusals[0].code).toBe("geometry-extent-contradiction");
+    // Nothing resolved is handed back: a refused sheet has no value to hold.
+    expect(result).not.toHaveProperty("layout");
+  });
+
+  it("judges a derived value like any other before accepting it", () => {
+    // The equation happily supplies an 80 mm label width, but the negative gap
+    // it was derived from overlaps every neighbouring label.
+    const result = resolveSheetLayout(
+      sheet({ labelWidth: "", horizontalGap: "-25" }),
+    );
+    if (result.status !== "refused") {
+      throw new Error("Expected the derived geometry to be refused.");
+    }
+
+    expect(result.refusals[0].code).toBe("geometry-labels-overlap");
+  });
+
+  it("refuses a radius larger than half the shorter label side", () => {
+    const result = resolveSheetLayout(withRadius("estimated", "25"));
+    if (result.status !== "refused") {
+      throw new Error("Expected an overlarge radius to be refused.");
+    }
+
+    expect(result.refusals[0]).toMatchObject({
+      code: "geometry-radius-exceeds-label",
+      fields: ["cornerRadius", "labelWidth", "labelHeight"],
+    });
+  });
+
+  it("leaves every entry exactly as typed when geometry is refused", () => {
+    const input = sheet({ marginRight: "20" });
+    const before = structuredClone(input);
+
+    expect(resolveSheetLayout(input).status).toBe("refused");
+    expect(input).toEqual(before);
   });
 });

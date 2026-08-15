@@ -1,18 +1,40 @@
 import { test, expect, type Page } from "@playwright/test";
 import { SCREENSHOTS } from "./support/paths.js";
 
-/** Every dimensional field, in the unit the form is currently showing. */
+/**
+ * An A4 sheet of 21 labels, in millimetres. Both axis equations balance, which
+ * is what the geometry validator requires of a describable sheet:
+ * 210 = 7.25 + 3 × 63.5 + 2 × 2.5 + 7.25, and 297 = 15.15 + 7 × 38.1 + 15.15.
+ */
 const MEASUREMENTS: readonly [string, string][] = [
   ["Sheet width", "210"],
   ["Sheet height", "297"],
   ["Label width", "63.5"],
   ["Label height", "38.1"],
-  ["Top margin", "10"],
-  ["Right margin", "7"],
-  ["Bottom margin", "10"],
-  ["Left margin", "7"],
+  ["Top margin", "15.15"],
+  ["Right margin", "7.25"],
+  ["Bottom margin", "15.15"],
+  ["Left margin", "7.25"],
   ["Horizontal gap", "2.5"],
   ["Vertical gap", "0"],
+];
+
+/**
+ * A US Letter sheet of 18 labels, in inches, with the label width written as a
+ * fraction: 8.5 = 0.25 + 3 × 2.5 + 2 × 0.25 + 0.25, and
+ * 11 = 0.5 + 6 × 1.5 + 5 × 0.2 + 0.5.
+ */
+const INCHES: readonly [string, string][] = [
+  ["Sheet width", "8.5"],
+  ["Sheet height", "11"],
+  ["Label width", "2 1/2"],
+  ["Label height", "1.5"],
+  ["Top margin", "0.5"],
+  ["Right margin", "0.25"],
+  ["Bottom margin", "0.5"],
+  ["Left margin", "0.25"],
+  ["Horizontal gap", "0.25"],
+  ["Vertical gap", "0.2"],
 ];
 
 async function openSheetLayouts(page: Page) {
@@ -29,12 +51,21 @@ async function openSheetLayouts(page: Page) {
   return consoleErrors;
 }
 
-async function fillCompleteSheet(page: Page, suffix = "mm") {
-  for (const [label, value] of MEASUREMENTS) {
+async function fillSheet(
+  page: Page,
+  values: readonly [string, string][],
+  suffix: string,
+  counts: { rows: string; columns: string },
+) {
+  for (const [label, value] of values) {
     await page.getByLabel(`${label} (${suffix})`).fill(value);
   }
-  await page.getByLabel("Rows").fill("7");
-  await page.getByLabel("Columns").fill("3");
+  await page.getByLabel("Rows").fill(counts.rows);
+  await page.getByLabel("Columns").fill(counts.columns);
+}
+
+async function fillCompleteSheet(page: Page) {
+  await fillSheet(page, MEASUREMENTS, "mm", { rows: "7", columns: "3" });
 }
 
 /**
@@ -173,9 +204,10 @@ test("normalizes imperial and metric entries into the same millimetres", async (
   await normalized.scrollIntoViewIfNeeded();
   await page.screenshot({ path: `${SCREENSHOTS}TASK-11-1.png` });
 
-  // The same label, written as an imperial fraction, normalizes identically.
+  // The same label, written as an imperial fraction on an imperial sheet,
+  // normalizes to identical millimetres.
   await page.getByLabel("Measurement unit").selectOption("in");
-  await page.getByLabel("Label width (in)").fill("2 1/2");
+  await fillSheet(page, INCHES, "in", { rows: "6", columns: "3" });
   await check.click();
   await expect(normalized.locator('[data-field-mm="labelWidth"]')).toHaveText(
     "63.5 mm",
@@ -328,6 +360,85 @@ test("refuses to derive when the answer is not unique, negative, or alone", asyn
     page.getByLabel("Horizontal gap (mm)"),
   ).toHaveAccessibleDescription(/Horizontal gap does not appear/);
   await page.screenshot({ path: `${SCREENSHOTS}TASK-12-4.png` });
+
+  expect(consoleErrors).toEqual([]);
+});
+
+test("refuses geometry it cannot describe and stores nothing", async ({
+  page,
+}) => {
+  const consoleErrors = await openSheetLayouts(page);
+  const check = page.getByRole("button", { name: "Check measurements" });
+  const alert = page.getByRole("alert");
+  const normalized = page.getByRole("table", {
+    name: "Normalized measurements",
+  });
+
+  // Contradictory extents: the parts of the sheet no longer add up to it.
+  await fillCompleteSheet(page);
+  await page.getByLabel("Right margin (mm)").fill("20");
+  await check.click();
+  await expect(alert).toContainText("This sheet cannot be described");
+  await expect(alert).toContainText(
+    "The horizontal measurements add up to 222.75 mm, but Sheet width is 210 mm",
+  );
+  await expect(alert.getByRole("listitem")).toHaveCount(1);
+  await expect(normalized).toHaveCount(0);
+  // The entry stays exactly as typed, and the refusal is on every field the
+  // reader could change, starting with the one that has focus.
+  await expect(page.getByLabel("Right margin (mm)")).toHaveValue("20");
+  await expect(page.getByLabel("Sheet width (mm)")).toBeFocused();
+  await expect(page.getByLabel("Columns")).toHaveAttribute(
+    "aria-invalid",
+    "true",
+  );
+  await expect(page.getByLabel("Label width (mm)")).toHaveAccessibleDescription(
+    /horizontal measurements add up to/,
+  );
+  await expect(page.getByLabel("Sheet height (mm)")).not.toHaveAttribute(
+    "aria-invalid",
+  );
+  await page.screenshot({ path: `${SCREENSHOTS}TASK-13-1.png` });
+
+  // A negative gap is refused as the overlap it would produce.
+  await page.getByLabel("Right margin (mm)").fill("7.25");
+  await page.getByLabel("Horizontal gap (mm)").fill("-2");
+  await check.click();
+  await expect(alert).toContainText("column 2 would overlap column 1 by 2 mm");
+  await expect(page.getByLabel("Horizontal gap (mm)")).toHaveValue("-2");
+  await page.screenshot({ path: `${SCREENSHOTS}TASK-13-2.png` });
+
+  // Labels that run past the sheet edge are refused as out of bounds.
+  await page.getByLabel("Horizontal gap (mm)").fill("2.5");
+  await page.getByLabel("Left margin (mm)").fill("20");
+  await check.click();
+  await expect(alert).toContainText("The grid does not fit the sheet");
+  await expect(alert).toContainText("column 3 runs from 152 mm to 215.5 mm");
+  await page.screenshot({ path: `${SCREENSHOTS}TASK-13-3.png` });
+
+  // A radius larger than half the shorter label side is refused too.
+  await page.getByLabel("Left margin (mm)").fill("7.25");
+  await page.getByRole("radio", { name: "Known radius", exact: true }).check();
+  await page.getByLabel("Corner radius (mm)").fill("25");
+  await check.click();
+  await expect(page.getByLabel("Corner radius (mm)")).toBeFocused();
+  await expect(
+    page.getByLabel("Corner radius (mm)"),
+  ).toHaveAccessibleDescription(/19.05 mm or less/);
+  await page.screenshot({ path: `${SCREENSHOTS}TASK-13-4.png` });
+
+  // Corrected, the same sheet is captured — nothing was adjusted on its behalf.
+  await page.getByLabel("Corner radius (mm)").fill("2");
+  await check.click();
+  await expect(alert).toHaveCount(0);
+  await expect(
+    page.getByRole("status", { name: "Sheet layout status" }),
+  ).toHaveText(
+    "Measurements captured: 7 rows by 3 columns. Corner radius: Known radius.",
+  );
+  await expect(normalized.locator('[data-field-mm="marginRight"]')).toHaveText(
+    "7.25 mm",
+  );
 
   expect(consoleErrors).toEqual([]);
 });

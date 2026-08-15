@@ -55,7 +55,7 @@ export interface AxisEquation {
 }
 
 /** Used where a message speaks about a single row or column. */
-const COUNT_SINGULAR: Record<CountFieldId, string> = {
+export const COUNT_SINGULAR: Record<CountFieldId, string> = {
   rows: "row",
   columns: "column",
 };
@@ -183,7 +183,7 @@ function mm(value: number): string {
 }
 
 /** "Sheet width = Left margin + Columns × Label width + …" */
-function equationText(equation: AxisEquation): string {
+export function axisEquationText(equation: AxisEquation): string {
   const count = countFieldLabel(equation.count);
   return (
     `${measurementFieldLabel(equation.extent)} = ` +
@@ -318,7 +318,7 @@ function solve(
       field,
       label,
       axis: equation.axis,
-      equation: equationText(equation),
+      equation: axisEquationText(equation),
       substitution: substitutionText(values, count),
       operands: operandsOf(equation, values, count, term),
       valueMm: millimetres(value),

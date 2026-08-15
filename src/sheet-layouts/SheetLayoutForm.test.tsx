@@ -8,29 +8,67 @@ afterEach(() => {
   cleanup();
 });
 
-/** Every dimensional field, in the unit the form is currently showing. */
+/**
+ * Every dimensional field of an A4 sheet of 21 labels, in millimetres.
+ *
+ * Both axis equations balance, which is what the geometry validator requires:
+ * 210 = 7.25 + 3 × 63.5 + 2 × 2.5 + 7.25, and 297 = 15.15 + 7 × 38.1 + 15.15.
+ */
 const MEASUREMENTS: readonly [string, string][] = [
   ["Sheet width", "210"],
   ["Sheet height", "297"],
   ["Label width", "63.5"],
   ["Label height", "38.1"],
-  ["Top margin", "10"],
-  ["Right margin", "7"],
-  ["Bottom margin", "10"],
-  ["Left margin", "7"],
+  ["Top margin", "15.15"],
+  ["Right margin", "7.25"],
+  ["Bottom margin", "15.15"],
+  ["Left margin", "7.25"],
   ["Horizontal gap", "2.5"],
   ["Vertical gap", "0"],
 ];
 
-async function fillCompleteSheet(
+/**
+ * The same sheet expressed in inches: US Letter carrying 18 labels.
+ *
+ * 8.5 = 0.25 + 3 × 2.5 + 2 × 0.25 + 0.25, and 11 = 0.5 + 6 × 1.5 + 5 × 0.2 + 0.5.
+ * The label width is written as a fraction so it exercises that notation.
+ */
+const INCHES: readonly [string, string][] = [
+  ["Sheet width", "8.5"],
+  ["Sheet height", "11"],
+  ["Label width", "2 1/2"],
+  ["Label height", "1.5"],
+  ["Top margin", "0.5"],
+  ["Right margin", "0.25"],
+  ["Bottom margin", "0.5"],
+  ["Left margin", "0.25"],
+  ["Horizontal gap", "0.25"],
+  ["Vertical gap", "0.2"],
+];
+
+async function fillSheet(
   user: ReturnType<typeof userEvent.setup>,
-  suffix = "mm",
+  values: readonly [string, string][],
+  suffix: string,
+  counts: { rows: string; columns: string },
 ) {
-  for (const [label, value] of MEASUREMENTS) {
-    await user.type(screen.getByLabelText(`${label} (${suffix})`), value);
+  for (const [label, value] of values) {
+    const field = screen.getByLabelText(`${label} (${suffix})`);
+    await user.clear(field);
+    await user.type(field, value);
   }
-  await user.type(screen.getByLabelText("Rows"), "7");
-  await user.type(screen.getByLabelText("Columns"), "3");
+  await user.clear(screen.getByLabelText("Rows"));
+  await user.type(screen.getByLabelText("Rows"), counts.rows);
+  await user.clear(screen.getByLabelText("Columns"));
+  await user.type(screen.getByLabelText("Columns"), counts.columns);
+}
+
+async function fillCompleteSheet(user: ReturnType<typeof userEvent.setup>) {
+  await fillSheet(user, MEASUREMENTS, "mm", { rows: "7", columns: "3" });
+}
+
+async function fillInchSheet(user: ReturnType<typeof userEvent.setup>) {
+  await fillSheet(user, INCHES, "in", { rows: "6", columns: "3" });
 }
 
 /**
@@ -241,10 +279,10 @@ describe("SheetLayoutForm", () => {
         sheetHeight: { text: "297", unit: "mm" },
         labelWidth: { text: "63.5", unit: "mm" },
         labelHeight: { text: "38.1", unit: "mm" },
-        marginTop: { text: "10", unit: "mm" },
-        marginRight: { text: "7", unit: "mm" },
-        marginBottom: { text: "10", unit: "mm" },
-        marginLeft: { text: "7", unit: "mm" },
+        marginTop: { text: "15.15", unit: "mm" },
+        marginRight: { text: "7.25", unit: "mm" },
+        marginBottom: { text: "15.15", unit: "mm" },
+        marginLeft: { text: "7.25", unit: "mm" },
         horizontalGap: { text: "2.5", unit: "mm" },
         verticalGap: { text: "0", unit: "mm" },
       },
@@ -284,9 +322,7 @@ describe("SheetLayoutForm", () => {
       screen.getByLabelText("Measurement unit"),
       "Inches (in)",
     );
-    await fillCompleteSheet(user, "in");
-    await user.clear(screen.getByLabelText("Label width (in)"));
-    await user.type(screen.getByLabelText("Label width (in)"), "2 1/2");
+    await fillInchSheet(user);
     await user.click(
       screen.getByRole("button", { name: "Check measurements" }),
     );
@@ -448,6 +484,129 @@ describe("SheetLayoutForm", () => {
       screen.getByLabelText("Left margin (mm)"),
     ).toHaveAccessibleDescription("Enter a value.");
     expect(screen.queryByText(/Derived value:/)).toBeNull();
+  });
+
+  it("refuses a sheet the measurements cannot describe, and keeps them", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(<SheetLayoutForm onSubmit={onSubmit} />);
+
+    await fillCompleteSheet(user);
+    await user.clear(screen.getByLabelText("Right margin (mm)"));
+    await user.type(screen.getByLabelText("Right margin (mm)"), "20");
+    await user.click(
+      screen.getByRole("button", { name: "Check measurements" }),
+    );
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent(
+      "This sheet cannot be described as entered",
+    );
+    expect(alert).toHaveTextContent(/add up to 222.75 mm/);
+    // Nothing is corrected to make it fit, and no result is shown.
+    expect(screen.getByLabelText("Right margin (mm)")).toHaveValue("20");
+    expect(screen.getByLabelText("Sheet width (mm)")).toHaveValue("210");
+    expect(
+      screen.queryByRole("table", { name: "Normalized measurements" }),
+    ).toBeNull();
+  });
+
+  it("associates a refusal with every field a reader could change", async () => {
+    const user = userEvent.setup();
+    render(<SheetLayoutForm />);
+
+    await fillCompleteSheet(user);
+    await user.clear(screen.getByLabelText("Right margin (mm)"));
+    await user.type(screen.getByLabelText("Right margin (mm)"), "20");
+    await user.click(
+      screen.getByRole("button", { name: "Check measurements" }),
+    );
+
+    const sheetWidth = screen.getByLabelText("Sheet width (mm)");
+    expect(sheetWidth).toHaveFocus();
+    for (const label of [
+      "Sheet width (mm)",
+      "Left margin (mm)",
+      "Label width (mm)",
+      "Horizontal gap (mm)",
+      "Right margin (mm)",
+      "Columns",
+    ]) {
+      expect(screen.getByLabelText(label)).toHaveAttribute(
+        "aria-invalid",
+        "true",
+      );
+      expect(screen.getByLabelText(label)).toHaveAccessibleDescription(
+        /horizontal measurements add up to/,
+      );
+    }
+    // The vertical axis still balances, so nothing there is marked.
+    expect(screen.getByLabelText("Sheet height (mm)")).not.toHaveAttribute(
+      "aria-invalid",
+    );
+  });
+
+  it("lists every refused condition separately", async () => {
+    const user = userEvent.setup();
+    render(<SheetLayoutForm />);
+
+    await fillCompleteSheet(user);
+    await user.clear(screen.getByLabelText("Right margin (mm)"));
+    await user.type(screen.getByLabelText("Right margin (mm)"), "20");
+    await user.clear(screen.getByLabelText("Bottom margin (mm)"));
+    await user.type(screen.getByLabelText("Bottom margin (mm)"), "5");
+    await user.click(
+      screen.getByRole("button", { name: "Check measurements" }),
+    );
+
+    const problems = within(screen.getByRole("alert")).getAllByRole("listitem");
+    expect(problems).toHaveLength(2);
+    expect(problems[0]).toHaveTextContent(/horizontal measurements/);
+    expect(problems[1]).toHaveTextContent(/vertical measurements/);
+  });
+
+  it("refuses a corner radius larger than half the shorter label side", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(<SheetLayoutForm onSubmit={onSubmit} />);
+
+    await fillCompleteSheet(user);
+    await user.click(screen.getByRole("radio", { name: "Known radius" }));
+    await user.type(screen.getByLabelText("Corner radius (mm)"), "25");
+    await user.click(
+      screen.getByRole("button", { name: "Check measurements" }),
+    );
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    const radius = screen.getByLabelText("Corner radius (mm)");
+    expect(radius).toHaveValue("25");
+    expect(radius).toHaveAccessibleDescription(/19.05 mm or less/);
+    expect(radius).toHaveFocus();
+  });
+
+  it("clears a refusal once the geometry is corrected", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(<SheetLayoutForm onSubmit={onSubmit} />);
+
+    await fillCompleteSheet(user);
+    await user.clear(screen.getByLabelText("Horizontal gap (mm)"));
+    await user.type(screen.getByLabelText("Horizontal gap (mm)"), "-2");
+    await user.click(
+      screen.getByRole("button", { name: "Check measurements" }),
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent(/cannot overlap/);
+
+    await user.clear(screen.getByLabelText("Horizontal gap (mm)"));
+    await user.type(screen.getByLabelText("Horizontal gap (mm)"), "2.5");
+    await user.click(
+      screen.getByRole("button", { name: "Check measurements" }),
+    );
+
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(statusRegion()).toHaveTextContent("Measurements captured");
+    expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 
   it("starts with an empty status region so a later result is announced", () => {

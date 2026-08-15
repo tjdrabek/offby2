@@ -29,6 +29,10 @@ import {
   type ResolvedSheetLayout,
 } from "./resolveSheetLayout";
 import NormalizedMeasurements from "./NormalizedMeasurements";
+import {
+  geometryRefusalIssues,
+  type SheetGeometryRefusal,
+} from "./validateSheetGeometry";
 import { formatMeasurement } from "./measurementUnits";
 import "./SheetLayoutForm.css";
 
@@ -83,6 +87,9 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
     ReadonlyMap<SheetLayoutFieldId, SheetLayoutIssue>
   >(new Map());
   const [summary, setSummary] = useState<string | null>(null);
+  // Geometry refusals span several fields at once, so the summary lists them
+  // in full as well as attaching each one to the controls it names.
+  const [refusals, setRefusals] = useState<readonly SheetGeometryRefusal[]>([]);
   const [status, setStatus] = useState<string | null>(null);
   // Held from the last accepted check. Changing the display unit re-reads the
   // form's labels, never this: normalized geometry is not display state.
@@ -142,6 +149,7 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
     const resolution = resolveSheetLayout(input);
     if (resolution.status === "unresolved") {
       setIssues(issuesByField(resolution.issues));
+      setRefusals([]);
       setStatus(null);
       const count = resolution.issues.length;
       setSummary(
@@ -153,8 +161,26 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
       focusField(resolution.issues[0].field);
       return;
     }
+    if (resolution.status === "refused") {
+      // Every entry was readable, so nothing is reported as unreadable: what
+      // is refused is the sheet they describe, and no value is adjusted to fit.
+      const geometryIssues = geometryRefusalIssues(resolution.refusals);
+      setIssues(issuesByField(geometryIssues));
+      setRefusals(resolution.refusals);
+      setStatus(null);
+      const count = resolution.refusals.length;
+      setSummary(
+        `This sheet cannot be described as entered. ${count} problem${count === 1 ? "" : "s"} to resolve:`,
+      );
+      setResolved(null);
+      if (geometryIssues.length > 0) {
+        focusField(geometryIssues[0].field);
+      }
+      return;
+    }
     const { layout } = resolution;
     setIssues(new Map());
+    setRefusals([]);
     setSummary(null);
     setResolved(layout);
     const derived = layout.derivation
@@ -207,9 +233,18 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
       </p>
 
       {summary && (
-        <p role="alert" className="sheet-layout-error-summary">
-          {summary}
-        </p>
+        <div role="alert" className="sheet-layout-error-summary">
+          <p>{summary}</p>
+          {refusals.length > 0 && (
+            <ul>
+              {refusals.map((refusal) => (
+                <li key={`${refusal.code}:${refusal.fields.join(",")}`}>
+                  {refusal.message}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       )}
 
       <div className="sheet-layout-field">
