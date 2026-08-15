@@ -40,6 +40,7 @@
   "estimatedComplexity": "low",
   "technicalNotes": [
     "Maximum execution scope is ten minutes; implement only the current fail-closed gate and focused refusal tests.",
+    "PHYSICAL BLOCKERS (source issues, not generated task IDs): issue 13 must establish available materials, issue 07 must establish a repeated-observation baseline, and issue 09 must establish evidence thresholds and correction policy.",
     "BLOCKED: no known printer, stock, fresh sheets, measuring tools, repeated observations, evidence thresholds, or resolved correction policy exist.",
     "This task may implement refusal behavior but cannot mark any physical prerequisite resolved."
   ]

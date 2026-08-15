@@ -7,7 +7,8 @@
     "The disclaimer is visible during instance editing, selection, preview/planning, reuse confirmation, and preparation review",
     "Text explicitly says the application cannot determine whether a partially used sheet is mechanically safe to refeed",
     "Warnings distinguish recorded used positions from physical inspection and safety",
-    "The disclosure is programmatically associated where action is required and remains understandable without color or icon"
+    "The disclosure is programmatically associated where action is required and remains understandable without color or icon",
+    "Verify in browser using Playwright"
   ],
   "steps": [
     {

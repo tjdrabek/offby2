@@ -35,10 +35,11 @@
       "pass": false
     }
   ],
-  "dependencies": ["TASK-1", "TASK-102", "TASK-105"],
+  "dependencies": ["TASK-1", "TASK-101", "TASK-102", "TASK-105"],
   "estimatedComplexity": "low",
   "technicalNotes": [
     "Maximum execution scope is ten minutes; define the narrow value object and gate tests only.",
+    "PHYSICAL BLOCKERS (source issues, not generated task IDs): issue 13 must establish available materials, issue 07 must establish a repeated-observation baseline, and issue 09 must establish evidence thresholds and correction policy.",
     "BLOCKED: physically derived x/y values do not exist and must not be fabricated.",
     "Zero test fixtures verify software behavior only and are not calibrated profiles."
   ]

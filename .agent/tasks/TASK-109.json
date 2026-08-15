@@ -35,10 +35,11 @@
       "pass": false
     }
   ],
-  "dependencies": ["TASK-1", "TASK-102", "TASK-106"],
+  "dependencies": ["TASK-1", "TASK-101", "TASK-102", "TASK-106"],
   "estimatedComplexity": "low",
   "technicalNotes": [
     "Maximum execution scope is ten minutes; audit narrow surfaces and add hostile schema fixtures only.",
+    "PHYSICAL BLOCKERS (source issues, not generated task IDs): issue 13 must establish available materials, issue 07 must establish a repeated-observation baseline, and issue 09 must establish evidence thresholds and correction policy.",
     "BLOCKED: issue 09 is unresolved and no repeated physical evidence supports additional correction freedoms.",
     "Do not make dormant unsupported fields that imports could later activate accidentally."
   ]

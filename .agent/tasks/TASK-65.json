@@ -7,7 +7,8 @@
     "Attestation is unchecked by default and requires an explicit operator action",
     "The disclosure names the selected setup, loading revision, configuration revision, and unobservable assumptions",
     "The saved attestation records exact identities, disclosure version, action, and timestamp",
-    "Completing or cancelling restores focus and status is announced without relying on color"
+    "Completing or cancelling restores focus and status is announced without relying on color",
+    "Verify in browser using Playwright"
   ],
   "steps": [
     {

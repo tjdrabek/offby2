@@ -7,7 +7,8 @@
     "Every named warning includes persistent descriptive text and a semantic label or icon with accessible name",
     "Removing color from the interface does not remove warning category, consequence, or corrective action",
     "Demo and physical-evidence-blocked states remain distinguishable in list, detail, preview, and recovery contexts",
-    "Warning controls retain visible focus and meet the established contrast treatment"
+    "Warning controls retain visible focus and meet the established contrast treatment",
+    "Verify in browser using Playwright"
   ],
   "steps": [
     {

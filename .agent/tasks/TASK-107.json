@@ -35,10 +35,11 @@
       "pass": false
     }
   ],
-  "dependencies": ["TASK-1", "TASK-96", "TASK-106"],
+  "dependencies": ["TASK-1", "TASK-96", "TASK-101", "TASK-106"],
   "estimatedComplexity": "low",
   "technicalNotes": [
     "Maximum execution scope is ten minutes; add one transform and three small coordinate fixtures.",
+    "PHYSICAL BLOCKERS (source issues, not generated task IDs): issue 13 must establish available materials, issue 07 must establish a repeated-observation baseline, and issue 09 must establish evidence thresholds and correction policy.",
     "BLOCKED: tests may prove software sign consistency but cannot prove physical correction or ink placement.",
     "PDF points appear only at the renderer boundary."
   ]

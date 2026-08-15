@@ -35,10 +35,11 @@
       "pass": false
     }
   ],
-  "dependencies": ["TASK-1", "TASK-99", "TASK-102"],
+  "dependencies": ["TASK-1", "TASK-99", "TASK-101", "TASK-102"],
   "estimatedComplexity": "low",
   "technicalNotes": [
     "Maximum execution scope is ten minutes; define the boundary and current blocked tests, not a derivation algorithm.",
+    "PHYSICAL BLOCKERS (source issues, not generated task IDs): issue 13 must establish available materials, issue 07 must establish a repeated-observation baseline, and issue 09 must establish evidence thresholds and correction policy.",
     "BLOCKED: implementation of a successful qualification path awaits real physical evidence and approved policy from issues 13, 07, and 09.",
     "Do not claim policy or qualifying observations exist."
   ]

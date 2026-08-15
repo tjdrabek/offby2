@@ -7,7 +7,8 @@
     "Closing or cancelling a dialog returns focus to its surviving initiator",
     "Removed initiators fall back to a documented next logical heading or control",
     "Navigation, refusal, import, update, and generation outcomes never leave focus in hidden or removed content",
-    "Focus movement occurs once, is visible, and does not steal focus during ordinary editing"
+    "Focus movement occurs once, is visible, and does not steal focus during ordinary editing",
+    "Verify in browser using Playwright"
   ],
   "steps": [
     {

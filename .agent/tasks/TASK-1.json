@@ -2,13 +2,14 @@
   "id": "TASK-1",
   "title": "Verify project prerequisites and access",
   "category": "setup",
-  "description": "Verify that the local React/Vite toolchain and required browser capabilities are available, confirm that this PRD slice needs no environment variables, services, authentication, or physical equipment, and explicitly preserve the physical-evidence boundary before implementation begins.",
+  "description": "Verify that the local React/Vite toolchain, repository documentation, and required browser capabilities are available; confirm that the local-first PRD portfolio requires no server, environment variables, authenticated tools, services, or test users; and preserve the physical-evidence gate before implementation begins.",
   "acceptanceCriteria": [
-    "`.env.local` exists and contains no environment-variable assignments because PRDs 14–17 require none",
+    "`.env.local` exists and contains no environment-variable assignments because PRDs 14–28 require none",
     "No secret, fake credential, or placeholder variable is added to `.env.local`, the PRDs, task specs, logs, chat, or committed files",
     "Dependency installation, build, lint, test, development, and Playwright commands are identified from the repository configuration",
     "IndexedDB, service workers, file download/upload, SVG, and client-side binary generation are available in the target test browser, or each gap has an explicit proceed/block decision",
-    "No database server, MCP authentication, third-party service account, login, or test user is treated as required",
+    "No database server, authenticated MCP or CLI, third-party service account, login, or test user is treated as required",
+    "The service and library documentation required by the portfolio is available, with PDF, QR, image, font, PWA, and accessibility documentation recorded when implementation selects those libraries",
     "The missing printer, identified stock, inventory, measuring tools, observed geometry, and repeated physical observations are explicitly recorded as an open evidence gap",
     "Implementation may proceed for PRDs 14–17, but physical placement, scale, printing, calibration, tolerance, feed consistency, and profile validity remain unproven and blocked from assertion"
   ],
@@ -16,7 +17,7 @@
     {
       "step": 1,
       "description": "Review prerequisite sources",
-      "details": "Read `.agent/prd/PRD.md` and PRDs 14–17, then list the local toolchain, browser capabilities, documentation, and explicit absence of services, accounts, users, secrets, and environment variables.",
+      "details": "Read `.agent/prd/PRD.md` and PRDs 14–28, then list the local toolchain, browser capabilities, documentation, and explicit absence of services, accounts, users, secrets, and environment variables.",
       "pass": false
     },
     {
@@ -34,11 +35,17 @@
     {
       "step": 4,
       "description": "Confirm access requirements are empty",
-      "details": "Record that no database connectivity, authenticated MCP or CLI, external service, login, test user, or dashboard access check is needed for TASK-2 through TASK-34.",
+      "details": "Record that no database connectivity, authenticated MCP or CLI, external service, login, test user, or dashboard access check is needed for TASK-2 through TASK-125.",
       "pass": false
     },
     {
       "step": 5,
+      "description": "Verify implementation documentation",
+      "details": "Confirm the React, Vite, IndexedDB, service-worker, and Playwright documentation links in the portfolio are available. Record that official PDF, QR, image, font, PWA, and accessibility-library documentation and licenses must be added when those libraries are selected.",
+      "pass": false
+    },
+    {
+      "step": 6,
       "description": "Record the physical evidence gate",
       "details": "Record the absent printer, stock, inventory, measurement tools, observed geometry, and repeated observations. Preserve the approved decision to proceed with software-only work while blocking every physical conclusion and noting that synthetic data cannot close the gap.",
       "pass": false
@@ -47,7 +54,7 @@
   "dependencies": [],
   "estimatedComplexity": "low",
   "technicalNotes": [
-    "This task gates all implementation tasks in this portfolio slice.",
+    "This task gates all implementation tasks in the PRD 14–28 portfolio.",
     "The prerequisite check must not manufacture environment variables merely to satisfy a generic template.",
     "Exact PDF geometry is software evidence only; it cannot establish where ink lands on physical stock."
   ]

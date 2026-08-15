@@ -8,7 +8,8 @@
     "Interactive controls expose accurate accessible names, roles, states, values, and instructions",
     "Tab order follows visible reading and workflow order without positive tabindex",
     "Focus is visibly distinguishable and skip navigation reaches primary content",
-    "Preview and grid meaning has a textual semantic alternative"
+    "Preview and grid meaning has a textual semantic alternative",
+    "Verify in browser using Playwright"
   ],
   "steps": [
     {

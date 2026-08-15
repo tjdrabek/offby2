@@ -7,7 +7,8 @@
     "Every named primary action is reachable and operable with keyboard alone",
     "Content ordering, position assignment, and overlay positioning have semantic non-pointer controls",
     "Hover and drag interactions, where retained, are optional enhancements rather than required paths",
-    "Keyboard operations provide the same validation, confirmation, refusal, and undo protections as pointer operations"
+    "Keyboard operations provide the same validation, confirmation, refusal, and undo protections as pointer operations",
+    "Verify in browser using Playwright"
   ],
   "steps": [
     {

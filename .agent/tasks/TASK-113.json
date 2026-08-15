@@ -7,7 +7,8 @@
     "Field errors are programmatically associated with invalid controls and summarized with focusable links when submission fails",
     "Compatibility, calibration, autosave, storage, import, and generation outcomes use appropriate polite or assertive status semantics",
     "Each meaningful outcome is announced once with enough context to identify the affected work",
-    "Messages remain visibly available for review and do not expose unrelated private content"
+    "Messages remain visibly available for review and do not expose unrelated private content",
+    "Verify in browser using Playwright"
   ],
   "steps": [
     {

@@ -7,7 +7,8 @@
     "Each measurement input has a programmatic name, current value, unit, constraint/range, and instructions",
     "Read-only derived values are distinguishable from editable source values without color",
     "Invalid values expose field-associated reasons and allowed bounds where a real bound exists",
-    "Controls do not present prototype calibration thresholds or unsupported physical tolerance ranges"
+    "Controls do not present prototype calibration thresholds or unsupported physical tolerance ranges",
+    "Verify in browser using Playwright"
   ],
   "steps": [
     {

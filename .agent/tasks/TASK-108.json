@@ -35,10 +35,18 @@
       "pass": false
     }
   ],
-  "dependencies": ["TASK-1", "TASK-75", "TASK-102", "TASK-105", "TASK-107"],
+  "dependencies": [
+    "TASK-1",
+    "TASK-75",
+    "TASK-101",
+    "TASK-102",
+    "TASK-105",
+    "TASK-107"
+  ],
   "estimatedComplexity": "low",
   "technicalNotes": [
     "Maximum execution scope is ten minutes; centralize reasons and run focused no-effect tests only.",
+    "PHYSICAL BLOCKERS (source issues, not generated task IDs): issue 13 must establish available materials, issue 07 must establish a repeated-observation baseline, and issue 09 must establish evidence thresholds and correction policy.",
     "BLOCKED: only refusal behavior is currently implementable; successful physical paths cannot be claimed.",
     "Operator confirmation records assumptions and does not verify printer behavior."
   ]
