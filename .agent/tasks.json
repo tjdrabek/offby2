@@ -4,7 +4,7 @@
     "title": "Verify project prerequisites and access",
     "category": "setup",
     "specFilePath": ".agent/tasks/TASK-1.json",
-    "passes": false
+    "passes": true
   },
   {
     "id": "TASK-2",
