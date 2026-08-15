@@ -1,0 +1,33 @@
+import { DESTINATIONS } from "./destinations";
+import { useCurrentDestination } from "./useCurrentDestination";
+import "./AppShell.css";
+
+function AppShell() {
+  const current = useCurrentDestination();
+
+  return (
+    <div className="app-shell">
+      <nav className="app-shell-nav" aria-label="Primary">
+        <ul>
+          {DESTINATIONS.map((destination) => (
+            <li key={destination.id}>
+              <a
+                href={`#${destination.path}`}
+                aria-current={
+                  destination.id === current.id ? "page" : undefined
+                }
+              >
+                {destination.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <main className="app-shell-main">
+        <h1>{current.label}</h1>
+      </main>
+    </div>
+  );
+}
+
+export default AppShell;

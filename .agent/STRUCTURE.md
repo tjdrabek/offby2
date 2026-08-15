@@ -7,9 +7,12 @@ diy-labels/
 ├── public/              # Static assets served as-is
 ├── src/                 # Application source
 │   ├── assets/          # Bundled static assets (images, icons)
+│   ├── shell/           # Application-shell navigation (destinations, AppShell)
+│   ├── tests/           # Playwright browser tests
 │   ├── App.tsx          # Root application component
 │   ├── App.css
 │   ├── index.css
+│   ├── test-setup.ts    # Vitest/RTL setup (jest-dom matchers)
 │   └── main.tsx         # Application entry point
 ├── docs/                # Ralph loop tooling docs
 ├── scripts/             # Ralph loop automation scripts

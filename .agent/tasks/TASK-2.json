@@ -15,28 +15,30 @@
       "step": 1,
       "description": "Define destination metadata",
       "details": "Add one typed, ordered destination definition containing the exact five names and stable route identifiers so labels are not duplicated across the shell.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 2,
       "description": "Render semantic navigation",
       "details": "Render the destination definition inside a named navigation landmark using native links or buttons appropriate to the routing approach.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 3,
       "description": "Expose current destination state",
       "details": "Render a destination heading and programmatic current marker such as `aria-current=\"page\"` for the active destination.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 4,
       "description": "Verify destination switching",
       "details": "Add a focused browser assertion that each semantic navigation item is reachable and activates the correctly named destination without relying on component internals.",
-      "pass": false
+      "pass": true
     }
   ],
-  "dependencies": ["TASK-1"],
+  "dependencies": [
+    "TASK-1"
+  ],
   "estimatedComplexity": "low",
   "technicalNotes": [
     "Keep routing private to the standalone application; do not introduce a public package API.",

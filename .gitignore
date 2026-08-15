@@ -5,6 +5,10 @@ node_modules/
 dist/
 dist-ssr/
 
+# Playwright artifacts
+playwright-report/
+test-results/
+
 # Logs and local configuration
 logs/
 *.log

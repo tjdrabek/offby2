@@ -11,7 +11,7 @@
     "title": "Expose stable application destinations",
     "category": "ui-ux",
     "specFilePath": ".agent/tasks/TASK-2.json",
-    "passes": false
+    "passes": true
   },
   {
     "id": "TASK-3",
