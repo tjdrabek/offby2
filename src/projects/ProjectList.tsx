@@ -4,7 +4,7 @@ interface ProjectListProps {
   projects: LabelProject[];
   openProjectId: string | null;
   onOpen: (id: string) => void;
-  onRequestDelete: (id: string, trigger: HTMLElement) => void;
+  onRequestDelete: (id: string) => void;
 }
 
 function ProjectList({
@@ -32,12 +32,7 @@ function ProjectList({
                 ? `Currently open: ${project.name}`
                 : `Open ${project.name}`}
             </button>
-            <button
-              type="button"
-              onClick={(event) =>
-                onRequestDelete(project.id, event.currentTarget)
-              }
-            >
+            <button type="button" onClick={() => onRequestDelete(project.id)}>
               {`Delete ${project.name}`}
             </button>
           </li>

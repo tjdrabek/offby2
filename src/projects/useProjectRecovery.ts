@@ -36,9 +36,10 @@ export function useProjectRecovery(
     };
   }, [repository, projects, projectsLoaded, checked]);
 
+  /** Resolves true only when the draft was actually applied. */
   const recover = useCallback(async () => {
     if (status.kind !== "recoverable") {
-      return;
+      return false;
     }
     setPending(true);
     setActionError(null);
@@ -48,24 +49,29 @@ export function useProjectRecovery(
       await renameProject(status.projectId, status.draftName);
       await repository.clearDraft(status.projectId);
       setStatus({ kind: "clean" });
+      return true;
     } catch {
       setActionError("Could not recover the saved changes. Try again.");
+      return false;
     } finally {
       setPending(false);
     }
   }, [repository, renameProject, status]);
 
+  /** Resolves true only when the draft was actually removed. */
   const discard = useCallback(async () => {
     if (status.kind !== "recoverable") {
-      return;
+      return false;
     }
     setPending(true);
     setActionError(null);
     try {
       await repository.clearDraft(status.projectId);
       setStatus({ kind: "clean" });
+      return true;
     } catch {
       setActionError("Could not discard the saved changes. Try again.");
+      return false;
     } finally {
       setPending(false);
     }
@@ -77,8 +83,10 @@ export function useProjectRecovery(
     try {
       await repository.clearAllDrafts();
       setStatus({ kind: "clean" });
+      return true;
     } catch {
       setActionError("Could not clear the saved recovery data. Try again.");
+      return false;
     } finally {
       setPending(false);
     }

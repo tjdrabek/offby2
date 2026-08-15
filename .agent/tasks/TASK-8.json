@@ -17,31 +17,31 @@
       "step": 1,
       "description": "Audit semantic structure",
       "details": "Inspect shell landmarks, headings, navigation, lists, forms, buttons, and dialogs; replace non-semantic clickable elements and add names only where native text is insufficient.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 2,
       "description": "Implement focus behavior",
       "details": "Define initial, contained, cancel, confirm, and restored focus for dialogs and place recovery focus at an informative heading or first action.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 3,
       "description": "Style visible focus",
       "details": "Add a high-contrast `:focus-visible` treatment that is not clipped or removed by navigation, list, form, and dialog styles.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 4,
       "description": "Announce status changes",
       "details": "Use appropriately scoped status or alert semantics for create, rename, delete, storage failure, recovery, offline, and update messages without repeatedly announcing static content.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 5,
       "description": "Verify keyboard paths",
       "details": "Drive navigation, create, rename, open, delete confirmation, and recovery using Tab, Shift+Tab, Enter, Space, and Escape as appropriate; assert focus and accessible names.",
-      "pass": false
+      "pass": true
     }
   ],
   "dependencies": ["TASK-1", "TASK-2", "TASK-3", "TASK-5", "TASK-7"],

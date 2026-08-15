@@ -1,11 +1,8 @@
-import { fileURLToPath } from "node:url";
 import { expect, type Page } from "@playwright/test";
 
 /** PWA behaviour only exists in built output; these specs run against the preview build. */
 
-export const SCREENSHOTS = fileURLToPath(
-  new URL("../../../.agent/screenshots/", import.meta.url),
-);
+export { SCREENSHOTS } from "./paths.js";
 
 /**
  * Loads the app once online and returns only after the service worker is

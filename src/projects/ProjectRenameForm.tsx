@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import type { LabelProject } from "./LabelProject";
 
 interface ProjectRenameFormProps {
@@ -21,6 +21,8 @@ function ProjectRenameForm({
   const [name, setName] = useState(project.name);
   const [validationError, setValidationError] = useState<string | null>(null);
   const isFirstRenderRef = useRef(true);
+  const inputId = useId();
+  const errorId = useId();
 
   useEffect(() => {
     if (isFirstRenderRef.current) {
@@ -48,15 +50,21 @@ function ProjectRenameForm({
   return (
     <form className="project-rename-form" onSubmit={handleSubmit}>
       <h2>{`Editing ${project.name}`}</h2>
-      <label htmlFor="rename-project-name">Rename project</label>
+      <label htmlFor={inputId}>Rename project</label>
       <input
-        id="rename-project-name"
+        id={inputId}
         type="text"
         value={name}
+        aria-invalid={validationError ? true : undefined}
+        aria-describedby={validationError ? errorId : undefined}
         onChange={(event) => setName(event.target.value)}
       />
       <button type="submit">Save name</button>
-      {validationError && <p role="alert">{validationError}</p>}
+      {validationError && (
+        <p id={errorId} role="alert" className="projects-error">
+          {validationError}
+        </p>
+      )}
     </form>
   );
 }

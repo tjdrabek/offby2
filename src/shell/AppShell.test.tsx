@@ -36,6 +36,33 @@ describe("AppShell", () => {
     );
   });
 
+  it("offers a skip link as the first stop in the tab order", async () => {
+    const user = userEvent.setup();
+    render(<AppShell />);
+
+    await user.tab();
+
+    expect(
+      screen.getByRole("link", { name: "Skip to main content" }),
+    ).toHaveFocus();
+  });
+
+  it("moves focus into main content without changing the active destination", async () => {
+    const user = userEvent.setup();
+    render(<AppShell />);
+
+    await user.click(
+      screen.getByRole("link", { name: "Skip to main content" }),
+    );
+
+    expect(screen.getByRole("main")).toHaveFocus();
+    // Destinations route on the hash, so the skip link must not navigate.
+    expect(window.location.hash).toBe("");
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Projects" }),
+    ).toBeInTheDocument();
+  });
+
   it("activates the matching destination and heading when navigation is used", async () => {
     const user = userEvent.setup();
     render(<AppShell />);

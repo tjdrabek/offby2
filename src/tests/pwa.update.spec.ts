@@ -47,7 +47,7 @@ test("applies a waiting update only after the open draft is durable", async ({
 
   await installWaitingUpdate(page);
 
-  const notice = page.getByRole("status");
+  const notice = page.getByRole("status", { name: "Application updates" });
   await expect(notice).toContainText("Update available:");
   await expect(page.getByRole("button", { name: "Update now" })).toBeVisible();
   // The waiting worker must not take the page out from under the typed name.
@@ -98,7 +98,7 @@ test("refuses to activate while the open draft cannot be saved", async ({
   const rename = await openProjectWithUnsavedRename(page);
 
   await installWaitingUpdate(page);
-  const notice = page.getByRole("status");
+  const notice = page.getByRole("status", { name: "Application updates" });
   await expect(notice).toContainText("Update available:");
 
   const navigations = countNavigations(page);

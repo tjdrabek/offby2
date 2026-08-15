@@ -1,4 +1,5 @@
 import type { ServiceWorkerUpdateState } from "./serviceWorkerUpdate";
+import StatusRegion from "../ui/StatusRegion";
 import "./UpdateNotice.css";
 
 interface UpdateNoticeProps {
@@ -22,11 +23,7 @@ function UpdateNotice({ state, onUpdate, onDismiss }: UpdateNoticeProps) {
     state.status === "failed";
 
   return (
-    <div
-      className="update-notice-region"
-      role="status"
-      aria-label="Application updates"
-    >
+    <StatusRegion className="update-notice-region" label="Application updates">
       {visible && (
         <div className={`update-notice update-notice-${state.status}`}>
           {state.status === "waiting" && (
@@ -68,7 +65,7 @@ function UpdateNotice({ state, onUpdate, onDismiss }: UpdateNoticeProps) {
           </div>
         </div>
       )}
-    </div>
+    </StatusRegion>
   );
 }
 

@@ -9,7 +9,8 @@ import ProjectCreateForm from "./ProjectCreateForm";
 import ProjectList from "./ProjectList";
 import ProjectRenameForm from "./ProjectRenameForm";
 import ProjectRecoveryBanner from "./ProjectRecoveryBanner";
-import DeleteConfirmDialog from "./DeleteConfirmDialog";
+import ConfirmDialog from "../ui/ConfirmDialog";
+import StatusRegion from "../ui/StatusRegion";
 import "./ProjectsPage.css";
 
 interface ProjectsPageProps {
@@ -42,9 +43,14 @@ function ProjectsPage({ repository }: ProjectsPageProps) {
 
   const [openProjectId, setOpenProjectId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const deleteTriggerRef = useRef<HTMLElement | null>(null);
+  const createNameRef = useRef<HTMLInputElement>(null);
+
+  // The create field is the page's first action, so it is where focus goes
+  // whenever a workflow removes the control the user was standing on.
+  const focusFallback = useCallback(() => createNameRef.current, []);
 
   const openProject =
     projects.find((project) => project.id === openProjectId) ?? null;
@@ -53,9 +59,11 @@ function ProjectsPage({ repository }: ProjectsPageProps) {
 
   async function handleCreate(name: string) {
     setError(null);
+    setStatus(null);
     try {
       const project = await createProject(name);
       setOpenProjectId(project.id);
+      setStatus(`Project "${project.name}" created and opened for editing.`);
     } catch {
       setError("Could not create the project. Try again.");
     }
@@ -66,11 +74,13 @@ function ProjectsPage({ repository }: ProjectsPageProps) {
       return;
     }
     setError(null);
+    setStatus(null);
     try {
       await renameProject(openProject.id, name);
       // The saved name is now authoritative, so the recovery marker must go.
       draft.record(openProject.id, null);
       await draft.flush().catch(() => undefined);
+      setStatus(`Project renamed to "${name}".`);
     } catch {
       setError("Could not rename the project. Try again.");
     }
@@ -86,29 +96,29 @@ function ProjectsPage({ repository }: ProjectsPageProps) {
     [draft, openProjectId],
   );
 
-  function requestDelete(id: string, trigger: HTMLElement) {
-    deleteTriggerRef.current = trigger;
+  function requestDelete(id: string) {
     setError(null);
+    setStatus(null);
     setPendingDeleteId(id);
   }
 
   function cancelDelete() {
     setPendingDeleteId(null);
-    deleteTriggerRef.current?.focus();
   }
 
   async function confirmDelete() {
-    if (!pendingDeleteId) {
+    if (!pendingDeleteProject) {
       return;
     }
+    const deletedName = pendingDeleteProject.name;
     setDeleting(true);
     try {
-      await deleteProject(pendingDeleteId);
-      if (openProjectId === pendingDeleteId) {
+      await deleteProject(pendingDeleteProject.id);
+      if (openProjectId === pendingDeleteProject.id) {
         setOpenProjectId(null);
       }
       setPendingDeleteId(null);
-      deleteTriggerRef.current?.focus();
+      setStatus(`Project "${deletedName}" deleted.`);
     } catch {
       setError("Could not delete the project. Try again.");
     } finally {
@@ -116,17 +126,51 @@ function ProjectsPage({ repository }: ProjectsPageProps) {
     }
   }
 
+  // Resolving recovery removes the banner the user is standing in, so each of
+  // these has to hand focus somewhere itself.
+  async function handleRecover() {
+    const draftName =
+      recovery.status.kind === "recoverable" ? recovery.status.draftName : null;
+    setStatus(null);
+    if (await recovery.recover()) {
+      setStatus(
+        `Unsaved changes recovered. Project renamed to "${draftName}".`,
+      );
+      focusFallback()?.focus();
+    }
+  }
+
+  async function handleDiscard() {
+    setStatus(null);
+    if (await recovery.discard()) {
+      setStatus("Unsaved changes discarded. Your saved project is unchanged.");
+      focusFallback()?.focus();
+    }
+  }
+
+  async function handleDismissUnreadable() {
+    setStatus(null);
+    if (await recovery.dismissUnreadable()) {
+      setStatus("Saved recovery data cleared.");
+      focusFallback()?.focus();
+    }
+  }
+
   const visibleError = error ?? loadError;
 
   return (
     <div className="projects-page">
+      <StatusRegion label="Project status" className="projects-status">
+        {status}
+      </StatusRegion>
       {recovery.status.kind !== "clean" && (
         <ProjectRecoveryBanner
           status={recovery.status}
           pending={recovery.pending}
-          onRecover={() => void recovery.recover()}
-          onDiscard={() => void recovery.discard()}
-          onDismissUnreadable={() => void recovery.dismissUnreadable()}
+          onRecover={() => void handleRecover()}
+          onDiscard={() => void handleDiscard()}
+          onDismissUnreadable={() => void handleDismissUnreadable()}
+          focusFallback={focusFallback}
         />
       )}
       {recovery.actionError && (
@@ -139,7 +183,7 @@ function ProjectsPage({ repository }: ProjectsPageProps) {
           {visibleError}
         </p>
       )}
-      <ProjectCreateForm onCreate={handleCreate} />
+      <ProjectCreateForm onCreate={handleCreate} inputRef={createNameRef} />
       <ProjectList
         projects={projects}
         openProjectId={openProjectId}
@@ -155,11 +199,16 @@ function ProjectsPage({ repository }: ProjectsPageProps) {
         />
       )}
       {pendingDeleteProject && (
-        <DeleteConfirmDialog
-          projectName={pendingDeleteProject.name}
+        <ConfirmDialog
+          title="Delete project?"
+          description={`Delete "${pendingDeleteProject.name}"? This cannot be undone.`}
+          confirmLabel="Delete"
+          destructive
           pending={deleting}
           onCancel={cancelDelete}
-          onConfirm={confirmDelete}
+          onConfirm={() => void confirmDelete()}
+          // Deleting removes the row the dialog was opened from.
+          restoreFocusFallback={focusFallback}
         />
       )}
     </div>

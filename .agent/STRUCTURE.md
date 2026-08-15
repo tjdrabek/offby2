@@ -15,6 +15,7 @@ diy-labels/
 │   ├── shell/           # Application-shell navigation (destinations, AppShell)
 │   ├── tests/           # Playwright browser tests
 │   │   └── support/     # Shared browser-test helpers
+│   ├── ui/              # Shared accessible UI primitives (modal confirm, focus trap, live region)
 │   ├── App.tsx          # Root application component
 │   ├── App.css
 │   ├── index.css

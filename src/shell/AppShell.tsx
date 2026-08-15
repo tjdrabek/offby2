@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { DESTINATIONS } from "./destinations";
 import { useCurrentDestination } from "./useCurrentDestination";
 import ProjectsPage from "../projects/ProjectsPage";
@@ -21,10 +21,23 @@ function AppShell() {
       serviceWorker.status === "registered" ? serviceWorker.registration : null,
     flushPendingWork: pendingWork.flush,
   });
+  const mainRef = useRef<HTMLElement>(null);
 
   return (
     <PendingWorkContext value={pendingWork}>
       <div className="app-shell">
+        <a
+          className="skip-link"
+          href="#main-content"
+          onClick={(event) => {
+            // Destinations are routed on the URL hash, so following the
+            // fragment would navigate away. Move focus directly instead.
+            event.preventDefault();
+            mainRef.current?.focus();
+          }}
+        >
+          Skip to main content
+        </a>
         <nav className="app-shell-nav" aria-label="Primary">
           <ul>
             {DESTINATIONS.map((destination) => (
@@ -41,7 +54,12 @@ function AppShell() {
             ))}
           </ul>
         </nav>
-        <main className="app-shell-main">
+        <main
+          className="app-shell-main"
+          id="main-content"
+          ref={mainRef}
+          tabIndex={-1}
+        >
           <UpdateNotice
             state={update.state}
             onUpdate={() => void update.activate()}

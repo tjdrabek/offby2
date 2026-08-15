@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { ProjectRecoveryStatus } from "./projectRecovery";
-import DiscardDraftConfirmDialog from "./DiscardDraftConfirmDialog";
+import ConfirmDialog from "../ui/ConfirmDialog";
 
 interface ProjectRecoveryBannerProps {
   status: Exclude<ProjectRecoveryStatus, { kind: "clean" }>;
@@ -8,6 +8,8 @@ interface ProjectRecoveryBannerProps {
   onRecover: () => void;
   onDiscard: () => void;
   onDismissUnreadable: () => void;
+  /** Where focus goes once the whole banner is gone. */
+  focusFallback?: () => HTMLElement | null;
 }
 
 function ProjectRecoveryBanner({
@@ -16,9 +18,12 @@ function ProjectRecoveryBanner({
   onRecover,
   onDiscard,
   onDismissUnreadable,
+  focusFallback,
 }: ProjectRecoveryBannerProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const discardTriggerRef = useRef<HTMLButtonElement>(null);
   const [confirmingDiscard, setConfirmingDiscard] = useState(false);
+  const headingId = useId();
 
   // Detection resolves asynchronously, so only claim focus while the user has
   // not already started interacting; yanking focus mid-keystroke loses input.
@@ -31,11 +36,8 @@ function ProjectRecoveryBanner({
 
   if (status.kind === "unreadable") {
     return (
-      <section
-        className="project-recovery-banner"
-        aria-labelledby="recovery-heading"
-      >
-        <h2 id="recovery-heading" tabIndex={-1} ref={headingRef}>
+      <section className="project-recovery-banner" aria-labelledby={headingId}>
+        <h2 id={headingId} tabIndex={-1} ref={headingRef}>
           Saved recovery data couldn't be read
         </h2>
         <p>
@@ -49,11 +51,8 @@ function ProjectRecoveryBanner({
   }
 
   return (
-    <section
-      className="project-recovery-banner"
-      aria-labelledby="recovery-heading"
-    >
-      <h2 id="recovery-heading" tabIndex={-1} ref={headingRef}>
+    <section className="project-recovery-banner" aria-labelledby={headingId}>
+      <h2 id={headingId} tabIndex={-1} ref={headingRef}>
         Recover unsaved changes?
       </h2>
       <p>
@@ -65,6 +64,7 @@ function ProjectRecoveryBanner({
         </button>
         <button
           type="button"
+          ref={discardTriggerRef}
           onClick={() => setConfirmingDiscard(true)}
           disabled={pending}
         >
@@ -72,14 +72,23 @@ function ProjectRecoveryBanner({
         </button>
       </div>
       {confirmingDiscard && (
-        <DiscardDraftConfirmDialog
-          draftName={status.draftName}
+        <ConfirmDialog
+          title="Discard unsaved changes?"
+          description={`Discard the unsaved rename to "${status.draftName}"? This only removes the saved draft, not your project.`}
+          confirmLabel="Discard"
+          destructive
           pending={pending}
           onCancel={() => setConfirmingDiscard(false)}
           onConfirm={() => {
             setConfirmingDiscard(false);
             onDiscard();
           }}
+          // Confirming removes the whole banner, taking the trigger with it.
+          restoreFocusFallback={() =>
+            headingRef.current?.isConnected
+              ? headingRef.current
+              : (focusFallback?.() ?? null)
+          }
         />
       )}
     </section>

@@ -32,35 +32,19 @@
   color: #b3261e;
 }
 
-.project-modal-overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
+/* Stays mounted so messages are announced, but out of flow so the empty
+   region does not consume a flex gap. */
+.projects-status:empty {
+  position: absolute;
 }
 
-.project-modal-dialog {
-  background: var(--card-bg, #fff);
-  color: inherit;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  max-width: 24rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.project-modal-actions {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
-}
-
-.project-modal-actions .destructive {
-  background-color: #b3261e;
-  color: #fff;
+.projects-status:not(:empty) {
+  padding: 0.625rem 0.875rem;
+  border: 1px solid #1f4b99;
+  border-left-width: 0.25rem;
+  border-radius: 0.375rem;
+  background-color: rgba(31, 75, 153, 0.12);
+  font-size: 0.9375rem;
 }
 
 .project-recovery-banner {
