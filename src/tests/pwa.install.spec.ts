@@ -101,7 +101,12 @@ test("registers and is controlled by a service worker scoped to the origin", asy
     .toBe(`${ORIGIN}/sw.js`);
 
   await expect(page.getByRole("heading", { name: "Projects" })).toBeVisible();
-  await expect(page.getByRole("status")).toHaveCount(0);
+  // The update live region is always mounted, but a healthy load has nothing
+  // to announce in it and no capability warning at all.
+  await expect(
+    page.getByRole("status", { name: "Application updates" }),
+  ).toBeEmpty();
+  await expect(page.getByText("Warning:")).toHaveCount(0);
   expect(consoleErrors).toEqual([]);
 });
 
@@ -121,7 +126,7 @@ test("keeps the application usable and warns when registration fails", async ({
     page.getByRole("heading", { name: "Editing Offline-less Project" }),
   ).toBeVisible();
 
-  const warning = page.getByRole("status");
+  const warning = page.getByRole("status").filter({ hasText: "Warning:" });
   await expect(warning).toContainText("Warning:");
   await expect(warning).toContainText("offline use is unavailable");
 

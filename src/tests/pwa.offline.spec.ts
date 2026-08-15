@@ -1,34 +1,10 @@
-import { fileURLToPath } from "node:url";
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
+import { SCREENSHOTS, loadOnceOnlineAndTakeControl } from "./support/pwa.js";
 
 /**
  * Offline startup after one successful load, verified against the production
  * preview build (see playwright.config.ts).
  */
-
-const SCREENSHOTS = fileURLToPath(
-  new URL("../../.agent/screenshots/", import.meta.url),
-);
-
-/**
- * Loads the app once online and returns only after the service worker is
- * activated and controlling the page, which is the "one successful load"
- * precondition for offline startup.
- */
-async function loadOnceOnlineAndTakeControl(page: Page) {
-  await page.goto("/#/projects");
-  await page.evaluate(() =>
-    navigator.serviceWorker.ready.then(() => undefined),
-  );
-  await page.reload();
-  await expect
-    .poll(() =>
-      page.evaluate(
-        () => navigator.serviceWorker.controller?.scriptURL ?? null,
-      ),
-    )
-    .not.toBeNull();
-}
 
 test("renders the shell and persisted projects after an offline restart", async ({
   page,

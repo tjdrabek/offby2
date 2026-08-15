@@ -1,8 +1,10 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { createIndexedDbProjectRepository } from "./IndexedDbProjectRepository";
 import type { ProjectRepository } from "./ProjectRepository";
 import { useProjects } from "./useProjects";
 import { useProjectRecovery } from "./useProjectRecovery";
+import { useDraftPersistence } from "./useDraftPersistence";
+import { usePendingWorkRegistration } from "../pwa/pendingWorkContext";
 import ProjectCreateForm from "./ProjectCreateForm";
 import ProjectList from "./ProjectList";
 import ProjectRenameForm from "./ProjectRenameForm";
@@ -33,6 +35,10 @@ function ProjectsPage({ repository }: ProjectsPageProps) {
     loaded,
     renameProject,
   );
+  const draft = useDraftPersistence(activeRepository);
+  // The shell must be able to make this page's unsaved rename durable before
+  // it allows a service-worker update to replace the running page.
+  usePendingWorkRegistration(draft.flush);
 
   const [openProjectId, setOpenProjectId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -62,23 +68,23 @@ function ProjectsPage({ repository }: ProjectsPageProps) {
     setError(null);
     try {
       await renameProject(openProject.id, name);
-      await activeRepository.clearDraft(openProject.id).catch(() => undefined);
+      // The saved name is now authoritative, so the recovery marker must go.
+      draft.record(openProject.id, null);
+      await draft.flush().catch(() => undefined);
     } catch {
       setError("Could not rename the project. Try again.");
     }
   }
 
-  function handleDraftChange(name: string | null) {
-    if (!openProject) {
-      return;
-    }
-    const saved = name
-      ? activeRepository.saveDraft(openProject.id, name)
-      : activeRepository.clearDraft(openProject.id);
-    // A failed draft write must not interrupt typing; the committed project
-    // is still authoritative and recovery simply won't be offered.
-    saved.catch(() => undefined);
-  }
+  const handleDraftChange = useCallback(
+    (name: string | null) => {
+      if (!openProjectId) {
+        return;
+      }
+      draft.record(openProjectId, name);
+    },
+    [draft, openProjectId],
+  );
 
   function requestDelete(id: string, trigger: HTMLElement) {
     deleteTriggerRef.current = trigger;

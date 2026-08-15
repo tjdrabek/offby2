@@ -16,9 +16,8 @@ function createContainer(
 
 describe("registerServiceWorker", () => {
   it("registers the emitted worker under the origin-wide scope", async () => {
-    const register = vi
-      .fn()
-      .mockResolvedValue({ scope: "http://localhost:4173/" });
+    const registration = { scope: "http://localhost:4173/" };
+    const register = vi.fn().mockResolvedValue(registration);
 
     const result = await registerServiceWorker({
       enabled: true,
@@ -31,6 +30,8 @@ describe("registerServiceWorker", () => {
     expect(result).toEqual({
       status: "registered",
       scope: "http://localhost:4173/",
+      // Carried through so the host can observe the update lifecycle.
+      registration,
     });
   });
 

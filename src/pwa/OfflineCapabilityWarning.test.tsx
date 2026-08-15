@@ -8,7 +8,11 @@ const SILENT_STATUSES: ServiceWorkerStatus[] = [
   { status: "pending" },
   { status: "disabled" },
   { status: "unsupported" },
-  { status: "registered", scope: "http://localhost:4173/" },
+  {
+    status: "registered",
+    scope: "http://localhost:4173/",
+    registration: {} as ServiceWorkerRegistration,
+  },
 ];
 
 function createContainer(

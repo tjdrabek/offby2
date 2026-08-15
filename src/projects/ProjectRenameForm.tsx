@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { LabelProject } from "./LabelProject";
 
-const DRAFT_DEBOUNCE_MS = 400;
-
 interface ProjectRenameFormProps {
   project: LabelProject;
   onRename: (name: string) => void;
-  /** Reports the pending unsaved name (debounced), or null once it matches the saved name. */
+  /**
+   * Reports the pending unsaved name, or null once it matches the saved name.
+   * Reported on every change so the owner always knows what is unsaved; the
+   * owner decides when to write it. Must be referentially stable.
+   */
   onDraftChange?: (name: string | null) => void;
 }
 
@@ -29,10 +31,7 @@ function ProjectRenameForm({
       return;
     }
     const trimmed = name.trim();
-    const timeoutId = window.setTimeout(() => {
-      onDraftChange(trimmed && trimmed !== project.name ? trimmed : null);
-    }, DRAFT_DEBOUNCE_MS);
-    return () => window.clearTimeout(timeoutId);
+    onDraftChange(trimmed && trimmed !== project.name ? trimmed : null);
   }, [name, project.name, onDraftChange]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {

@@ -6,6 +6,8 @@
  * touches rendering or durable records.
  */
 
+import { describeError } from "./describeError";
+
 /** Emitted by the production build at the origin root by vite-plugin-pwa. */
 export const SERVICE_WORKER_URL = "/sw.js";
 
@@ -19,7 +21,12 @@ export type ServiceWorkerStatus =
   | { status: "disabled" }
   /** The browser has no service worker support; the app still works online. */
   | { status: "unsupported" }
-  | { status: "registered"; scope: string }
+  | {
+      status: "registered";
+      scope: string;
+      /** Carried so the host can observe this registration's update lifecycle. */
+      registration: ServiceWorkerRegistration;
+    }
   | { status: "failed"; reason: string };
 
 export interface RegisterServiceWorkerOptions {
@@ -29,12 +36,6 @@ export interface RegisterServiceWorkerOptions {
   scope?: string;
   /** Injectable for tests; defaults to `navigator.serviceWorker`. */
   container?: ServiceWorkerContainer;
-}
-
-function describeError(error: unknown): string {
-  if (error instanceof Error && error.message) return error.message;
-  if (typeof error === "string" && error) return error;
-  return "The browser rejected the service worker registration.";
 }
 
 /**
@@ -60,8 +61,14 @@ export async function registerServiceWorker(
 
   try {
     const registration = await container.register(scriptUrl, { scope });
-    return { status: "registered", scope: registration.scope };
+    return { status: "registered", scope: registration.scope, registration };
   } catch (error) {
-    return { status: "failed", reason: describeError(error) };
+    return {
+      status: "failed",
+      reason: describeError(
+        error,
+        "The browser rejected the service worker registration.",
+      ),
+    };
   }
 }
