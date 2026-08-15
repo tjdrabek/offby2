@@ -17,31 +17,31 @@
       "step": 1,
       "description": "Create lifecycle fixtures",
       "details": "Add isolated browser storage setup and helpers that can preserve one test's IndexedDB across context restart without sharing state between tests.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 2,
       "description": "Cover project actions",
       "details": "Write one public-flow scenario for create, rename, open, cancel deletion, confirm deletion, and user-visible success/error state.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 3,
       "description": "Cover restart and recovery",
       "details": "Restart the context with preserved storage and assert the same project returns; seed or trigger recoverable state and complete recovery through the UI.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 4,
       "description": "Cover installation and offline startup",
       "details": "Run against the production preview, verify manifest and worker control, load once online, go offline, restart, and assert no network dependency prevents startup.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 5,
       "description": "Run production checks",
       "details": "Run type checking/build, lint, unit/integration tests, and the focused Playwright project; resolve failures without weakening observable assertions.",
-      "pass": false
+      "pass": true
     }
   ],
   "dependencies": [

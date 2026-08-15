@@ -1,88 +1,68 @@
 import { test, expect } from "@playwright/test";
+import {
+  createProject,
+  openSession,
+  projectStatus,
+  readDurableDraftNames,
+  readDurableProjects,
+  restartSession,
+  typeUnsavedRename,
+} from "./support/lifecycle.js";
+import { SCREENSHOTS } from "./support/paths.js";
 
-const PROJECTS_URL = "http://localhost:3000/#/projects";
+/**
+ * Discarding recovery. The recover path is covered as part of the full
+ * journey in project-lifecycle.spec.ts; what is distinct here is that
+ * declining recovery must remove only the draft.
+ */
 
-test("recovers an unsaved rename after a browser-context restart", async ({
+test("discards an unsaved rename after a restart, keeping the saved project", async ({
   browser,
+  baseURL,
 }) => {
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  await page.goto(PROJECTS_URL);
+  const consoleErrors: string[] = [];
+  let session = await openSession(browser, baseURL!, { consoleErrors });
 
-  await page.getByLabel("Project name").fill("Pantry Jars");
-  await page.getByRole("button", { name: "Create project" }).click();
+  await createProject(session.page, "Pantry Jars");
+  const [created] = await readDurableProjects(session.page);
+  await typeUnsavedRename(session.page, "Spice Jars");
+
+  session = await restartSession(session, browser, baseURL!, { consoleErrors });
+
   await expect(
-    page.getByRole("heading", { name: "Editing Pantry Jars" }),
+    session.page.getByRole("heading", { name: "Recover unsaved changes?" }),
   ).toBeVisible();
+  await session.page.getByRole("button", { name: "Discard" }).click();
 
-  // Edit the name but never click "Save name": the draft should be
-  // persisted in the background (debounced) without a committed rename.
-  await page.getByLabel("Rename project").fill("Spice Jars");
-  await page.waitForTimeout(600);
-
-  const storageState = await context.storageState({ indexedDB: true });
-  await context.close();
-
-  const restoredContext = await browser.newContext({ storageState });
-  const restoredPage = await restoredContext.newPage();
-  await restoredPage.goto(PROJECTS_URL);
-
-  await expect(
-    restoredPage.getByRole("heading", { name: "Recover unsaved changes?" }),
-  ).toBeVisible();
-  await restoredPage
-    .getByRole("button", { name: 'Recover "Spice Jars"' })
-    .click();
-
-  const list = restoredPage.getByRole("list", { name: "Projects" });
-  await expect(list.getByRole("listitem")).toHaveCount(1);
-  await expect(list.getByRole("listitem")).toContainText("Spice Jars");
-  await expect(
-    restoredPage.getByRole("heading", { name: "Recover unsaved changes?" }),
-  ).toHaveCount(0);
-
-  await restoredContext.close();
-});
-
-test("discards an unsaved rename after a browser-context restart, keeping the saved project", async ({
-  browser,
-}) => {
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  await page.goto(PROJECTS_URL);
-
-  await page.getByLabel("Project name").fill("Pantry Jars");
-  await page.getByRole("button", { name: "Create project" }).click();
-  await expect(
-    page.getByRole("heading", { name: "Editing Pantry Jars" }),
-  ).toBeVisible();
-
-  await page.getByLabel("Rename project").fill("Spice Jars");
-  await page.waitForTimeout(600);
-
-  const storageState = await context.storageState({ indexedDB: true });
-  await context.close();
-
-  const restoredContext = await browser.newContext({ storageState });
-  const restoredPage = await restoredContext.newPage();
-  await restoredPage.goto(PROJECTS_URL);
-
-  await expect(
-    restoredPage.getByRole("heading", { name: "Recover unsaved changes?" }),
-  ).toBeVisible();
-  await restoredPage.getByRole("button", { name: "Discard" }).click();
-  const dialog = restoredPage.getByRole("alertdialog", {
+  const dialog = session.page.getByRole("alertdialog", {
     name: "Discard unsaved changes?",
   });
   await expect(dialog).toBeVisible();
+  await session.page.screenshot({ path: `${SCREENSHOTS}TASK-9-4.png` });
   await dialog.getByRole("button", { name: "Discard" }).click();
 
+  await expect(projectStatus(session.page)).toHaveText(
+    "Unsaved changes discarded. Your saved project is unchanged.",
+  );
   await expect(
-    restoredPage.getByRole("heading", { name: "Recover unsaved changes?" }),
+    session.page.getByRole("heading", { name: "Recover unsaved changes?" }),
   ).toHaveCount(0);
-  const list = restoredPage.getByRole("list", { name: "Projects" });
-  await expect(list.getByRole("listitem")).toHaveCount(1);
-  await expect(list.getByRole("listitem")).toContainText("Pantry Jars");
+  await expect(
+    session.page.getByRole("list", { name: "Projects" }).getByRole("listitem"),
+  ).toContainText("Pantry Jars");
 
-  await restoredContext.close();
+  // Only the draft is gone; the saved record is untouched.
+  expect(await readDurableProjects(session.page)).toEqual([created]);
+  expect(await readDurableDraftNames(session.page)).toEqual([]);
+
+  session = await restartSession(session, browser, baseURL!, { consoleErrors });
+  await expect(
+    session.page.getByRole("list", { name: "Projects" }).getByRole("listitem"),
+  ).toContainText("Pantry Jars");
+  await expect(
+    session.page.getByRole("heading", { name: "Recover unsaved changes?" }),
+  ).toHaveCount(0);
+
+  expect(consoleErrors).toEqual([]);
+  await session.context.close();
 });
