@@ -1,5 +1,6 @@
 import { DESTINATIONS } from "./destinations";
 import { useCurrentDestination } from "./useCurrentDestination";
+import ProjectsPage from "../projects/ProjectsPage";
 import "./AppShell.css";
 
 function AppShell() {
@@ -25,6 +26,7 @@ function AppShell() {
       </nav>
       <main className="app-shell-main">
         <h1>{current.label}</h1>
+        {current.id === "projects" && <ProjectsPage />}
       </main>
     </div>
   );

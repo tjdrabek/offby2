@@ -16,31 +16,31 @@
       "step": 1,
       "description": "Define minimal project actions",
       "details": "Introduce typed create, open, rename, list, and delete action boundaries using `LabelProject` identity and name; keep storage behind an injected repository contract.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 2,
       "description": "Build create and list controls",
       "details": "Add a labeled project-name input, native create button, empty state, and project list whose entries expose stable open actions.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 3,
       "description": "Add rename behavior",
       "details": "Provide a labeled rename control for the open or selected project, validate a non-empty name, and preserve the existing project identity.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 4,
       "description": "Add explicit deletion confirmation",
       "details": "Use an accessible confirmation dialog with distinct cancel and destructive confirm actions; keep focus behavior predictable and update the list only after success.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 5,
       "description": "Verify the visible lifecycle",
       "details": "Exercise create, list, open, rename, cancel-delete, and confirm-delete through public UI controls and assert names and state transitions.",
-      "pass": false
+      "pass": true
     }
   ],
   "dependencies": ["TASK-1", "TASK-2"],

@@ -1,0 +1,64 @@
+.projects-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 32rem;
+}
+
+.project-create-form,
+.project-rename-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.project-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.project-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.projects-error {
+  color: #b3261e;
+}
+
+.project-delete-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.project-delete-dialog {
+  background: var(--card-bg, #fff);
+  color: inherit;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  max-width: 24rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.project-delete-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.project-delete-actions .destructive {
+  background-color: #b3261e;
+  color: #fff;
+}

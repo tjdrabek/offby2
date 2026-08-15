@@ -7,6 +7,7 @@ diy-labels/
 ├── public/              # Static assets served as-is
 ├── src/                 # Application source
 │   ├── assets/          # Bundled static assets (images, icons)
+│   ├── projects/        # LabelProject lifecycle (repository, hook, UI)
 │   ├── shell/           # Application-shell navigation (destinations, AppShell)
 │   ├── tests/           # Playwright browser tests
 │   ├── App.tsx          # Root application component
