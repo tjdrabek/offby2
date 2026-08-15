@@ -32,7 +32,7 @@
     "title": "Offer actionable project recovery",
     "category": "functional",
     "specFilePath": ".agent/tasks/TASK-5.json",
-    "passes": false
+    "passes": true
   },
   {
     "id": "TASK-6",

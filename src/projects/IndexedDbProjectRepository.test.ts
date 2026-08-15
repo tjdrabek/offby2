@@ -80,6 +80,57 @@ describe("IndexedDbProjectRepository", () => {
     );
   });
 
+  it("keeps a saved draft readable from a new repository instance", async () => {
+    const first = createIndexedDbProjectRepository();
+    const created = await first.create("Pantry Jars");
+    await first.saveDraft(created.id, "Spice Jars");
+
+    const second = createIndexedDbProjectRepository();
+
+    await expect(second.listDrafts()).resolves.toMatchObject([
+      { projectId: created.id, draftName: "Spice Jars" },
+    ]);
+  });
+
+  it("clears only the named draft, leaving the project and other drafts intact", async () => {
+    const repository = createIndexedDbProjectRepository();
+    const kept = await repository.create("Pantry Jars");
+    const cleared = await repository.create("Herb Jars");
+    await repository.saveDraft(kept.id, "Spice Jars");
+    await repository.saveDraft(cleared.id, "Tea Jars");
+
+    await repository.clearDraft(cleared.id);
+
+    await expect(repository.listDrafts()).resolves.toMatchObject([
+      { projectId: kept.id, draftName: "Spice Jars" },
+    ]);
+    await expect(repository.list()).resolves.toEqual(
+      expect.arrayContaining([kept, cleared]),
+    );
+  });
+
+  it("orders same-millisecond creations deterministically", async () => {
+    const repository = createIndexedDbProjectRepository();
+    await repository.create("Pantry Jars");
+    await repository.create("Herb Jars");
+
+    const first = await repository.list();
+    const second = await createIndexedDbProjectRepository().list();
+
+    expect(second).toEqual(first);
+  });
+
+  it("clears every draft without touching projects", async () => {
+    const repository = createIndexedDbProjectRepository();
+    const created = await repository.create("Pantry Jars");
+    await repository.saveDraft(created.id, "Spice Jars");
+
+    await repository.clearAllDrafts();
+
+    await expect(repository.listDrafts()).resolves.toEqual([]);
+    await expect(repository.list()).resolves.toEqual([created]);
+  });
+
   it("surfaces an actionable error and leaves no trace when IndexedDB fails to open", async () => {
     vi.spyOn(globalThis.indexedDB, "open").mockImplementation(
       failingOpen("storage unavailable"),

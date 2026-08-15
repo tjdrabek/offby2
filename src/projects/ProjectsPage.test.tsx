@@ -8,44 +8,11 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ProjectsPage from "./ProjectsPage";
-import type { LabelProject } from "./LabelProject";
-import type { ProjectRepository } from "./ProjectRepository";
+import { createFakeProjectRepository } from "./testing/fakeProjectRepository";
 
 afterEach(() => {
   cleanup();
 });
-
-function createFakeRepository(
-  overrides: Partial<ProjectRepository> = {},
-): ProjectRepository {
-  let projects: LabelProject[] = [];
-  let nextId = 0;
-
-  return {
-    async list() {
-      return [...projects];
-    },
-    async create(name) {
-      const project: LabelProject = { id: `p${nextId++}`, name };
-      projects = [...projects, project];
-      return project;
-    },
-    async rename(id, name) {
-      projects = projects.map((project) =>
-        project.id === id ? { ...project, name } : project,
-      );
-      const renamed = projects.find((project) => project.id === id);
-      if (!renamed) {
-        throw new Error("Project not found");
-      }
-      return renamed;
-    },
-    async remove(id) {
-      projects = projects.filter((project) => project.id !== id);
-    },
-    ...overrides,
-  };
-}
 
 async function createProjectViaUi(
   user: ReturnType<typeof userEvent.setup>,
@@ -57,7 +24,7 @@ async function createProjectViaUi(
 
 describe("ProjectsPage", () => {
   it("shows an empty state with no projects", () => {
-    render(<ProjectsPage repository={createFakeRepository()} />);
+    render(<ProjectsPage repository={createFakeProjectRepository()} />);
 
     expect(
       screen.getByText("No projects yet. Create one to get started."),
@@ -66,7 +33,7 @@ describe("ProjectsPage", () => {
 
   it("creates a project and lists it", async () => {
     const user = userEvent.setup();
-    render(<ProjectsPage repository={createFakeRepository()} />);
+    render(<ProjectsPage repository={createFakeProjectRepository()} />);
 
     await createProjectViaUi(user, "Pantry Jars");
 
@@ -76,7 +43,7 @@ describe("ProjectsPage", () => {
 
   it("opens a project from the list on request", async () => {
     const user = userEvent.setup();
-    render(<ProjectsPage repository={createFakeRepository()} />);
+    render(<ProjectsPage repository={createFakeProjectRepository()} />);
 
     await createProjectViaUi(user, "Pantry Jars");
     await createProjectViaUi(user, "Spice Jars");
@@ -93,7 +60,7 @@ describe("ProjectsPage", () => {
 
   it("opens a project and renames it without changing identity", async () => {
     const user = userEvent.setup();
-    render(<ProjectsPage repository={createFakeRepository()} />);
+    render(<ProjectsPage repository={createFakeProjectRepository()} />);
 
     await createProjectViaUi(user, "Pantry Jars");
 
@@ -118,7 +85,7 @@ describe("ProjectsPage", () => {
 
   it("preserves the project when deletion is cancelled", async () => {
     const user = userEvent.setup();
-    render(<ProjectsPage repository={createFakeRepository()} />);
+    render(<ProjectsPage repository={createFakeProjectRepository()} />);
 
     await createProjectViaUi(user, "Pantry Jars");
     await user.click(
@@ -139,7 +106,7 @@ describe("ProjectsPage", () => {
 
   it("removes the project only after confirming deletion", async () => {
     const user = userEvent.setup();
-    render(<ProjectsPage repository={createFakeRepository()} />);
+    render(<ProjectsPage repository={createFakeProjectRepository()} />);
 
     await createProjectViaUi(user, "Pantry Jars");
     await user.click(
@@ -156,7 +123,7 @@ describe("ProjectsPage", () => {
 
   it("keeps the project listed and reports an error when deletion fails", async () => {
     const user = userEvent.setup();
-    const repository = createFakeRepository({
+    const repository = createFakeProjectRepository({
       remove: async () => {
         throw new Error("boom");
       },

@@ -16,34 +16,37 @@
       "step": 1,
       "description": "Define recovery state",
       "details": "Add a versioned `DraftStatus` or equivalent durable marker that distinguishes clean state from a recoverable revision without embedding editor-specific content.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 2,
       "description": "Detect recovery on startup",
       "details": "Read recovery metadata after repository initialization and expose a typed clean, recoverable, or unreadable result to the shell.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 3,
       "description": "Present recovery choices",
       "details": "Render a named recovery status with native recover and discard controls, a confirmation before discard, and focus placement on the recovery heading or first action.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 4,
       "description": "Preserve last-known-good state",
       "details": "Make recovery/discard updates atomic and ensure parsing or storage failure cannot replace the durable project with an empty or partially decoded value.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 5,
       "description": "Verify recovery behavior",
       "details": "Seed a recoverable marker, restart the browser context, exercise recover and discard paths, and assert visible outcomes and durable records.",
-      "pass": false
+      "pass": true
     }
   ],
-  "dependencies": ["TASK-1", "TASK-4"],
+  "dependencies": [
+    "TASK-1",
+    "TASK-4"
+  ],
   "estimatedComplexity": "medium",
   "technicalNotes": [
     "Recovery is distinct from cloud backup or cross-device sync.",

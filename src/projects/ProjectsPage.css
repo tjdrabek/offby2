@@ -32,7 +32,7 @@
   color: #b3261e;
 }
 
-.project-delete-overlay {
+.project-modal-overlay {
   position: fixed;
   inset: 0;
   display: flex;
@@ -41,7 +41,7 @@
   background: rgba(0, 0, 0, 0.5);
 }
 
-.project-delete-dialog {
+.project-modal-dialog {
   background: var(--card-bg, #fff);
   color: inherit;
   border-radius: 0.5rem;
@@ -52,13 +52,28 @@
   gap: 1rem;
 }
 
-.project-delete-actions {
+.project-modal-actions {
   display: flex;
   gap: 0.75rem;
   justify-content: flex-end;
 }
 
-.project-delete-actions .destructive {
+.project-modal-actions .destructive {
   background-color: #b3261e;
   color: #fff;
+}
+
+.project-recovery-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+  border: 1px solid #b3261e;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.project-recovery-actions {
+  display: flex;
+  gap: 0.75rem;
 }

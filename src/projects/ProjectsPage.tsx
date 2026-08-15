@@ -2,9 +2,11 @@ import { useRef, useState } from "react";
 import { createIndexedDbProjectRepository } from "./IndexedDbProjectRepository";
 import type { ProjectRepository } from "./ProjectRepository";
 import { useProjects } from "./useProjects";
+import { useProjectRecovery } from "./useProjectRecovery";
 import ProjectCreateForm from "./ProjectCreateForm";
 import ProjectList from "./ProjectList";
 import ProjectRenameForm from "./ProjectRenameForm";
+import ProjectRecoveryBanner from "./ProjectRecoveryBanner";
 import DeleteConfirmDialog from "./DeleteConfirmDialog";
 import "./ProjectsPage.css";
 
@@ -17,8 +19,20 @@ function ProjectsPage({ repository }: ProjectsPageProps) {
     createIndexedDbProjectRepository(),
   );
   const activeRepository = repository ?? defaultRepository;
-  const { projects, loadError, createProject, renameProject, deleteProject } =
-    useProjects(activeRepository);
+  const {
+    projects,
+    loaded,
+    loadError,
+    createProject,
+    renameProject,
+    deleteProject,
+  } = useProjects(activeRepository);
+  const recovery = useProjectRecovery(
+    activeRepository,
+    projects,
+    loaded,
+    renameProject,
+  );
 
   const [openProjectId, setOpenProjectId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -48,9 +62,22 @@ function ProjectsPage({ repository }: ProjectsPageProps) {
     setError(null);
     try {
       await renameProject(openProject.id, name);
+      await activeRepository.clearDraft(openProject.id).catch(() => undefined);
     } catch {
       setError("Could not rename the project. Try again.");
     }
+  }
+
+  function handleDraftChange(name: string | null) {
+    if (!openProject) {
+      return;
+    }
+    const saved = name
+      ? activeRepository.saveDraft(openProject.id, name)
+      : activeRepository.clearDraft(openProject.id);
+    // A failed draft write must not interrupt typing; the committed project
+    // is still authoritative and recovery simply won't be offered.
+    saved.catch(() => undefined);
   }
 
   function requestDelete(id: string, trigger: HTMLElement) {
@@ -87,6 +114,20 @@ function ProjectsPage({ repository }: ProjectsPageProps) {
 
   return (
     <div className="projects-page">
+      {recovery.status.kind !== "clean" && (
+        <ProjectRecoveryBanner
+          status={recovery.status}
+          pending={recovery.pending}
+          onRecover={() => void recovery.recover()}
+          onDiscard={() => void recovery.discard()}
+          onDismissUnreadable={() => void recovery.dismissUnreadable()}
+        />
+      )}
+      {recovery.actionError && (
+        <p role="alert" className="projects-error">
+          {recovery.actionError}
+        </p>
+      )}
       {visibleError && (
         <p role="alert" className="projects-error">
           {visibleError}
@@ -104,6 +145,7 @@ function ProjectsPage({ repository }: ProjectsPageProps) {
           key={openProject.id}
           project={openProject}
           onRename={handleRename}
+          onDraftChange={handleDraftChange}
         />
       )}
       {pendingDeleteProject && (

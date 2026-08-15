@@ -20,16 +20,16 @@ function DeleteConfirmDialog({
   }, []);
 
   return (
-    <div className="project-delete-overlay">
+    <div className="project-modal-overlay">
       <div
-        className="project-delete-dialog"
+        className="project-modal-dialog"
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="delete-project-title"
       >
         <h2 id="delete-project-title">Delete project?</h2>
         <p>{`Delete "${projectName}"? This cannot be undone.`}</p>
-        <div className="project-delete-actions">
+        <div className="project-modal-actions">
           <button type="button" onClick={onCancel} disabled={pending}>
             Cancel
           </button>
