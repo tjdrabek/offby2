@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { DESTINATIONS } from "./destinations";
 import { useCurrentDestination } from "./useCurrentDestination";
 import ProjectsPage from "../projects/ProjectsPage";
+import SheetLayoutsPage from "../sheet-layouts/SheetLayoutsPage";
 import OfflineCapabilityWarning from "../pwa/OfflineCapabilityWarning";
 import UpdateNotice from "../pwa/UpdateNotice";
 import { useServiceWorkerRegistration } from "../pwa/useServiceWorkerRegistration";
@@ -68,6 +69,7 @@ function AppShell() {
           <OfflineCapabilityWarning status={serviceWorker} />
           <h1>{current.label}</h1>
           {current.id === "projects" && <ProjectsPage />}
+          {current.id === "sheet-layouts" && <SheetLayoutsPage />}
         </main>
       </div>
     </PendingWorkContext>

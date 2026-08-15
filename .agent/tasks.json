@@ -67,7 +67,7 @@
     "title": "Capture complete uniform-grid geometry",
     "category": "data-model",
     "specFilePath": ".agent/tasks/TASK-10.json",
-    "passes": false
+    "passes": true
   },
   {
     "id": "TASK-11",
