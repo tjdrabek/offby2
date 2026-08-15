@@ -112,3 +112,19 @@ export function isGridCount(value: number): boolean {
     value <= MAX_GRID_COUNT
   );
 }
+
+/**
+ * Reads a count without accepting anything a Number() coercion would let
+ * through: empty text, whitespace, "1e3", "12px", "+3", or a decimal fraction.
+ *
+ * Range is not judged here — {@link isGridCount} does that — so a caller can
+ * tell "not a whole number" apart from "outside the supported range".
+ */
+export function parseGridCountText(text: string): number | null {
+  const trimmed = text.trim();
+  if (!/^\d+$/.test(trimmed)) {
+    return null;
+  }
+  const value = Number(trimmed);
+  return Number.isSafeInteger(value) ? value : null;
+}

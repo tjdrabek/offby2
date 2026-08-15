@@ -22,21 +22,25 @@ import {
 } from "./SheetLayoutInput";
 import {
   issuesByField,
-  validateSheetLayoutInput,
-  type NormalizedSheetLayout,
   type SheetLayoutIssue,
 } from "./validateSheetLayoutInput";
+import {
+  resolveSheetLayout,
+  type ResolvedSheetLayout,
+} from "./resolveSheetLayout";
 import NormalizedMeasurements from "./NormalizedMeasurements";
+import { formatMeasurement } from "./measurementUnits";
 import "./SheetLayoutForm.css";
 
 interface SheetLayoutFormProps {
   /**
-   * Receives the source input and its normalized millimetres once the entry is
-   * representable as uniform-grid geometry.
+   * Receives the source input and its resolved millimetres once the entry is
+   * representable as uniform-grid geometry, whether every value was typed or
+   * one of them was derived.
    */
   onSubmit?: (
     input: SheetLayoutSourceInput,
-    normalized: NormalizedSheetLayout,
+    resolved: ResolvedSheetLayout,
   ) => void;
 }
 
@@ -82,9 +86,7 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
   const [status, setStatus] = useState<string | null>(null);
   // Held from the last accepted check. Changing the display unit re-reads the
   // form's labels, never this: normalized geometry is not display state.
-  const [normalized, setNormalized] = useState<NormalizedSheetLayout | null>(
-    null,
-  );
+  const [resolved, setResolved] = useState<ResolvedSheetLayout | null>(null);
   const unitId = useId();
   const headingId = useId();
 
@@ -137,27 +139,31 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const validation = validateSheetLayoutInput(input);
-    if (validation.status === "unrepresentable") {
-      setIssues(issuesByField(validation.issues));
+    const resolution = resolveSheetLayout(input);
+    if (resolution.status === "unresolved") {
+      setIssues(issuesByField(resolution.issues));
       setStatus(null);
-      const count = validation.issues.length;
+      const count = resolution.issues.length;
       setSummary(
         `${count} measurement${count === 1 ? "" : "s"} still ${count === 1 ? "needs" : "need"} attention. Each one is described under its own field.`,
       );
       // A refused entry has no normalized result; keeping the previous one on
       // screen would state a value the form has just declined to accept.
-      setNormalized(null);
-      focusField(validation.issues[0].field);
+      setResolved(null);
+      focusField(resolution.issues[0].field);
       return;
     }
+    const { layout } = resolution;
     setIssues(new Map());
     setSummary(null);
-    setNormalized(validation);
+    setResolved(layout);
+    const derived = layout.derivation
+      ? ` ${layout.derivation.label} was derived as ${formatMeasurement(layout.derivation.valueMm, "mm")}, not entered.`
+      : "";
     setStatus(
-      `Measurements captured: ${validation.counts.rows} rows by ${validation.counts.columns} columns. Corner radius: ${cornerRadiusLabel(input.cornerRadius.state)}.`,
+      `Measurements captured: ${layout.counts.rows} rows by ${layout.counts.columns} columns. Corner radius: ${cornerRadiusLabel(input.cornerRadius.state)}.${derived}`,
     );
-    onSubmit?.(input, validation);
+    onSubmit?.(input, layout);
   }
 
   function focusField(field: SheetLayoutFieldId) {
@@ -165,6 +171,8 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
       ?.querySelector<HTMLInputElement>(`[data-field="${field}"]`)
       ?.focus();
   }
+
+  const derivation = resolved?.derivation ?? null;
 
   function renderMeasurements(group: MeasurementGroup) {
     return MEASUREMENT_FIELDS.filter((field) => field.group === group).map(
@@ -175,6 +183,8 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
           label={`${field.label} (${suffix})`}
           value={input.measurements[field.id].text}
           issue={issues.get(field.id)}
+          derivation={derivation?.field === field.id ? derivation : undefined}
+          displayUnit={unit}
           onChange={(text) => changeMeasurement(field.id, text)}
         />
       ),
@@ -251,9 +261,9 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
         Check measurements
       </button>
 
-      {normalized && (
+      {resolved && (
         <>
-          <NormalizedMeasurements layout={normalized} displayUnit={unit} />
+          <NormalizedMeasurements layout={resolved} displayUnit={unit} />
           <p className="sheet-layout-note">
             Millimetres are the values this layout is stored and measured in.
             The measurement unit above is a display preference: changing it

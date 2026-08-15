@@ -1,5 +1,7 @@
 import { useId } from "react";
-import type { SheetLayoutFieldId } from "./SheetLayoutInput";
+import DerivedValueNotice from "./DerivedValueNotice";
+import type { SheetLayoutDerivation } from "./deriveDimension";
+import type { LengthUnit, SheetLayoutFieldId } from "./SheetLayoutInput";
 import type { SheetLayoutIssue } from "./validateSheetLayoutInput";
 
 interface SheetLayoutFieldProps {
@@ -10,13 +12,18 @@ interface SheetLayoutFieldProps {
   value: string;
   onChange: (text: string) => void;
   issue?: SheetLayoutIssue;
+  /** Present when this field's value was calculated rather than typed. */
+  derivation?: SheetLayoutDerivation;
+  /** Unit the derivation is restated in, alongside its millimetres. */
+  displayUnit?: LengthUnit;
 }
 
 /**
  * One labelled text entry. The source text is held verbatim — no parsing,
  * trimming, or coercion happens here — so an invalid entry stays on screen to
- * be corrected. Its problem is associated programmatically rather than being
- * shown as colour alone.
+ * be corrected. Its problem, or the derivation that stands in for an entry it
+ * never received, is associated programmatically rather than shown as colour
+ * alone.
  */
 function SheetLayoutField({
   field,
@@ -24,9 +31,13 @@ function SheetLayoutField({
   value,
   onChange,
   issue,
+  derivation,
+  displayUnit = "mm",
 }: SheetLayoutFieldProps) {
   const inputId = useId();
   const errorId = useId();
+  const derivedId = useId();
+  const describedBy = issue ? errorId : derivation ? derivedId : undefined;
 
   return (
     <div className="sheet-layout-field">
@@ -39,13 +50,20 @@ function SheetLayoutField({
         autoComplete="off"
         value={value}
         aria-invalid={issue ? true : undefined}
-        aria-describedby={issue ? errorId : undefined}
+        aria-describedby={describedBy}
         onChange={(event) => onChange(event.target.value)}
       />
       {issue && (
         <p id={errorId} className="sheet-layout-field-error">
           {issue.message}
         </p>
+      )}
+      {!issue && derivation && (
+        <DerivedValueNotice
+          derivation={derivation}
+          displayUnit={displayUnit}
+          id={derivedId}
+        />
       )}
     </div>
   );

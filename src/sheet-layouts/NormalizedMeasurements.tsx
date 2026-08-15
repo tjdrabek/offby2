@@ -5,13 +5,22 @@ import {
   type SheetLayoutFieldId,
 } from "./SheetLayoutInput";
 import { formatMillimetres } from "./measurementUnits";
-import type { ParsedMeasurement } from "./parseMeasurement";
-import type { NormalizedSheetLayout } from "./validateSheetLayoutInput";
+import type {
+  ResolvedMeasurement,
+  ResolvedSheetLayout,
+} from "./resolveSheetLayout";
 
 interface NormalizedMeasurementsProps {
-  layout: NormalizedSheetLayout;
+  layout: ResolvedSheetLayout;
   /** Presentation only: the unit new entries are read in and results restated in. */
   displayUnit: LengthUnit;
+}
+
+/** What the "As entered" column says — a derived value was never entered. */
+function sourceText(measurement: ResolvedMeasurement): string {
+  return measurement.status === "derived"
+    ? "Derived, not entered"
+    : `${measurement.source.text} ${lengthUnitSuffix(measurement.source.unit)}`;
 }
 
 /**
@@ -19,7 +28,9 @@ interface NormalizedMeasurementsProps {
  *
  * Millimetres are the authoritative column and never change. The display-unit
  * column is derived from those millimetres for reading convenience only —
- * nothing converts it back, so its rounding cannot reach stored geometry.
+ * nothing converts it back, so its rounding cannot reach stored geometry. A
+ * value the sheet equation supplied says so in its own row, so it is never read
+ * as something the user measured.
  */
 function NormalizedMeasurements({
   layout,
@@ -28,17 +39,17 @@ function NormalizedMeasurements({
   const rows: {
     key: SheetLayoutFieldId;
     label: string;
-    parsed: ParsedMeasurement;
+    measurement: ResolvedMeasurement;
   }[] = MEASUREMENT_FIELDS.map((field) => ({
     key: field.id,
     label: field.label,
-    parsed: layout.measurements[field.id],
+    measurement: layout.measurements[field.id],
   }));
   if (layout.cornerRadius) {
     rows.push({
       key: "cornerRadius",
       label: "Corner radius",
-      parsed: layout.cornerRadius,
+      measurement: layout.cornerRadius,
     });
   }
   const showsDisplayUnit = displayUnit !== "mm";
@@ -57,18 +68,16 @@ function NormalizedMeasurements({
         </tr>
       </thead>
       <tbody>
-        {rows.map(({ key, label, parsed }) => (
-          <tr key={key}>
+        {rows.map(({ key, label, measurement }) => (
+          <tr key={key} data-derived={measurement.status === "derived"}>
             <th scope="row">{label}</th>
-            <td>
-              {parsed.source.text} {lengthUnitSuffix(parsed.source.unit)}
-            </td>
+            <td>{sourceText(measurement)}</td>
             <td data-field-mm={key}>
-              {formatMillimetres(parsed.valueMm, "mm")} mm
+              {formatMillimetres(measurement.valueMm, "mm")} mm
             </td>
             {showsDisplayUnit && (
               <td>
-                {formatMillimetres(parsed.valueMm, displayUnit)}{" "}
+                {formatMillimetres(measurement.valueMm, displayUnit)}{" "}
                 {lengthUnitSuffix(displayUnit)}
               </td>
             )}

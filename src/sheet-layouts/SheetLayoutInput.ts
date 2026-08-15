@@ -81,6 +81,10 @@ export const MEASUREMENT_FIELDS: readonly MeasurementFieldDefinition[] = [
   { id: "verticalGap", group: "gaps", label: "Vertical gap" },
 ];
 
+export function measurementFieldLabel(id: MeasurementFieldId): string {
+  return MEASUREMENT_FIELDS.find((field) => field.id === id)?.label ?? id;
+}
+
 export interface CountFieldDefinition {
   id: CountFieldId;
   label: string;
@@ -90,6 +94,10 @@ export const COUNT_FIELDS: readonly CountFieldDefinition[] = [
   { id: "rows", label: "Rows" },
   { id: "columns", label: "Columns" },
 ];
+
+export function countFieldLabel(id: CountFieldId): string {
+  return COUNT_FIELDS.find((field) => field.id === id)?.label ?? id;
+}
 
 /**
  * Four-state corner-radius disclosure. This is a discriminated union rather

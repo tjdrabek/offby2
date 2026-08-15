@@ -1,11 +1,11 @@
 import SheetLayoutForm from "./SheetLayoutForm";
 import type { SheetLayoutSourceInput } from "./SheetLayoutInput";
-import type { NormalizedSheetLayout } from "./validateSheetLayoutInput";
+import type { ResolvedSheetLayout } from "./resolveSheetLayout";
 
 interface SheetLayoutsPageProps {
   onSubmit?: (
     input: SheetLayoutSourceInput,
-    normalized: NormalizedSheetLayout,
+    resolved: ResolvedSheetLayout,
   ) => void;
 }
 

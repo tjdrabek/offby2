@@ -33,6 +33,34 @@ async function fillCompleteSheet(
   await user.type(screen.getByLabelText("Columns"), "3");
 }
 
+/**
+ * A sheet whose entries satisfy both axis equations exactly, so clearing any
+ * one field leaves a single well-determined unknown.
+ *
+ * Horizontal: 210 = 10 + 3 × 60 + 2 × 5 + 10
+ * Vertical:   297 = 9.5 + 7 × 38 + 6 × 2 + 9.5
+ */
+const CONSISTENT: readonly [string, string][] = [
+  ["Sheet width", "210"],
+  ["Sheet height", "297"],
+  ["Label width", "60"],
+  ["Label height", "38"],
+  ["Top margin", "9.5"],
+  ["Right margin", "10"],
+  ["Bottom margin", "9.5"],
+  ["Left margin", "10"],
+  ["Horizontal gap", "5"],
+  ["Vertical gap", "2"],
+];
+
+async function fillConsistentSheet(user: ReturnType<typeof userEvent.setup>) {
+  for (const [label, value] of CONSISTENT) {
+    await user.type(screen.getByLabelText(`${label} (mm)`), value);
+  }
+  await user.type(screen.getByLabelText("Rows"), "7");
+  await user.type(screen.getByLabelText("Columns"), "3");
+}
+
 function statusRegion() {
   return screen.getByRole("status", { name: "Sheet layout status" });
 }
@@ -326,6 +354,100 @@ describe("SheetLayoutForm", () => {
     expect(
       screen.getByRole("columnheader", { name: "Shown in in" }),
     ).toBeInTheDocument();
+  });
+
+  it("derives the one missing dimension and discloses it beside the field", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(<SheetLayoutForm onSubmit={onSubmit} />);
+
+    // 210 = 10 + 3 × 60 + 2 × 5 + 10, with the left margin left empty.
+    await fillConsistentSheet(user);
+    await user.clear(screen.getByLabelText("Left margin (mm)"));
+    await user.click(
+      screen.getByRole("button", { name: "Check measurements" }),
+    );
+
+    const marginLeft = screen.getByLabelText("Left margin (mm)");
+    // The entry is not filled in for the user; the derivation stands beside it.
+    expect(marginLeft).toHaveValue("");
+    expect(marginLeft).not.toHaveAttribute("aria-invalid");
+    expect(marginLeft).toHaveAccessibleDescription(
+      /Derived value: Left margin is 10 mm/,
+    );
+    expect(marginLeft).toHaveAccessibleDescription(
+      /210 = 10 \+ 3 × 60 \+ 2 × 5 \+ 10/,
+    );
+    expect(statusRegion()).toHaveTextContent(
+      "Left margin was derived as 10 mm, not entered.",
+    );
+    expect(onSubmit.mock.calls[0][1].measurements.marginLeft).toMatchObject({
+      status: "derived",
+      valueMm: 10,
+    });
+  });
+
+  it("marks a derived value apart from entered ones in the results", async () => {
+    const user = userEvent.setup();
+    render(<SheetLayoutForm />);
+
+    await fillConsistentSheet(user);
+    await user.clear(screen.getByLabelText("Horizontal gap (mm)"));
+    await user.click(
+      screen.getByRole("button", { name: "Check measurements" }),
+    );
+
+    const table = screen.getByRole("table", {
+      name: "Normalized measurements",
+    });
+    expect(
+      within(table).getByRole("row", { name: /Horizontal gap/ }),
+    ).toHaveTextContent("Derived, not entered");
+    expect(
+      within(table).getByRole("row", { name: /Right margin/ }),
+    ).toHaveTextContent("10 mm");
+  });
+
+  it("refuses to derive a gap that a single column removes from the equation", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(<SheetLayoutForm onSubmit={onSubmit} />);
+
+    await fillConsistentSheet(user);
+    await user.clear(screen.getByLabelText("Columns"));
+    await user.type(screen.getByLabelText("Columns"), "1");
+    await user.clear(screen.getByLabelText("Sheet width (mm)"));
+    await user.type(screen.getByLabelText("Sheet width (mm)"), "80");
+    await user.clear(screen.getByLabelText("Horizontal gap (mm)"));
+    await user.click(
+      screen.getByRole("button", { name: "Check measurements" }),
+    );
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    const gap = screen.getByLabelText("Horizontal gap (mm)");
+    expect(gap).toHaveFocus();
+    expect(gap).toHaveAccessibleDescription(/cannot be derived/);
+    expect(screen.queryByText(/Derived value:/)).toBeNull();
+  });
+
+  it("leaves two missing dimensions to be entered rather than guessed", async () => {
+    const user = userEvent.setup();
+    render(<SheetLayoutForm />);
+
+    await fillConsistentSheet(user);
+    await user.clear(screen.getByLabelText("Left margin (mm)"));
+    await user.clear(screen.getByLabelText("Right margin (mm)"));
+    await user.click(
+      screen.getByRole("button", { name: "Check measurements" }),
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "2 measurements still need attention",
+    );
+    expect(
+      screen.getByLabelText("Left margin (mm)"),
+    ).toHaveAccessibleDescription("Enter a value.");
+    expect(screen.queryByText(/Derived value:/)).toBeNull();
   });
 
   it("starts with an empty status region so a later result is announced", () => {

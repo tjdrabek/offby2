@@ -12,7 +12,7 @@ diy-labels/
 │   │   └── testing/     # Shared in-memory repository fake for tests
 │   ├── pwa/             # Service worker registration, update activation, pending-work durability
 │   │   └── testing/     # Shared service-worker fakes for tests
-│   ├── sheet-layouts/   # Sheet-layout source input, measurement parsing/units, normalized mm geometry, form
+│   ├── sheet-layouts/   # Sheet-layout source input, measurement parsing/units, normalized mm geometry, single-value derivation, form
 │   ├── shell/           # Application-shell navigation (destinations, AppShell)
 │   ├── tests/           # Playwright browser tests
 │   │   └── support/     # Shared browser-test helpers

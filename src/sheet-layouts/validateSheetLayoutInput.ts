@@ -7,7 +7,13 @@ import {
   type SheetLayoutFieldId,
   type SheetLayoutSourceInput,
 } from "./SheetLayoutInput";
-import { MAX_GRID_COUNT, MIN_GRID_COUNT, isGridCount } from "./SheetGeometry";
+import {
+  MAX_GRID_COUNT,
+  MIN_GRID_COUNT,
+  isGridCount,
+  parseGridCountText,
+} from "./SheetGeometry";
+import type { DerivationRefusalCode } from "./deriveDimension";
 import {
   REQUIRED_MESSAGE,
   parseMeasurement,
@@ -35,7 +41,10 @@ export type SheetLayoutIssueCode =
   | "required"
   | "count-not-an-integer"
   | "count-out-of-range"
-  | MeasurementParseErrorCode;
+  | MeasurementParseErrorCode
+  // Attached by resolveSheetLayout.ts when a missing value could not be
+  // derived; the field it belongs to reports it like any other refusal.
+  | DerivationRefusalCode;
 
 export interface SheetLayoutIssue {
   field: SheetLayoutFieldId;
@@ -55,22 +64,26 @@ export interface NormalizedSheetLayout {
   cornerRadius: ParsedMeasurement | null;
 }
 
+/**
+ * Everything that did normalize, kept alongside the refusals. Derivation reads
+ * this rather than parsing a second time; nothing else should treat it as a
+ * layout, because by definition at least one field is absent.
+ */
+export interface PartialNormalizedSheetLayout {
+  counts: Readonly<Partial<Record<CountFieldId, number>>>;
+  measurements: Readonly<
+    Partial<Record<MeasurementFieldId, ParsedMeasurement>>
+  >;
+  cornerRadius: ParsedMeasurement | null;
+}
+
 export type SheetLayoutInputValidation =
   | ({ status: "representable" } & NormalizedSheetLayout)
-  | { status: "unrepresentable"; issues: readonly SheetLayoutIssue[] };
-
-/**
- * Parses a count without accepting anything a Number() coercion would let
- * through: empty text, whitespace, "1e3", "12px", or a decimal fraction.
- */
-function parseCount(text: string): number | null {
-  const trimmed = text.trim();
-  if (!/^\d+$/.test(trimmed)) {
-    return null;
-  }
-  const value = Number(trimmed);
-  return Number.isSafeInteger(value) ? value : null;
-}
+  | {
+      status: "unrepresentable";
+      issues: readonly SheetLayoutIssue[];
+      partial: PartialNormalizedSheetLayout;
+    };
 
 function validateCount(
   field: CountFieldId,
@@ -82,7 +95,7 @@ function validateCount(
     issues.push({ field, code: "required", message: REQUIRED_MESSAGE });
     return null;
   }
-  const value = parseCount(text);
+  const value = parseGridCountText(text);
   if (value === null) {
     issues.push({
       field,
@@ -163,7 +176,11 @@ export function validateSheetLayoutInput(
       : normalizeMeasurement("cornerRadius", radius, issues);
 
   if (issues.length > 0) {
-    return { status: "unrepresentable", issues };
+    return {
+      status: "unrepresentable",
+      issues,
+      partial: { counts, measurements, cornerRadius },
+    };
   }
   return { status: "representable", counts, measurements, cornerRadius };
 }
