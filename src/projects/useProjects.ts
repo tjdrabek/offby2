@@ -4,14 +4,22 @@ import type { ProjectRepository } from "./ProjectRepository";
 
 export function useProjects(repository: ProjectRepository) {
   const [projects, setProjects] = useState<LabelProject[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    repository.list().then((loaded) => {
-      if (!cancelled) {
-        setProjects(loaded);
-      }
-    });
+    repository
+      .list()
+      .then((loaded) => {
+        if (!cancelled) {
+          setProjects(loaded);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLoadError("Could not load projects. Try again.");
+        }
+      });
     return () => {
       cancelled = true;
     };
@@ -45,5 +53,5 @@ export function useProjects(repository: ProjectRepository) {
     [repository],
   );
 
-  return { projects, createProject, renameProject, deleteProject };
+  return { projects, loadError, createProject, renameProject, deleteProject };
 }

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { createInMemoryProjectRepository } from "./InMemoryProjectRepository";
+import { createIndexedDbProjectRepository } from "./IndexedDbProjectRepository";
 import type { ProjectRepository } from "./ProjectRepository";
 import { useProjects } from "./useProjects";
 import ProjectCreateForm from "./ProjectCreateForm";
@@ -13,9 +13,11 @@ interface ProjectsPageProps {
 }
 
 function ProjectsPage({ repository }: ProjectsPageProps) {
-  const [defaultRepository] = useState(() => createInMemoryProjectRepository());
+  const [defaultRepository] = useState(() =>
+    createIndexedDbProjectRepository(),
+  );
   const activeRepository = repository ?? defaultRepository;
-  const { projects, createProject, renameProject, deleteProject } =
+  const { projects, loadError, createProject, renameProject, deleteProject } =
     useProjects(activeRepository);
 
   const [openProjectId, setOpenProjectId] = useState<string | null>(null);
@@ -81,11 +83,13 @@ function ProjectsPage({ repository }: ProjectsPageProps) {
     }
   }
 
+  const visibleError = error ?? loadError;
+
   return (
     <div className="projects-page">
-      {error && (
+      {visibleError && (
         <p role="alert" className="projects-error">
-          {error}
+          {visibleError}
         </p>
       )}
       <ProjectCreateForm onCreate={handleCreate} />

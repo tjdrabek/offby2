@@ -15,34 +15,37 @@
       "step": 1,
       "description": "Define the durable record schema",
       "details": "Create the versioned minimal `LabelProject` record and validation boundary, including stable ID, normalized name, schema version, and deterministic timestamp fields.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 2,
       "description": "Create the project repository",
       "details": "Implement a feature-oriented repository with list, get, put, and delete operations over one IndexedDB object store; contain browser API details inside the adapter.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 3,
       "description": "Connect project actions to persistence",
       "details": "Route create, open, rename, list, and delete behavior through the repository and update visible state only after the durable operation succeeds.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 4,
       "description": "Verify restart durability",
       "details": "Create and rename a project, close the browser context without clearing storage, reopen it, and assert the same ID and name are loaded from IndexedDB.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 5,
       "description": "Verify storage failure handling",
       "details": "Inject or simulate an IndexedDB rejection and assert an actionable error is shown while the prior visible and durable state remains truthful.",
-      "pass": false
+      "pass": true
     }
   ],
-  "dependencies": ["TASK-1", "TASK-3"],
+  "dependencies": [
+    "TASK-1",
+    "TASK-3"
+  ],
   "estimatedComplexity": "medium",
   "technicalNotes": [
     "Use IndexedDB, not localStorage, as the durable boundary.",
