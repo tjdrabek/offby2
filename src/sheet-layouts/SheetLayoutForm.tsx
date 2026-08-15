@@ -23,13 +23,21 @@ import {
 import {
   issuesByField,
   validateSheetLayoutInput,
+  type NormalizedSheetLayout,
   type SheetLayoutIssue,
 } from "./validateSheetLayoutInput";
+import NormalizedMeasurements from "./NormalizedMeasurements";
 import "./SheetLayoutForm.css";
 
 interface SheetLayoutFormProps {
-  /** Receives the source input once it is representable as uniform-grid geometry. */
-  onSubmit?: (input: SheetLayoutSourceInput) => void;
+  /**
+   * Receives the source input and its normalized millimetres once the entry is
+   * representable as uniform-grid geometry.
+   */
+  onSubmit?: (
+    input: SheetLayoutSourceInput,
+    normalized: NormalizedSheetLayout,
+  ) => void;
 }
 
 const GROUP_LEGENDS: Record<MeasurementGroup, string> = {
@@ -72,6 +80,11 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
   >(new Map());
   const [summary, setSummary] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  // Held from the last accepted check. Changing the display unit re-reads the
+  // form's labels, never this: normalized geometry is not display state.
+  const [normalized, setNormalized] = useState<NormalizedSheetLayout | null>(
+    null,
+  );
   const unitId = useId();
   const headingId = useId();
 
@@ -132,15 +145,19 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
       setSummary(
         `${count} measurement${count === 1 ? "" : "s"} still ${count === 1 ? "needs" : "need"} attention. Each one is described under its own field.`,
       );
+      // A refused entry has no normalized result; keeping the previous one on
+      // screen would state a value the form has just declined to accept.
+      setNormalized(null);
       focusField(validation.issues[0].field);
       return;
     }
     setIssues(new Map());
     setSummary(null);
+    setNormalized(validation);
     setStatus(
       `Measurements captured: ${validation.counts.rows} rows by ${validation.counts.columns} columns. Corner radius: ${cornerRadiusLabel(input.cornerRadius.state)}.`,
     );
-    onSubmit?.(input);
+    onSubmit?.(input, validation);
   }
 
   function focusField(field: SheetLayoutFieldId) {
@@ -233,6 +250,17 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
       <button className="sheet-layout-submit" type="submit">
         Check measurements
       </button>
+
+      {normalized && (
+        <>
+          <NormalizedMeasurements layout={normalized} displayUnit={unit} />
+          <p className="sheet-layout-note">
+            Millimetres are the values this layout is stored and measured in.
+            The measurement unit above is a display preference: changing it
+            restates the entry fields, and never changes a captured value.
+          </p>
+        </>
+      )}
     </form>
   );
 }

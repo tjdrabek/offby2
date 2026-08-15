@@ -3,26 +3,39 @@ import {
   MEASUREMENT_FIELDS,
   cornerRadiusValue,
   type CountFieldId,
+  type MeasurementFieldId,
   type SheetLayoutFieldId,
   type SheetLayoutSourceInput,
 } from "./SheetLayoutInput";
 import { MAX_GRID_COUNT, MIN_GRID_COUNT, isGridCount } from "./SheetGeometry";
+import {
+  REQUIRED_MESSAGE,
+  parseMeasurement,
+  type MeasurementParseErrorCode,
+  type ParsedMeasurement,
+} from "./parseMeasurement";
 
 /**
- * Representability checks for source input: is every required field present,
- * are the counts bounded positive integers, and does the corner-radius state
- * carry the payload its variant requires.
+ * Turns source input into normalized millimetres, or into structured refusals.
  *
- * This deliberately does not parse measurements into millimetres or judge the
- * resulting geometry; it only decides whether the input can be normalized at
- * all. Nothing here mutates the input, so invalid source text always survives
- * for correction.
+ * Two things are checked: representability — is every required field present,
+ * are the counts bounded positive integers, does the corner-radius state carry
+ * the payload its variant requires — and measurement parsing, which is
+ * delegated to parseMeasurement.ts.
+ *
+ * This deliberately does not judge the resulting geometry: negative lengths,
+ * overlapping labels, and contradictory extents are refused elsewhere. Nothing
+ * here mutates the input, so invalid source text always survives for
+ * correction.
  *
  * This module is pure: it imports no React, DOM, IndexedDB, or PDF API.
  */
 
 export type SheetLayoutIssueCode =
-  "required" | "count-not-an-integer" | "count-out-of-range";
+  | "required"
+  | "count-not-an-integer"
+  | "count-out-of-range"
+  | MeasurementParseErrorCode;
 
 export interface SheetLayoutIssue {
   field: SheetLayoutFieldId;
@@ -30,15 +43,21 @@ export interface SheetLayoutIssue {
   message: string;
 }
 
-export type SheetLayoutInputValidation =
-  | {
-      status: "representable";
-      /** The only values this step can fully validate. */
-      counts: Readonly<Record<CountFieldId, number>>;
-    }
-  | { status: "unrepresentable"; issues: readonly SheetLayoutIssue[] };
+/**
+ * Normalized millimetres for one layout, each still carrying the text and unit
+ * it came from. The display unit is a separate, presentational choice: it is
+ * not read back out of these values.
+ */
+export interface NormalizedSheetLayout {
+  counts: Readonly<Record<CountFieldId, number>>;
+  measurements: Readonly<Record<MeasurementFieldId, ParsedMeasurement>>;
+  /** Null for the zero and unknown states, which carry no measurement. */
+  cornerRadius: ParsedMeasurement | null;
+}
 
-const REQUIRED_MESSAGE = "Enter a value.";
+export type SheetLayoutInputValidation =
+  | ({ status: "representable" } & NormalizedSheetLayout)
+  | { status: "unrepresentable"; issues: readonly SheetLayoutIssue[] };
 
 /**
  * Parses a count without accepting anything a Number() coercion would let
@@ -83,18 +102,42 @@ function validateCount(
   return value;
 }
 
+/**
+ * Parses one measurement, recording any refusal against its own field. The
+ * empty case keeps the plain `required` code so a missing entry reads the same
+ * whether it is a measurement or a count.
+ */
+function normalizeMeasurement(
+  field: SheetLayoutFieldId,
+  input: SheetLayoutSourceInput["measurements"][MeasurementFieldId],
+  issues: SheetLayoutIssue[],
+): ParsedMeasurement | null {
+  const result = parseMeasurement(field, input);
+  if (result.status === "parsed") {
+    return result;
+  }
+  issues.push({
+    field,
+    code: result.code === "measurement-required" ? "required" : result.code,
+    message: result.message,
+  });
+  return null;
+}
+
 export function validateSheetLayoutInput(
   input: SheetLayoutSourceInput,
 ): SheetLayoutInputValidation {
   const issues: SheetLayoutIssue[] = [];
 
+  const measurements = {} as Record<MeasurementFieldId, ParsedMeasurement>;
   for (const field of MEASUREMENT_FIELDS) {
-    if (!input.measurements[field.id].text.trim()) {
-      issues.push({
-        field: field.id,
-        code: "required",
-        message: REQUIRED_MESSAGE,
-      });
+    const parsed = normalizeMeasurement(
+      field.id,
+      input.measurements[field.id],
+      issues,
+    );
+    if (parsed) {
+      measurements[field.id] = parsed;
     }
   }
 
@@ -114,18 +157,15 @@ export function validateSheetLayoutInput(
   // Only the known and estimated states carry a radius; zero and unknown are
   // complete on their own, and unknown must never be filled in as zero.
   const radius = cornerRadiusValue(input.cornerRadius);
-  if (radius !== null && !radius.text.trim()) {
-    issues.push({
-      field: "cornerRadius",
-      code: "required",
-      message: REQUIRED_MESSAGE,
-    });
-  }
+  const cornerRadius =
+    radius === null
+      ? null
+      : normalizeMeasurement("cornerRadius", radius, issues);
 
   if (issues.length > 0) {
     return { status: "unrepresentable", issues };
   }
-  return { status: "representable", counts };
+  return { status: "representable", counts, measurements, cornerRadius };
 }
 
 /** Indexes issues by field so a form can attach each one to its own control. */

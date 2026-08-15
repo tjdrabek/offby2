@@ -4,8 +4,10 @@ import {
   createEmptySheetLayoutInput,
   withCornerRadiusState,
   withMeasurementUnit,
+  type LengthUnit,
   type SheetLayoutSourceInput,
 } from "./SheetLayoutInput";
+import { measurementsEqual } from "./measurementUnits";
 import {
   issuesByField,
   validateSheetLayoutInput,
@@ -50,10 +52,93 @@ describe("validateSheetLayoutInput", () => {
   it("accepts a complete uniform grid and returns its validated counts", () => {
     const result = validateSheetLayoutInput(completeInput());
 
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       status: "representable",
       counts: { rows: 7, columns: 3 },
+      cornerRadius: null,
     });
+  });
+
+  it("normalizes every measurement into millimetres with its source", () => {
+    const result = validateSheetLayoutInput(completeInput());
+    if (result.status !== "representable") {
+      throw new Error("Expected the complete input to be representable.");
+    }
+
+    expect(result.measurements.sheetWidth).toEqual({
+      status: "parsed",
+      valueMm: 210,
+      source: { text: "210", unit: "mm", notation: "decimal" },
+    });
+    expect(result.measurements.labelWidth.valueMm).toBe(63.5);
+    expect(result.measurements.verticalGap.valueMm).toBe(0);
+  });
+
+  it("normalizes the same sheet identically however it was entered", () => {
+    const metric = validateSheetLayoutInput(completeInput());
+    const input = completeInput();
+    const imperial = validateSheetLayoutInput({
+      ...input,
+      measurements: {
+        ...input.measurements,
+        // 2 1/2 in is exactly the 63.5 mm the metric entry states.
+        labelWidth: { text: "2 1/2", unit: "in" },
+      },
+    });
+    if (
+      metric.status !== "representable" ||
+      imperial.status !== "representable"
+    ) {
+      throw new Error("Expected both entries to be representable.");
+    }
+
+    expect(
+      measurementsEqual(
+        imperial.measurements.labelWidth.valueMm,
+        metric.measurements.labelWidth.valueMm,
+      ),
+    ).toBe(true);
+    // The equal value does not erase how it was written.
+    expect(imperial.measurements.labelWidth.source).toEqual({
+      text: "2 1/2",
+      unit: "in",
+      notation: "fraction",
+    });
+  });
+
+  it("normalizes a claimed corner radius alongside the dimensions", () => {
+    const base = withCornerRadiusState(completeInput(), "known", "in");
+    const result = validateSheetLayoutInput({
+      ...base,
+      cornerRadius: { state: "known", value: { text: "1/8", unit: "in" } },
+    });
+    if (result.status !== "representable") {
+      throw new Error("Expected the radius to normalize.");
+    }
+
+    expect(result.cornerRadius?.valueMm).toBeCloseTo(3.175, 9);
+  });
+
+  it.each<[string, LengthUnit, string]>([
+    ["abc", "mm", "measurement-malformed"],
+    ["1e3", "mm", "measurement-malformed"],
+    ["12mm", "mm", "measurement-malformed"],
+    ["1/0", "in", "measurement-zero-denominator"],
+    ["1/2", "mm", "measurement-fraction-requires-inches"],
+    ["99999999", "mm", "measurement-out-of-range"],
+  ])("refuses %s (%s) as a sheet width", (text, unit, code) => {
+    const input = completeInput();
+    const issues = countIssues({
+      ...input,
+      measurements: {
+        ...input.measurements,
+        sheetWidth: { text, unit },
+      },
+    });
+
+    expect(issues).toHaveLength(1);
+    expect(issues[0]).toMatchObject({ field: "sheetWidth", code });
+    expect(issues[0].message).not.toBe("");
   });
 
   it("requires every dimension, both counts, and nothing else", () => {

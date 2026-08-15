@@ -225,6 +225,109 @@ describe("SheetLayoutForm", () => {
     });
   });
 
+  it("shows what every entry normalized to, beside what was typed", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(<SheetLayoutForm onSubmit={onSubmit} />);
+
+    await fillCompleteSheet(user);
+    await user.click(
+      screen.getByRole("button", { name: "Check measurements" }),
+    );
+
+    const normalized = screen.getByRole("table", {
+      name: "Normalized measurements",
+    });
+    const labelWidth = within(normalized).getByRole("row", {
+      name: /Label width/,
+    });
+    expect(labelWidth).toHaveTextContent("63.5 mm");
+    expect(onSubmit.mock.calls[0][1].measurements.labelWidth.valueMm).toBe(
+      63.5,
+    );
+  });
+
+  it("accepts an imperial fraction and normalizes it to millimetres", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(<SheetLayoutForm onSubmit={onSubmit} />);
+
+    await user.selectOptions(
+      screen.getByLabelText("Measurement unit"),
+      "Inches (in)",
+    );
+    await fillCompleteSheet(user, "in");
+    await user.clear(screen.getByLabelText("Label width (in)"));
+    await user.type(screen.getByLabelText("Label width (in)"), "2 1/2");
+    await user.click(
+      screen.getByRole("button", { name: "Check measurements" }),
+    );
+
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(onSubmit.mock.calls[0][1].measurements.labelWidth).toEqual({
+      status: "parsed",
+      valueMm: 63.5,
+      source: { text: "2 1/2", unit: "in", notation: "fraction" },
+    });
+    expect(
+      within(
+        screen.getByRole("table", { name: "Normalized measurements" }),
+      ).getByRole("row", { name: /Label width/ }),
+    ).toHaveTextContent("2 1/2 in");
+  });
+
+  it("refuses text that is not a measurement and keeps it on screen", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(<SheetLayoutForm onSubmit={onSubmit} />);
+
+    await fillCompleteSheet(user);
+    await user.clear(screen.getByLabelText("Label height (mm)"));
+    await user.type(screen.getByLabelText("Label height (mm)"), "1 1/2");
+    await user.click(
+      screen.getByRole("button", { name: "Check measurements" }),
+    );
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    const field = screen.getByLabelText("Label height (mm)");
+    expect(field).toHaveValue("1 1/2");
+    expect(field).toHaveFocus();
+    expect(field).toHaveAccessibleDescription(
+      /Fractions are only accepted for inches/,
+    );
+    expect(
+      screen.queryByRole("table", { name: "Normalized measurements" }),
+    ).toBeNull();
+  });
+
+  it("does not change a captured value when the display unit changes", async () => {
+    const user = userEvent.setup();
+    render(<SheetLayoutForm />);
+
+    await fillCompleteSheet(user);
+    await user.click(
+      screen.getByRole("button", { name: "Check measurements" }),
+    );
+
+    const millimetreCell = () =>
+      screen
+        .getByRole("table", { name: "Normalized measurements" })
+        .querySelector('[data-field-mm="sheetWidth"]');
+    expect(millimetreCell()).toHaveTextContent("210 mm");
+
+    await user.selectOptions(
+      screen.getByLabelText("Measurement unit"),
+      "Inches (in)",
+    );
+
+    // The entry fields are restated in inches; the captured geometry is not.
+    expect(screen.getByLabelText("Sheet width (in)")).toHaveValue("210");
+    expect(millimetreCell()).toHaveTextContent("210 mm");
+    expect(
+      screen.getByRole("columnheader", { name: "Shown in in" }),
+    ).toBeInTheDocument();
+  });
+
   it("starts with an empty status region so a later result is announced", () => {
     render(<SheetLayoutForm />);
 

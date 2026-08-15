@@ -16,34 +16,37 @@
       "step": 1,
       "description": "Define parser results",
       "details": "Create a pure result type containing either a finite millimetre value plus source disclosure or a structured error code, field reference, and corrective message.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 2,
       "description": "Implement metric and decimal parsing",
       "details": "Parse trimmed decimal text with explicit unit selection, reject non-finite output, and convert inches using the documented 25.4 constant.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 3,
       "description": "Implement bounded fraction parsing",
       "details": "Parse signed whole, numerator, and denominator tokens directly; cap token length and magnitude, reject zero denominator, and never use `eval` or dynamic code.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 4,
       "description": "Retain display preference",
       "details": "Store display-unit preference separately from normalized millimetres and format source disclosures without feeding formatted rounding back into calculations.",
-      "pass": false
+      "pass": true
     },
     {
       "step": 5,
       "description": "Verify parser contracts",
       "details": "Add table-driven checks for metric, decimal inch, mixed fraction, fraction-only, malformed, zero-denominator, overflow, and equivalent-unit cases.",
-      "pass": false
+      "pass": true
     }
   ],
-  "dependencies": ["TASK-1", "TASK-10"],
+  "dependencies": [
+    "TASK-1",
+    "TASK-10"
+  ],
   "estimatedComplexity": "medium",
   "technicalNotes": [
     "Geometry parsing must remain pure and import no React, DOM, storage, or PDF APIs.",

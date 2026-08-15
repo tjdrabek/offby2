@@ -128,6 +128,86 @@ test("keeps unknown corners distinct from square corners and refuses unusable co
   expect(consoleErrors).toEqual([]);
 });
 
+test("normalizes imperial and metric entries into the same millimetres", async ({
+  page,
+}) => {
+  const consoleErrors = await openSheetLayouts(page);
+  const check = page.getByRole("button", { name: "Check measurements" });
+  const normalized = page.getByRole("table", {
+    name: "Normalized measurements",
+  });
+
+  await fillCompleteSheet(page);
+  await check.click();
+  await expect(normalized.locator('[data-field-mm="labelWidth"]')).toHaveText(
+    "63.5 mm",
+  );
+  await normalized.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: `${SCREENSHOTS}TASK-11-1.png` });
+
+  // The same label, written as an imperial fraction, normalizes identically.
+  await page.getByLabel("Measurement unit").selectOption("in");
+  await page.getByLabel("Label width (in)").fill("2 1/2");
+  await check.click();
+  await expect(normalized.locator('[data-field-mm="labelWidth"]')).toHaveText(
+    "63.5 mm",
+  );
+  await expect(
+    normalized.getByRole("row", { name: /Label width/ }),
+  ).toContainText("2 1/2 in");
+  await normalized.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: `${SCREENSHOTS}TASK-11-2.png` });
+
+  expect(consoleErrors).toEqual([]);
+});
+
+test("refuses unparsable measurements and keeps captured values stable", async ({
+  page,
+}) => {
+  const consoleErrors = await openSheetLayouts(page);
+  const check = page.getByRole("button", { name: "Check measurements" });
+  const normalized = page.getByRole("table", {
+    name: "Normalized measurements",
+  });
+
+  await fillCompleteSheet(page);
+  await page.getByLabel("Sheet width (mm)").fill("21O");
+  await check.click();
+
+  // The unusable entry stays exactly as typed, with its own correction.
+  await expect(page.getByLabel("Sheet width (mm)")).toHaveValue("21O");
+  await expect(page.getByLabel("Sheet width (mm)")).toBeFocused();
+  await expect(page.getByLabel("Sheet width (mm)")).toHaveAccessibleDescription(
+    /Enter a decimal measurement such as/,
+  );
+  await expect(normalized).toHaveCount(0);
+  await page.screenshot({ path: `${SCREENSHOTS}TASK-11-3.png` });
+
+  await page.getByLabel("Sheet width (mm)").fill("210");
+  await check.click();
+  await expect(normalized.locator('[data-field-mm="sheetWidth"]')).toHaveText(
+    "210 mm",
+  );
+
+  // Changing the display preference restates the entry fields only; the
+  // captured millimetres are unchanged and are additionally shown in inches.
+  await page.getByLabel("Measurement unit").selectOption("in");
+  await expect(page.getByLabel("Sheet width (in)")).toHaveValue("210");
+  await expect(normalized.locator('[data-field-mm="sheetWidth"]')).toHaveText(
+    "210 mm",
+  );
+  await expect(
+    normalized.getByRole("columnheader", { name: "Shown in in" }),
+  ).toBeVisible();
+  await expect(
+    normalized.getByRole("row", { name: /Sheet width/ }),
+  ).toContainText("8.2677 in");
+  await normalized.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: `${SCREENSHOTS}TASK-11-4.png` });
+
+  expect(consoleErrors).toEqual([]);
+});
+
 test("offers no unsupported media and says which media is supported", async ({
   page,
 }) => {

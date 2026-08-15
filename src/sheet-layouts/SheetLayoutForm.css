@@ -44,6 +44,25 @@
   font-weight: 700;
 }
 
+.sheet-layout-normalized {
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9375rem;
+}
+
+.sheet-layout-normalized caption {
+  text-align: left;
+  font-weight: 700;
+  padding-bottom: 0.5rem;
+}
+
+.sheet-layout-normalized th,
+.sheet-layout-normalized td {
+  border: 1px solid currentColor;
+  padding: 0.25rem 0.625rem;
+  white-space: nowrap;
+}
+
 .sheet-layout-choice {
   display: grid;
   grid-template-columns: auto 1fr;

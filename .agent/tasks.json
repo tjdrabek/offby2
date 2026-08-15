@@ -74,7 +74,7 @@
     "title": "Parse measurements into finite millimetres",
     "category": "functional",
     "specFilePath": ".agent/tasks/TASK-11.json",
-    "passes": false
+    "passes": true
   },
   {
     "id": "TASK-12",
