@@ -5,10 +5,12 @@ High-level directory layout. Dotfiles, tests, and config files are excluded.
 ```
 diy-labels/
 ├── public/              # Static assets served as-is
+│   └── icons/           # Generated PWA icon set (see scripts/generate-pwa-icons.mjs)
 ├── src/                 # Application source
 │   ├── assets/          # Bundled static assets (images, icons)
 │   ├── projects/        # LabelProject lifecycle + draft recovery (repository, hooks, UI)
 │   │   └── testing/     # Shared in-memory repository fake for tests
+│   ├── pwa/             # Service worker registration + offline-capability warning
 │   ├── shell/           # Application-shell navigation (destinations, AppShell)
 │   ├── tests/           # Playwright browser tests
 │   ├── App.tsx          # Root application component
@@ -17,7 +19,7 @@ diy-labels/
 │   ├── test-setup.ts    # Vitest/RTL setup (jest-dom matchers)
 │   └── main.tsx         # Application entry point
 ├── docs/                # Ralph loop tooling docs
-├── scripts/             # Ralph loop automation scripts
+├── scripts/             # Ralph loop automation + PWA icon generation
 └── .agent/              # Task specs, PRDs, logs, screenshots
     ├── prd/              # PRD portfolio (PRD-14 .. PRD-28)
     ├── tasks/             # Per-task detailed specs (TASK-1 .. TASK-125)

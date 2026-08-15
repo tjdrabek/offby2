@@ -1,10 +1,13 @@
 import { DESTINATIONS } from "./destinations";
 import { useCurrentDestination } from "./useCurrentDestination";
 import ProjectsPage from "../projects/ProjectsPage";
+import OfflineCapabilityWarning from "../pwa/OfflineCapabilityWarning";
+import { useServiceWorkerRegistration } from "../pwa/useServiceWorkerRegistration";
 import "./AppShell.css";
 
 function AppShell() {
   const current = useCurrentDestination();
+  const serviceWorker = useServiceWorkerRegistration();
 
   return (
     <div className="app-shell">
@@ -25,6 +28,7 @@ function AppShell() {
         </ul>
       </nav>
       <main className="app-shell-main">
+        <OfflineCapabilityWarning status={serviceWorker} />
         <h1>{current.label}</h1>
         {current.id === "projects" && <ProjectsPage />}
       </main>

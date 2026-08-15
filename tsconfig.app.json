@@ -23,5 +23,5 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"],
-  "exclude": ["src/playwright.config.ts"]
+  "exclude": ["src/playwright.config.ts", "src/tests"]
 }
