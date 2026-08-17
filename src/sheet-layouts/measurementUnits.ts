@@ -92,3 +92,36 @@ export function formatMeasurement(
 export function measurementFrom(value: number, unit: LengthUnit): Millimetres {
   return millimetres(toMillimetres(value, unit));
 }
+
+/**
+ * As many fraction digits as a converted value could ever need. Only reached
+ * by a value with no exact decimal in the target unit, and far more precision
+ * than any physical label dimension carries.
+ */
+const MAX_LOSSLESS_DIGITS = 12;
+
+/**
+ * The shortest text in `unit` that still means the same measurement.
+ *
+ * Display rounding cannot be reused for conversion: `formatMillimetres`
+ * defaults to four fraction digits, which is right for showing a value and
+ * wrong for rewriting an entry — 4.7625 mm would become "0.4762" cm and the
+ * axis it belongs to would stop adding up to the sheet. Each candidate is
+ * therefore normalized back and kept only if it equals the value it came
+ * from within the documented tolerance. Shorter is preferred purely so an
+ * operator sees "0.5" rather than "0.500000000000".
+ */
+export function losslessMeasurementText(
+  value: Millimetres,
+  unit: LengthUnit,
+): string {
+  for (let digits = 0; digits <= MAX_LOSSLESS_DIGITS; digits += 1) {
+    const text = formatMillimetres(value, unit, digits);
+    if (measurementsEqual(toMillimetres(Number(text), unit), value)) {
+      return text;
+    }
+  }
+  // No exact decimal exists in this unit. The longest candidate is the
+  // closest one, and its error is far below the documented tolerance scale.
+  return formatMillimetres(value, unit, MAX_LOSSLESS_DIGITS);
+}

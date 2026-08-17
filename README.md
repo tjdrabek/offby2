@@ -44,16 +44,19 @@ switch (result.status) {
 }
 ```
 
-`resolveSheetLayout` runs the three underlying steps in the only order that
-makes sense, so a derived value is never shown while some other entry is still
-wrong. Each step is exported on its own for consumers that need finer control:
+`resolveSheetLayout` runs validation, derivation, and geometry checking in the
+only order that makes sense, so a derived value is never shown while some other
+entry is still wrong. The steps themselves are not exported — the one call is
+the API.
 
-| Question | Call |
+The package is split by job, so a consumer imports only what they are building:
+
+| Entry | Job |
 | --- | --- |
-| Is every entry present and readable? | `validateSheetLayoutInput` |
-| Can the one absent dimension be computed? | `deriveMissingDimension` |
-| Is the resulting sheet possible? | `validateSheetGeometry` |
-| Where does each label land? | `labelPositions` |
+| `offby2` | The workflow: start an input, resolve it, read the result, place labels. |
+| `offby2/fields` | Building an entry form: field definitions, units, parsing and formatting entries. |
+| `offby2/calibration` | Measuring where a printing setup puts content, and correcting for it. |
+| `offby2/presets` | Published figures for common label products and standard sheet sizes. |
 
 ## Two distinctions worth knowing
 
@@ -72,24 +75,21 @@ that would quietly assert square corners.
 Only rectangular sheets carrying a uniform grid of identical square or
 rounded-rectangle labels. Circular, oval, non-uniform, roll, continuous, and
 arbitrary die-cut media have no representation here by construction —
-see `UNSUPPORTED_MEDIA` and `unsupportedMediaMessage` for the wording to show
-an operator who asks for one.
+see `UNSUPPORTED_MEDIA` for the wording to show an operator who asks for one.
 
 Nothing here inspects a printer, enforces a print dialog, or asserts that
 physical printing occurred.
 
 ## This repository
 
-The package source is `src/`, entry point `src/index.ts`, published from `lib/`
-via `npm run build:package`. Everything under `src/` that the entry point does
-not reach — the projects, shell, storage and PWA modules, and the Vite
-application around them — is a harness for exercising the domain, not part of
-what ships.
+The package source is `src/`, with one file per entry point (`index.ts`,
+`fields.ts`, `calibration.ts`, `presets.ts`), published from `lib/` via
+`npm run build:package`. Anything not reachable from an entry point is not
+part of the package.
 
 ```sh
 npm test              # the domain's test suite
 npm run build:package # emit lib/ for publishing
-npm run dev           # the harness application
 ```
 
 ## Status
@@ -111,11 +111,8 @@ physical baseline that would justify real numbers has not been measured.
 ## Calibration
 
 ```ts
-import {
-  calibrationSheet,
-  derivePrinterProfile,
-  labelPositions,
-} from "offby2";
+import { labelPositions } from "offby2";
+import { calibrationSheet, derivePrinterProfile } from "offby2/calibration";
 
 // 1. Marks at the corners of the grid, with the positions they should print at.
 const plan = calibrationSheet(geometry);

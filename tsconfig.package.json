@@ -21,7 +21,12 @@
     "erasableSyntaxOnly": true,
     "skipLibCheck": true
   },
-  // Only the entry point. Everything the package publishes is reachable from
-  // here, and anything that is not reachable is not part of the package.
-  "files": ["src/index.ts"]
+  // Only the entry points. Everything the package publishes is reachable from
+  // one of these, and anything that is not reachable is not part of the package.
+  "files": [
+    "src/index.ts",
+    "src/fields.ts",
+    "src/calibration.ts",
+    "src/presets.ts"
+  ]
 }

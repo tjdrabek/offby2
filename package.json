@@ -12,6 +12,18 @@
     ".": {
       "types": "./lib/index.d.ts",
       "default": "./lib/index.js"
+    },
+    "./fields": {
+      "types": "./lib/fields.d.ts",
+      "default": "./lib/fields.js"
+    },
+    "./calibration": {
+      "types": "./lib/calibration.d.ts",
+      "default": "./lib/calibration.js"
+    },
+    "./presets": {
+      "types": "./lib/presets.d.ts",
+      "default": "./lib/presets.js"
     }
   },
   "publishConfig": {
