@@ -156,34 +156,144 @@ interface PrinterProfile {
 
 ## Building a form: `offby2/fields`
 
-Field definitions carry their own labels and grouping, so a host renders what
-the package declares rather than hard-coding a field list:
+The input model is plain serializable state, so a React form is one `useState`
+plus one `resolveSheetLayout` per render. Field definitions carry their own
+labels and grouping — the form renders what the package declares rather than
+hard-coding a field list, and issues attach to the control they belong to:
 
-```ts
+```tsx
+import { useMemo, useState } from "react";
 import {
-  MEASUREMENT_FIELDS,
+  createEmptySheetLayoutInput,
+  issuesByField,
+  resolveSheetLayout,
+} from "offby2";
+import {
+  COUNT_FIELDS,
   LENGTH_UNITS,
-  parseMeasurement,
+  MEASUREMENT_FIELDS,
   convertInputUnits,
-  formatMeasurement,
+  lengthUnitSuffix,
 } from "offby2/fields";
+import type { LengthUnit, MeasurementFieldId, CountFieldId } from "offby2";
 
-// One input per definition; each knows its group ("sheet", "grid", …) and label.
-for (const field of MEASUREMENT_FIELDS) {
-  render(field.id, field.label, field.group);
+export function SheetLayoutForm() {
+  const [unit, setUnit] = useState<LengthUnit>("mm");
+  const [input, setInput] = useState(() => createEmptySheetLayoutInput("mm"));
+
+  // Resolution is pure and fast: run it on every keystroke.
+  const result = useMemo(() => resolveSheetLayout(input), [input]);
+  const issues =
+    result.status === "unresolved" ? issuesByField(result.issues) : undefined;
+
+  const setMeasurement = (id: MeasurementFieldId, text: string) =>
+    setInput((prev) => ({
+      ...prev,
+      measurements: { ...prev.measurements, [id]: { text, unit } },
+    }));
+
+  const setCount = (id: CountFieldId, text: string) =>
+    setInput((prev) => ({ ...prev, counts: { ...prev.counts, [id]: { text } } }));
+
+  // Converts every readable value to the new unit losslessly; text that is
+  // still being corrected survives as typed.
+  const switchUnit = (next: LengthUnit) => {
+    setUnit(next);
+    setInput((prev) => convertInputUnits(prev, next));
+  };
+
+  return (
+    <form>
+      <select value={unit} onChange={(e) => switchUnit(e.target.value as LengthUnit)}>
+        {LENGTH_UNITS.map((o) => (
+          <option key={o.unit} value={o.unit}>{o.label}</option>
+        ))}
+      </select>
+
+      {MEASUREMENT_FIELDS.map((field) => (
+        <label key={field.id}>
+          {field.label} ({lengthUnitSuffix(unit)})
+          <input
+            value={input.measurements[field.id].text}
+            onChange={(e) => setMeasurement(field.id, e.target.value)}
+            aria-invalid={issues?.has(field.id) ?? false}
+          />
+          {issues?.get(field.id) && <span role="alert">{issues.get(field.id)!.message}</span>}
+        </label>
+      ))}
+
+      {COUNT_FIELDS.map((field) => (
+        <label key={field.id}>
+          {field.label}
+          <input
+            inputMode="numeric"
+            value={input.counts[field.id].text}
+            onChange={(e) => setCount(field.id, e.target.value)}
+          />
+        </label>
+      ))}
+    </form>
+  );
 }
-
-// Validate a single entry as it is typed.
-const parsed = parseMeasurement("sheetWidth", input.measurements.sheetWidth);
-if (parsed.status === "invalid") show(parsed.message);
-
-// Switch display units without corrupting the values: every readable entry is
-// rewritten as the shortest text that still means the same measurement.
-const inInches = convertInputUnits(input, "in");
-
-// Show a normalized value back to the operator: "63.5 mm".
-formatMeasurement(layout.geometry.label.widthMm, "mm");
 ```
+
+Leave one dimension blank per axis and `resolveSheetLayout` supplies it: enter
+the sheet size, counts, margins and gaps, and the label size comes out of the
+axis equations — `result.layout.derivations` says what was worked out.
+
+## Placing content that fits
+
+A `resolved` result is everything a renderer needs. `labelPositions` says
+where each label is; `safeArea` shrinks that to the region content must stay
+inside, given what the printing setup cannot guarantee (alignment tolerance)
+and what the composition chooses (an optional content inset). Content sized to
+the safe area still lands on the label even when the print drifts by the full
+tolerance:
+
+```tsx
+import { labelPositions, safeArea, sheetExtent } from "offby2";
+import type { ResolvedSheetLayout } from "offby2";
+
+// What your printing setup cannot guarantee. 1 mm is a fair uncalibrated
+// default; a confirmed PrinterProfile is the evidence for a smaller number.
+const ALIGNMENT_TOLERANCE_MM = 1;
+
+export function SheetWithContent({ layout }: { layout: ResolvedSheetLayout }) {
+  const sheet = sheetExtent(layout.geometry);
+  return (
+    // millimetre viewBox: every package value is usable as-is, no scaling math.
+    <svg viewBox={`0 0 ${sheet.widthMm} ${sheet.heightMm}`}>
+      {labelPositions(layout.geometry).map((label) => {
+        const safe = safeArea(label, ALIGNMENT_TOLERANCE_MM);
+        // null means the tolerance ate the whole label — a real answer about
+        // the printing setup, not a zero-sized box. Skip, or warn the user.
+        if (!safe) return null;
+        return (
+          <g key={label.index}>
+            <rect
+              x={label.xMm} y={label.yMm}
+              width={label.widthMm} height={label.heightMm}
+              rx={label.cornerRadiusMm ?? 0}
+              fill="none" stroke="currentColor" strokeWidth={0.2}
+            />
+            {/* Anything constrained to the safe rectangle is guaranteed to fit. */}
+            <foreignObject x={safe.xMm} y={safe.yMm} width={safe.widthMm} height={safe.heightMm}>
+              <div style={{ overflow: "hidden", width: "100%", height: "100%" }}>
+                Label {label.index + 1}
+              </div>
+            </foreignObject>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+```
+
+The same numbers drive a PDF writer: `LabelPosition` and the safe area are
+plain millimetres from the sheet's top-left corner, and a calibrated setup
+passes its profile — `labelPositions(geometry, profile)` — to shift every
+position by the measured correction before rendering.
 
 ## Starting from a preset: `offby2/presets`
 
