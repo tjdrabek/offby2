@@ -58,6 +58,102 @@ The package is split by job, so a consumer imports only what they are building:
 | `offby2/calibration` | Measuring where a printing setup puts content, and correcting for it. |
 | `offby2/presets` | Published figures for common label products and standard sheet sizes. |
 
+## The shapes it creates
+
+Every value the package produces is one of a small set of shapes. Dimensions
+are branded `Millimetres` — a `number` a raw value cannot pose as, so entered
+text can never leak into geometry unparsed.
+
+**`SheetLayoutResolution`** — the one result `resolveSheetLayout` returns:
+
+```ts
+type SheetLayoutResolution =
+  | { status: "resolved"; layout: ResolvedSheetLayout }
+  | { status: "unresolved"; issues: SheetLayoutIssue[]; derivation: AxisDerivationResults }
+  | { status: "refused"; refusals: SheetGeometryRefusal[] };
+```
+
+**`ResolvedSheetLayout`** — everything a resolved input yields, including which
+values were worked out rather than entered:
+
+```ts
+interface ResolvedSheetLayout {
+  counts: Record<CountFieldId, number>;
+  // Each measurement discloses whether it was parsed from text or derived.
+  measurements: Record<MeasurementFieldId, ParsedMeasurement | DerivedMeasurement>;
+  cornerRadius: ParsedMeasurement | null; // null for the zero and unknown states
+  derivations: SheetLayoutDerivation[];   // at most one per axis; empty if all entered
+  geometry: SheetGeometry;                // the same values, judged and accepted
+}
+```
+
+**`SheetGeometry`** — normalized, validated millimetre geometry. This is the
+shape previews, PDF writers, and calibration all consume:
+
+```ts
+interface SheetGeometry {
+  sheet: { widthMm: Millimetres; heightMm: Millimetres };
+  grid: { rows: number; columns: number };
+  label: { widthMm: Millimetres; heightMm: Millimetres };
+  margins: { topMm: Millimetres; rightMm: Millimetres; bottomMm: Millimetres; leftMm: Millimetres };
+  gaps: { horizontalMm: Millimetres; verticalMm: Millimetres };
+  // Four states: "unknown" (nobody measured) is a different claim from "zero".
+  cornerRadius:
+    | { state: "zero" }
+    | { state: "known"; radiusMm: Millimetres }
+    | { state: "estimated"; radiusMm: Millimetres }
+    | { state: "unknown" };
+}
+```
+
+**`SheetLayoutIssue`** — one problem, tied to the field it belongs to, ready to
+render next to it (`issuesByField` groups them):
+
+```ts
+interface SheetLayoutIssue {
+  field: SheetLayoutFieldId; // "sheetWidth", "rows", "cornerRadius", …
+  code: SheetLayoutIssueCode; // "required", "measurement-malformed", …
+  message: string;            // wording to show the operator
+}
+```
+
+**`LabelPosition`** — where one label lands, from `labelPositions(geometry)`:
+
+```ts
+interface LabelPosition {
+  index: number;  // reading order: left to right, then top to bottom
+  row: number;
+  column: number;
+  xMm: number;    // from the sheet's left edge
+  yMm: number;    // from the sheet's top edge
+  widthMm: number;
+  heightMm: number;
+  cornerRadiusMm: number | null;
+}
+```
+
+**Calibration shapes** (`offby2/calibration`) — a plan to print, and the
+profile derived from measuring it:
+
+```ts
+interface CalibrationSheetPlan {
+  sheet: { widthMm: number; heightMm: number };
+  targets: CalibrationTarget[]; // id, label, row/column, intended centre x/y
+  markLengthMm: number;         // crosshair arm length, for a renderer
+}
+
+interface PrinterProfile {
+  setupId: string;                      // opaque host identity of the printing setup
+  layoutRevision: SheetLayoutRevisionRef; // the exact revision it was measured against
+  translationMm: { xMm: number; yMm: number }; // the whole correction — translation only
+  evidence: "preliminary" | "confirmed";  // one sheet vs. repeated sheets that agreed
+  sheetCount: number;
+  worstTargetDisagreementMm: number;    // proof the correction really is a translation
+  worstSheetVariationMm: number;
+  createdAt: number;
+}
+```
+
 ## Building a form: `offby2/fields`
 
 Field definitions carry their own labels and grouping, so a host renders what
