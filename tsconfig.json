@@ -1,7 +1,19 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  // Editor and test config: same rules as the package build, but covering
+  // tests too and emitting nothing. The published build is tsconfig.package.json.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "types": [],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "skipLibCheck": true
+  },
+  "include": ["src", "vitest.config.ts"]
 }

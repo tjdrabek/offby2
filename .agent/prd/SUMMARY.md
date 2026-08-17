@@ -31,4 +31,4 @@ Reusable Label Printing is a local-first static React PWA for creating label pro
 - Browser limitations and operator responsibilities are explicit.
 - No alignment, suitability, physical-verification, feed-consistency, or safe-refeeding claim exists without qualifying physical evidence.
 
-See [the PRD portfolio](PRD.md) and its 15 ticket-scoped PRDs for requirements and acceptance criteria.
+See [the PRD portfolio](PRD.md) and its 5 ticket-scoped PRDs for requirements and acceptance criteria.

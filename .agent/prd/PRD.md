@@ -6,7 +6,7 @@ Reusable Label Printing is a personal, local-first desktop-browser application f
 
 The product explicitly separates software validation from physical evidence. Preview and PDF geometry can prove deterministic software structure but cannot prove where ink lands. The browser cannot identify or control a printer, inspect print-dialog choices, load media, measure output, determine safe refeeding, or confirm printing. Until real equipment and repeated observations establish policy, output remains visibly uncalibrated and no alignment tolerance, suitable printing setup, physical verification, feed consistency, or validated correction is claimed.
 
-This portfolio turns implementation issues 14–28 into one PRD per ticket. PRDs are ordered by dependency but remain parts of one product. Accessibility is required in every UI slice and validated end to end in PRD 27. Behavioral performance requirements apply throughout; numeric budgets wait for representative profiling.
+This portfolio turns implementation issues into one PRD per ticket. PRDs are ordered by dependency but remain parts of one product. Behavioral performance requirements apply throughout; numeric budgets wait for representative profiling.
 
 ## Product objectives
 
@@ -35,23 +35,13 @@ A desktop-browser label author or print operator managing reusable label project
 
 | PRD | Objective | Dependencies | Requirement IDs | Gate |
 |---|---|---|---|---|
-| [14 — Application shell](PRD-14-local-first-application-shell.md) | Recoverable local-first PWA and project lifecycle | None | TASK-2–9 | Open |
-| [15 — Sheet-layout revisions](PRD-15-sheet-layout-revisions.md) | Validated immutable uniform-grid geometry | 14 | TASK-10–18 | Open |
-| [16 — Text label preview](PRD-16-text-label-preview.md) | Serializable text and shared scene previews | 15 | TASK-19–26 | Open |
-| [17 — Deterministic PDF](PRD-17-deterministic-text-label-pdf.md) | Explicit-page PDF and print preparation | 16 | TASK-27–34 | Open |
-| [18 — Rich content](PRD-18-rich-responsive-label-content.md) | QR, images, shapes, flow, overlay | 17 | TASK-35–43 | Open |
-| [19 — Templates and pagination](PRD-19-template-data-and-pagination.md) | Data-bound templates and stable sheet filling | 18 | TASK-44–51 | Open |
-| [20 — Rounded safe areas](PRD-20-rounded-safe-areas.md) | Rounded validation, inset, refusal, override | 18; 19 for full coverage | TASK-52–59 | Open; physical claims unavailable |
-| [21 — Printing setups](PRD-21-printing-setups.md) | Setup assumptions and attestations | 14 | TASK-60–67 | Open |
-| [22 — Compatibility](PRD-22-profile-compatibility-and-uncalibrated-output.md) | Central compatibility and zero-correction output | 15, 17, 21 | TASK-68–75 | Open |
-| [23 — Sheet instances](PRD-23-partially-used-sheet-tracking.md) | Used positions without safe-refeeding claims | 19, 21, 22 | TASK-76–83 | Open |
-| [24 — Backup and migration](PRD-24-workspace-backup-and-migration.md) | Complete transactional portability/deletion | 15, 18, 19, 21, 22, 23 | TASK-84–91 | Open |
-| [25 — Calibration draft](PRD-25-evidence-gated-calibration-draft.md) | Evidence-safe draft state machine | 17, 21, 22; 24 integration | TASK-92–101 | Software open; physical conclusions gated |
+| [15 — Sheet-layout revisions](PRD-15-sheet-layout-revisions.md) | Validated immutable uniform-grid geometry | None | TASK-10–13, 15, 16 | Open |
+| [20 — Rounded safe areas](PRD-20-rounded-safe-areas.md) | Rounded safe-area and content-inset geometry | 15 | TASK-52–53 | Open; physical claims unavailable |
+| [22 — Compatibility](PRD-22-profile-compatibility-and-uncalibrated-output.md) | Central pure profile compatibility | 15 | TASK-68–69, 71–73 | Open |
+| [25 — Calibration draft](PRD-25-evidence-gated-calibration-draft.md) | Evidence-safe draft state machine | 22 | TASK-92–93, 95, 97–100 | Software open; physical conclusions gated |
 | [26 — Translation profiles](PRD-26-validated-translation-profiles.md) | Evidence-backed whole-sheet x/y correction | 25 and issues 13, 07, 09 | TASK-102–109 | **Blocked by physical evidence** |
-| [27 — Accessibility](PRD-27-accessible-complete-workflow.md) | End-to-end keyboard/AT validation | 20, 23, 25; all UI slices | TASK-110–117 | Open after workflows |
-| [28 — Offline/recovery](PRD-28-offline-update-and-recovery-hardening.md) | Final non-physical release hardening | 24, 25, 27 | TASK-118–125 | Open after workflows |
 
-`TASK-1` is reserved for prerequisite verification during later implementation-task generation. This portfolio defines requirements only; it does not generate `.agent/tasks.json` or detailed task specs.
+This portfolio defines requirements only; it does not generate `.agent/tasks.json` or detailed task specs.
 
 ## Shared architecture and technical stack
 
@@ -123,11 +113,10 @@ Accounts, authentication, backend storage, cloud backup/sync, mobile support, di
 
 ## Milestones
 
-1. Foundation: PRDs 14–17.
-2. Rich authoring and validation: PRDs 18–20.
-3. Printing assumptions and portability: PRDs 21–24.
+1. Sheet-layout domain foundation: PRD 15.
+2. Safe-area and content-inset geometry: PRD 20.
+3. Profile compatibility: PRD 22.
 4. Evidence-aware calibration: PRD 25; PRD 26 remains physically gated.
-5. Release validation: PRDs 27–28.
 
 ## Assumptions and dependencies
 

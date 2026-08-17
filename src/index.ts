@@ -1,5 +1,5 @@
 ﻿/**
- * offby2 â€” sheet layouts for label printing.
+ * offby2 — sheet layouts for label printing.
  *
  * The package answers three questions and refuses to guess at the rest:
  *
@@ -10,7 +10,7 @@
  * `resolveSheetLayout` is the one call most consumers need: it runs all three
  * in the only order that makes sense and returns a single discriminated result.
  *
- * Everything here is pure. No React, no DOM, no storage, no PDF writer â€” a host
+ * Everything here is pure. No React, no DOM, no storage, no PDF writer — a host
  * application owns presentation and durability, and the operator and their
  * printer own everything physical.
  */
@@ -143,7 +143,7 @@ export {
   type SheetLayoutDerivationResult,
 } from "./sheet-layouts/deriveDimension";
 
-// What this package represents, and â€” just as importantly â€” what it does not.
+// What this package represents, and — just as importantly — what it does not.
 export {
   SUPPORTED_MEDIA_DESCRIPTION,
   SUPPORTED_MEDIA_KIND,
