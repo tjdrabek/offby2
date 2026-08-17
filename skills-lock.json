@@ -67,12 +67,6 @@
       "skillPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
       "computedHash": "3929c6892605b67b60503ced451876e9b313d1a909ab7066fbcd9967c56ed226"
     },
-    "prd-creator": {
-      "source": "pageai-pro/ralph-loop",
-      "sourceType": "github",
-      "skillPath": ".agent/skills/prd-creator/SKILL.md",
-      "computedHash": "7b168f6035f6dfa3be98dab99f15a9bfdaf27c79790066c2c07baf458577e4c0"
-    },
     "prototype": {
       "source": "mattpocock/skills",
       "sourceType": "github",

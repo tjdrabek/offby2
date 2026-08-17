@@ -58,6 +58,56 @@ The package is split by job, so a consumer imports only what they are building:
 | `offby2/calibration` | Measuring where a printing setup puts content, and correcting for it. |
 | `offby2/presets` | Published figures for common label products and standard sheet sizes. |
 
+## Building a form: `offby2/fields`
+
+Field definitions carry their own labels and grouping, so a host renders what
+the package declares rather than hard-coding a field list:
+
+```ts
+import {
+  MEASUREMENT_FIELDS,
+  LENGTH_UNITS,
+  parseMeasurement,
+  convertInputUnits,
+  formatMeasurement,
+} from "offby2/fields";
+
+// One input per definition; each knows its group ("sheet", "grid", …) and label.
+for (const field of MEASUREMENT_FIELDS) {
+  render(field.id, field.label, field.group);
+}
+
+// Validate a single entry as it is typed.
+const parsed = parseMeasurement("sheetWidth", input.measurements.sheetWidth);
+if (parsed.status === "invalid") show(parsed.message);
+
+// Switch display units without corrupting the values: every readable entry is
+// rewritten as the shortest text that still means the same measurement.
+const inInches = convertInputUnits(input, "in");
+
+// Show a normalized value back to the operator: "63.5 mm".
+formatMeasurement(layout.geometry.label.widthMm, "mm");
+```
+
+## Starting from a preset: `offby2/presets`
+
+Presets are published figures for common label products — entries to be
+validated, not trusted geometry. Each one is a `SheetLayoutSourceInput` that
+still goes through `resolveSheetLayout` like anything an operator typed:
+
+```ts
+import { sheetLayoutPreset, matchStandardSheetSize } from "offby2/presets";
+import { resolveSheetLayout } from "offby2";
+
+const preset = sheetLayoutPreset("avery-5160");
+if (preset) {
+  const result = resolveSheetLayout(preset.input);
+}
+
+// Recognize a sheet the operator described by hand: A4, Letter, …
+const standard = matchStandardSheetSize(210, 297);
+```
+
 ## Two distinctions worth knowing
 
 **Entered values are not geometry.** `SheetLayoutSourceInput` is exactly what

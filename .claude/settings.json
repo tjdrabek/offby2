@@ -1,15 +1,12 @@
 {
   "permissions": {
-    "deny": [
-      "Read(.agent/history/**)"
-    ],
+    "deny": [],
     "allow": [
       "Bash(npm run build)",
       "Bash(npm run lint)",
       "Bash(npm test:*)",
       "Bash(npm run test:*)",
       "Bash(npx tsc:*)",
-      "Bash(npx playwright:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
@@ -32,15 +29,6 @@
           {
             "type": "command",
             "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/post-tool-use.js"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $CLAUDE_PROJECT_DIR/.claude/hooks/one-task-guard.js"
           }
         ]
       }
