@@ -1,11 +1,29 @@
 {
-  "name": "diy-labels",
-  "private": true,
+  "name": "offby2",
   "version": "0.0.0",
+  "description": "Sheet layouts for label printing: read what an operator entered, derive the values they left out, and refuse geometry that cannot exist.",
+  "license": "MIT",
   "type": "module",
+  "sideEffects": false,
+  "files": ["lib"],
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "clean:package": "node -e \"require('fs').rmSync('lib',{recursive:true,force:true})\"",
+    "build:package": "npm run clean:package && tsc -p tsconfig.package.json",
+    "watch:package": "tsc -p tsconfig.package.json --watch",
+    "prepublishOnly": "npm run build:package && npm test",
     "lint": "eslint .",
     "generate:icons": "node scripts/generate-pwa-icons.mjs",
     "test": "vitest run --passWithNoTests",

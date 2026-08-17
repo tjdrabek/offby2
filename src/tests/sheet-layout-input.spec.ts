@@ -1,5 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
 import { SCREENSHOTS } from "./support/paths.js";
+import {
+  fillConsistentSheet,
+  fillSheet,
+  openSheetLayouts,
+} from "./support/sheetLayout.js";
 
 /**
  * An A4 sheet of 21 labels, in millimetres. Both axis equations balance, which
@@ -37,63 +42,8 @@ const INCHES: readonly [string, string][] = [
   ["Vertical gap", "0.2"],
 ];
 
-async function openSheetLayouts(page: Page) {
-  const consoleErrors: string[] = [];
-  page.on("console", (message) => {
-    if (message.type() === "error") {
-      consoleErrors.push(message.text());
-    }
-  });
-  await page.goto("/#/sheet-layouts");
-  await expect(
-    page.getByRole("heading", { level: 1, name: "Sheet layouts" }),
-  ).toBeVisible();
-  return consoleErrors;
-}
-
-async function fillSheet(
-  page: Page,
-  values: readonly [string, string][],
-  suffix: string,
-  counts: { rows: string; columns: string },
-) {
-  for (const [label, value] of values) {
-    await page.getByLabel(`${label} (${suffix})`).fill(value);
-  }
-  await page.getByLabel("Rows").fill(counts.rows);
-  await page.getByLabel("Columns").fill(counts.columns);
-}
-
 async function fillCompleteSheet(page: Page) {
   await fillSheet(page, MEASUREMENTS, "mm", { rows: "7", columns: "3" });
-}
-
-/**
- * A sheet that satisfies both axis equations exactly, so clearing any single
- * field leaves one well-determined unknown.
- *
- * Horizontal: 210 = 10 + 3 × 60 + 2 × 5 + 10
- * Vertical:   297 = 9.5 + 7 × 38 + 6 × 2 + 9.5
- */
-const CONSISTENT: readonly [string, string][] = [
-  ["Sheet width", "210"],
-  ["Sheet height", "297"],
-  ["Label width", "60"],
-  ["Label height", "38"],
-  ["Top margin", "9.5"],
-  ["Right margin", "10"],
-  ["Bottom margin", "9.5"],
-  ["Left margin", "10"],
-  ["Horizontal gap", "5"],
-  ["Vertical gap", "2"],
-];
-
-async function fillConsistentSheet(page: Page) {
-  for (const [label, value] of CONSISTENT) {
-    await page.getByLabel(`${label} (mm)`).fill(value);
-  }
-  await page.getByLabel("Rows").fill("7");
-  await page.getByLabel("Columns").fill("3");
 }
 
 test("captures every uniform-grid dimension with units and a stated corner radius", async ({

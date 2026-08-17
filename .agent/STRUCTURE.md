@@ -3,7 +3,7 @@
 High-level directory layout. Dotfiles, tests, and config files are excluded.
 
 ```
-diy-labels/
+offby2/
 ├── public/              # Static assets served as-is
 │   └── icons/           # Generated PWA icon set (see scripts/generate-pwa-icons.mjs)
 ├── src/                 # Application source

@@ -161,11 +161,14 @@ display_final_summary() {
       echo "${line:0:$cut_at}"
       line="${line:$cut_at}"
       line="${line# }"  # Remove leading space
-      ((line_count++))
+      # Assignment form, not ((line_count++)): the post-increment form
+      # evaluates to the pre-increment value, so it returns exit status 1
+      # when line_count is 0 — which aborts the whole run under `set -e`.
+      line_count=$((line_count + 1))
     done
     if [ $line_count -lt $max_lines ] && [ -n "$line" ]; then
       echo "$line"
-      ((line_count++))
+      line_count=$((line_count + 1))
     fi
   done <<< "$summary"
 

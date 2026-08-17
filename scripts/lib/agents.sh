@@ -288,46 +288,58 @@ format_agent_extra_args() {
   printf "%s" "$output"
 }
 
-# Build the command executed inside script(1)'s pseudo-TTY.
+# Build the non-interactive command that runs one agent turn in the sandbox.
 #
-# `exists` (3rd arg, default 0) selects between the create form
-# (`sbx run --name <name> <agent> .`) and the attach form
-# (`sbx run <name>`). Both accept the same `[-- AGENT_ARGS...]` tail, so
-# the per-agent printf lines below stay identical.
+# `sbx run` opens an *interactive* session and relays the container's PTY
+# stream only to a real TTY. Under `script(1)`/winpty on Git Bash — or any
+# non-TTY stdout — the agent still runs but Ralph captures zero bytes, so
+# every iteration looked like an instant no-op. `sbx exec` is the batch
+# form: it writes agent stdout straight to our pipe with no TTY required,
+# and it starts the sandbox first if it is stopped.
+#
+# `exists` (3rd arg, default 0) decides whether the sandbox has to be
+# created first. `sbx exec` takes the agent binary as its command, so the
+# separator differs per form: `-- <agent>` for exec, plain `--` for run.
 build_agent_command() {
   local agent="${1:-claude}"
   local sandbox_name="${2:-}"
   local exists="${3:-0}"
   local extra_args
   local sbx_run
+  local sep
   extra_args=$(format_agent_extra_args)
 
   if [ -z "$sandbox_name" ]; then
     sbx_run="sbx run $agent ."
+    sep="--"
   elif [ "$exists" = "1" ]; then
-    sbx_run="sbx run $sandbox_name"
+    sbx_run="sbx exec $sandbox_name"
+    sep="-- $agent"
   else
-    sbx_run="sbx run --name $sandbox_name $agent ."
+    # Create detached, then exec into it — `sbx run --name` would attach
+    # interactively and swallow the output we need.
+    sbx_run="sbx create --name $sandbox_name $agent . >/dev/null && sbx exec $sandbox_name"
+    sep="-- $agent"
   fi
 
   case "$agent" in
     claude)
-      printf '%s -- --output-format stream-json --verbose%s -p "$PROMPT_CONTENT"' "$sbx_run" "$extra_args"
+      printf '%s %s --output-format stream-json --verbose%s -p "$PROMPT_CONTENT"' "$sbx_run" "$sep" "$extra_args"
       ;;
     codex)
-      printf '%s -- exec%s "$PROMPT_CONTENT"' "$sbx_run" "$extra_args"
+      printf '%s %s exec%s "$PROMPT_CONTENT"' "$sbx_run" "$sep" "$extra_args"
       ;;
     copilot)
-      printf '%s --%s -p "$PROMPT_CONTENT"' "$sbx_run" "$extra_args"
+      printf '%s %s%s -p "$PROMPT_CONTENT"' "$sbx_run" "$sep" "$extra_args"
       ;;
     cursor)
-      printf '%s -- -p%s "$PROMPT_CONTENT"' "$sbx_run" "$extra_args"
+      printf '%s %s -p%s "$PROMPT_CONTENT"' "$sbx_run" "$sep" "$extra_args"
       ;;
     gemini)
-      printf '%s --%s -p "$PROMPT_CONTENT"' "$sbx_run" "$extra_args"
+      printf '%s %s%s -p "$PROMPT_CONTENT"' "$sbx_run" "$sep" "$extra_args"
       ;;
     opencode)
-      printf '%s -- run%s "$PROMPT_CONTENT"' "$sbx_run" "$extra_args"
+      printf '%s %s run%s "$PROMPT_CONTENT"' "$sbx_run" "$sep" "$extra_args"
       ;;
     *)
       return 1

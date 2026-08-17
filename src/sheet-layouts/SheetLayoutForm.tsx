@@ -183,9 +183,14 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
     setRefusals([]);
     setSummary(null);
     setResolved(layout);
-    const derived = layout.derivation
-      ? ` ${layout.derivation.label} was derived as ${formatMeasurement(layout.derivation.valueMm, "mm")}, not entered.`
-      : "";
+    // Each derived value is announced, because each is a value the reader did
+    // not enter and would otherwise have to notice for themselves.
+    const derived = layout.derivations
+      .map(
+        (derivation) =>
+          ` ${derivation.label} was derived as ${formatMeasurement(derivation.valueMm, "mm")}, not entered.`,
+      )
+      .join("");
     setStatus(
       `Measurements captured: ${layout.counts.rows} rows by ${layout.counts.columns} columns. Corner radius: ${cornerRadiusLabel(input.cornerRadius.state)}.${derived}`,
     );
@@ -198,7 +203,13 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
       ?.focus();
   }
 
-  const derivation = resolved?.derivation ?? null;
+  /** The derived value for each field, so a field can find its own. */
+  const derivations = new Map(
+    (resolved?.derivations ?? []).map((derivation) => [
+      derivation.field,
+      derivation,
+    ]),
+  );
 
   function renderMeasurements(group: MeasurementGroup) {
     return MEASUREMENT_FIELDS.filter((field) => field.group === group).map(
@@ -209,7 +220,7 @@ function SheetLayoutForm({ onSubmit }: SheetLayoutFormProps) {
           label={`${field.label} (${suffix})`}
           value={input.measurements[field.id].text}
           issue={issues.get(field.id)}
-          derivation={derivation?.field === field.id ? derivation : undefined}
+          derivation={derivations.get(field.id)}
           displayUnit={unit}
           onChange={(text) => changeMeasurement(field.id, text)}
         />

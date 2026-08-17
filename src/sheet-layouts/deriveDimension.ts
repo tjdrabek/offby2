@@ -338,18 +338,14 @@ function readCounts(
   return isGridCount(rows) && isGridCount(columns) ? { rows, columns } : null;
 }
 
-/**
- * Derives the single missing dimension of a sheet layout, if there is exactly
- * one and the axis equation has exactly one valid solution for it.
- */
-export function deriveMissingDimension(
-  input: SheetLayoutSourceInput,
-): SheetLayoutDerivationResult {
-  const counts = readCounts(input);
-  if (!counts) {
-    return { status: "not-attempted", reason: "counts-unusable" };
-  }
+/** Every entry read once, so both axes are solved from the same reading. */
+interface MeasurementEntries {
+  parsed: ReadonlyMap<MeasurementFieldId, number>;
+  /** Fields left blank. A field that was entered but unreadable is in neither. */
+  missing: readonly MeasurementFieldId[];
+}
 
+function readMeasurements(input: SheetLayoutSourceInput): MeasurementEntries {
   const parsed = new Map<MeasurementFieldId, number>();
   const missing: MeasurementFieldId[] = [];
   for (const field of MEASUREMENT_FIELDS) {
@@ -360,6 +356,24 @@ export function deriveMissingDimension(
       missing.push(field.id);
     }
   }
+  return { parsed, missing };
+}
+
+/**
+ * Solves one axis for whichever of its dimensions was left blank.
+ *
+ * "Nothing missing" and "more than one missing" are both reported against this
+ * axis alone. The other axis is a separate equation with separate terms, and
+ * says nothing about whether this one can be solved.
+ */
+function deriveOnAxis(
+  equation: AxisEquation,
+  entries: MeasurementEntries,
+  count: number,
+): SheetLayoutDerivationResult {
+  const missing = entries.missing.filter(
+    (field) => axisEquationFor(field).axis === equation.axis,
+  );
   if (missing.length === 0) {
     return { status: "not-attempted", reason: "nothing-missing" };
   }
@@ -368,7 +382,6 @@ export function deriveMissingDimension(
   }
 
   const field = missing[0];
-  const equation = axisEquationFor(field);
   const terms: AxisTermId[] = ["extent", "leading", "size", "gap", "trailing"];
   const known: Partial<Record<AxisTermId, number>> = {};
   let derivedTerm: AxisTermId | null = null;
@@ -377,7 +390,7 @@ export function deriveMissingDimension(
       derivedTerm = term;
       continue;
     }
-    const value = parsed.get(equation[term]);
+    const value = entries.parsed.get(equation[term]);
     if (value === undefined) {
       return { status: "not-attempted", reason: "operands-unusable" };
     }
@@ -387,5 +400,75 @@ export function deriveMissingDimension(
     return { status: "not-attempted", reason: "operands-unusable" };
   }
 
-  return solve(equation, known, counts[equation.count], derivedTerm);
+  return solve(equation, known, count, derivedTerm);
+}
+
+/** One result per axis, in the order of {@link AXIS_EQUATIONS}. */
+export interface AxisDerivationResults {
+  horizontal: SheetLayoutDerivationResult;
+  vertical: SheetLayoutDerivationResult;
+}
+
+/**
+ * Derives the missing dimension of each axis independently.
+ *
+ * The horizontal and vertical equations share no term: a sheet's width relates
+ * its left margin, columns, label width, horizontal gap and right margin, and
+ * nothing else. So a layout that leaves one dimension blank on each axis has
+ * two equations with one unknown apiece, not one equation with two — and both
+ * are solvable. A caller wanting label width and height derived from margins
+ * and gaps needs exactly this.
+ *
+ * An axis with nothing missing, or with more than one thing missing, reports
+ * `not-attempted` for itself and does not affect the other.
+ */
+export function deriveMissingDimensions(
+  input: SheetLayoutSourceInput,
+): AxisDerivationResults {
+  const counts = readCounts(input);
+  if (!counts) {
+    const unusable: SheetLayoutDerivationResult = {
+      status: "not-attempted",
+      reason: "counts-unusable",
+    };
+    return { horizontal: unusable, vertical: unusable };
+  }
+
+  const entries = readMeasurements(input);
+  const results = {} as AxisDerivationResults;
+  for (const equation of AXIS_EQUATIONS) {
+    results[equation.axis] = deriveOnAxis(
+      equation,
+      entries,
+      counts[equation.count],
+    );
+  }
+  return results;
+}
+
+/**
+ * Derives the single missing dimension of a sheet layout, if there is exactly
+ * one across both axes and its equation has exactly one valid solution for it.
+ *
+ * Kept for callers that want the stricter one-unknown-per-sheet rule;
+ * {@link deriveMissingDimensions} is the general form.
+ */
+export function deriveMissingDimension(
+  input: SheetLayoutSourceInput,
+): SheetLayoutDerivationResult {
+  const counts = readCounts(input);
+  if (!counts) {
+    return { status: "not-attempted", reason: "counts-unusable" };
+  }
+
+  const entries = readMeasurements(input);
+  if (entries.missing.length === 0) {
+    return { status: "not-attempted", reason: "nothing-missing" };
+  }
+  if (entries.missing.length > 1) {
+    return { status: "not-attempted", reason: "multiple-missing" };
+  }
+
+  const equation = axisEquationFor(entries.missing[0]);
+  return deriveOnAxis(equation, entries, counts[equation.count]);
 }

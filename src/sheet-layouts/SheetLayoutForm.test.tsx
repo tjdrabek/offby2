@@ -3,6 +3,7 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SheetLayoutForm from "./SheetLayoutForm";
 import { MAX_GRID_COUNT } from "./SheetGeometry";
+import { fillSheetLayoutForm } from "./testing/sheetLayoutFormActions";
 
 afterEach(() => {
   cleanup();
@@ -46,29 +47,15 @@ const INCHES: readonly [string, string][] = [
   ["Vertical gap", "0.2"],
 ];
 
-async function fillSheet(
-  user: ReturnType<typeof userEvent.setup>,
-  values: readonly [string, string][],
-  suffix: string,
-  counts: { rows: string; columns: string },
-) {
-  for (const [label, value] of values) {
-    const field = screen.getByLabelText(`${label} (${suffix})`);
-    await user.clear(field);
-    await user.type(field, value);
-  }
-  await user.clear(screen.getByLabelText("Rows"));
-  await user.type(screen.getByLabelText("Rows"), counts.rows);
-  await user.clear(screen.getByLabelText("Columns"));
-  await user.type(screen.getByLabelText("Columns"), counts.columns);
-}
-
 async function fillCompleteSheet(user: ReturnType<typeof userEvent.setup>) {
-  await fillSheet(user, MEASUREMENTS, "mm", { rows: "7", columns: "3" });
+  await fillSheetLayoutForm(user, MEASUREMENTS, "mm", {
+    rows: "7",
+    columns: "3",
+  });
 }
 
 async function fillInchSheet(user: ReturnType<typeof userEvent.setup>) {
-  await fillSheet(user, INCHES, "in", { rows: "6", columns: "3" });
+  await fillSheetLayoutForm(user, INCHES, "in", { rows: "6", columns: "3" });
 }
 
 /**

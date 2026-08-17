@@ -132,9 +132,9 @@ function readStore(page: Page, storeName: string): Promise<unknown[]> {
   return page.evaluate(
     (name) =>
       new Promise<unknown[]>((resolve, reject) => {
-        const open = indexedDB.open("diy-labels");
+        const open = indexedDB.open("offby2");
         open.onerror = () =>
-          reject(new Error("Could not open the diy-labels database."));
+          reject(new Error("Could not open the offby2 database."));
         open.onsuccess = () => {
           const db = open.result;
           if (!db.objectStoreNames.contains(name)) {

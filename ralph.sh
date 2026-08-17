@@ -160,7 +160,10 @@ $(cat "$SCRIPT_DIR/.agent/PROMPT.md")"
     SANDBOX_EXISTS=0
   fi
   AGENT_COMMAND=$(build_agent_command "$RALPH_AGENT" "$RALPH_SANDBOX_NAME" "$SANDBOX_EXISTS")
-  script -q "$OUTPUT_FILE" bash -c "$AGENT_COMMAND" >/dev/null 2>&1 &
+  # No script(1)/pseudo-TTY wrapper: build_agent_command emits `sbx exec`,
+  # which streams to a plain pipe. script(1) does not exist on Git Bash and
+  # silently captured nothing there.
+  bash -c "$AGENT_COMMAND" > "$OUTPUT_FILE" 2>&1 &
   AGENT_PID=$!
 
   # Track position in output file for incremental reading
@@ -195,7 +198,8 @@ $(cat "$SCRIPT_DIR/.agent/PROMPT.md")"
     sleep 0.2 || true
   done
 
-  wait "$AGENT_PID" || true
+  AGENT_EXIT=0
+  wait "$AGENT_PID" || AGENT_EXIT=$?
   AGENT_PID=""  # Clear PID after process exits
 
   # Process any remaining output
@@ -214,6 +218,23 @@ $(cat "$SCRIPT_DIR/.agent/PROMPT.md")"
   fi
 
   OUTPUT=$(cat "$FULL_OUTPUT_FILE" 2>/dev/null || cat "$OUTPUT_FILE")
+
+  # Guard: an iteration that captured nothing is a failure, not a success.
+  # Completion detection is pure string-matching on agent output, so empty
+  # output would otherwise be silently counted as a finished iteration.
+  if [ -z "${OUTPUT//[[:space:]]/}" ]; then
+    stop_spinner
+    clear_rolling_preview
+    echo ""
+    echo -e "${RD}░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒░░${R}"
+    echo -e "  ❌ ${RD}No agent output${R} (agent exit code: ${Y}${AGENT_EXIT}${R})"
+    echo -e "  The agent produced no parseable output, so this iteration did no work."
+    echo -e "  Command: ${D}${AGENT_COMMAND}${R}"
+    echo -e "${RD}░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒░░${R}"
+    print_full_error_log "$(cat "$OUTPUT_FILE" 2>/dev/null)"
+    rm -f "$OUTPUT_FILE" "$FULL_OUTPUT_FILE"
+    exit $EXIT_BLOCKED
+  fi
 
   # Check for Docker daemon not ready error
   if echo "$OUTPUT" | grep -q "docker daemon not ready"; then

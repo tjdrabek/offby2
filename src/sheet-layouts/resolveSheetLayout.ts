@@ -7,10 +7,14 @@
  * dimension be computed"; geometry validation (validateSheetGeometry.ts)
  * answers "is the resulting sheet possible". This module is the only place the
  * three are combined, and it keeps the joins deliberately narrow: derivation is
- * attempted only when a single empty dimensional field is the sole thing
- * standing in the way, and geometry is judged only once every value is in
- * millimetres, so a derived value is never presented while some other entry is
- * still wrong.
+ * attempted only when empty dimensional fields are the sole thing standing in
+ * the way and no axis carries more than one of them, and geometry is judged
+ * only once every value is in millimetres, so a derived value is never
+ * presented while some other entry is still wrong.
+ *
+ * Because the two axis equations share no term, one blank per axis is one
+ * unknown per equation: a layout that leaves both label width and label height
+ * out is resolvable from its margins, gaps, and counts.
  *
  * A derived measurement carries `status: "derived"` and its disclosure rather
  * than a source text, so it stays distinguishable from an entered value
@@ -37,9 +41,11 @@ import {
   type SheetGeometryRefusal,
 } from "./validateSheetGeometry";
 import {
-  deriveMissingDimension,
+  axisEquationFor,
+  deriveMissingDimensions,
+  type AxisDerivationResults,
+  type DerivationAxis,
   type SheetLayoutDerivation,
-  type SheetLayoutDerivationResult,
 } from "./deriveDimension";
 import {
   validateSheetLayoutInput,
@@ -60,8 +66,11 @@ export interface ResolvedSheetLayout {
   measurements: Readonly<Record<MeasurementFieldId, ResolvedMeasurement>>;
   /** Null for the zero and unknown corner-radius states, which carry no measurement. */
   cornerRadius: ParsedMeasurement | null;
-  /** The single derived field, or null when every value was entered. */
-  derivation: SheetLayoutDerivation | null;
+  /**
+   * The fields that were worked out rather than entered — at most one per
+   * axis, and empty when every value was entered.
+   */
+  derivations: readonly SheetLayoutDerivation[];
   /** The same values as normalized geometry, judged and accepted. */
   geometry: SheetGeometry;
 }
@@ -71,8 +80,11 @@ export type SheetLayoutResolution =
   | {
       status: "unresolved";
       issues: readonly SheetLayoutIssue[];
-      /** Why no value was derived, so a refusal can be explained rather than repeated. */
-      derivation: SheetLayoutDerivationResult;
+      /**
+       * Why each axis supplied no value, so a refusal can be explained rather
+       * than repeated. An axis that had nothing to derive says so.
+       */
+      derivation: AxisDerivationResults;
     }
   // Every entry was readable, but the sheet they describe is not one that can
   // exist. Nothing is returned to save: a refused layout has no resolved value.
@@ -83,20 +95,33 @@ const MEASUREMENT_FIELD_IDS: ReadonlySet<string> = new Set(
 );
 
 /**
- * True when the only thing missing is one dimensional entry: every count is
- * usable, every other measurement parsed, and the corner-radius state has what
- * it needs. Only then is there a single unknown for the equation to solve.
+ * The blank dimensions, when blank dimensions are the only thing wrong and no
+ * axis carries more than one of them.
+ *
+ * Each axis is its own equation with its own terms, so one unknown per axis is
+ * one unknown per equation and every one of them is solvable. Two on the same
+ * axis is not, and anything other than a missing dimension — an unusable count,
+ * an unreadable entry, a corner-radius state without its radius — has to be
+ * corrected before an equation is worth attempting at all.
  */
-function onlyOneDimensionMissing(
+function missingOnePerAxis(
   issues: readonly SheetLayoutIssue[],
-): MeasurementFieldId | null {
-  if (issues.length !== 1) {
-    return null;
+): MeasurementFieldId[] | null {
+  const missing: MeasurementFieldId[] = [];
+  const axes = new Set<DerivationAxis>();
+  for (const issue of issues) {
+    if (issue.code !== "required" || !MEASUREMENT_FIELD_IDS.has(issue.field)) {
+      return null;
+    }
+    const field = issue.field as MeasurementFieldId;
+    const { axis } = axisEquationFor(field);
+    if (axes.has(axis)) {
+      return null;
+    }
+    axes.add(axis);
+    missing.push(field);
   }
-  const [issue] = issues;
-  return issue.code === "required" && MEASUREMENT_FIELD_IDS.has(issue.field)
-    ? (issue.field as MeasurementFieldId)
-    : null;
+  return missing.length > 0 ? missing : null;
 }
 
 /**
@@ -161,54 +186,64 @@ export function resolveSheetLayout(
         counts: validation.counts,
         measurements: validation.measurements,
         cornerRadius: validation.cornerRadius,
-        derivation: null,
+        derivations: [],
       },
       input.cornerRadius,
     );
   }
 
-  const missing = onlyOneDimensionMissing(validation.issues);
+  const derivation = deriveMissingDimensions(input);
+  const missing = missingOnePerAxis(validation.issues);
   if (!missing) {
+    return { status: "unresolved", issues: validation.issues, derivation };
+  }
+
+  // Each blank field is answered by its own axis. A refusal replaces the bare
+  // "Enter a value." with the reason that value could not be supplied, against
+  // the same field.
+  const derivations: SheetLayoutDerivation[] = [];
+  const refusals: SheetLayoutIssue[] = [];
+  for (const field of missing) {
+    const result = derivation[axisEquationFor(field).axis];
+    if (result.status === "derived") {
+      derivations.push(result.derivation);
+    } else if (result.status === "refused") {
+      refusals.push({
+        field: result.field,
+        code: result.code,
+        message: result.message,
+      });
+    }
+  }
+
+  if (derivations.length !== missing.length) {
     return {
       status: "unresolved",
-      issues: validation.issues,
-      derivation: { status: "not-attempted", reason: "multiple-missing" },
+      issues: refusals.length > 0 ? refusals : validation.issues,
+      derivation,
     };
   }
 
-  const derivation = deriveMissingDimension(input);
-  if (derivation.status !== "derived") {
-    // A refusal replaces the bare "Enter a value." with the reason the value
-    // could not be supplied, against the same field.
-    const issues =
-      derivation.status === "refused"
-        ? [
-            {
-              field: derivation.field,
-              code: derivation.code,
-              message: derivation.message,
-            },
-          ]
-        : validation.issues;
-    return { status: "unresolved", issues, derivation };
+  // The missing fields are the only gaps in `partial`, and they are filled in
+  // here, so the record is complete even though its parts are typed as optional.
+  const measurements = { ...validation.partial.measurements } as Record<
+    MeasurementFieldId,
+    ResolvedMeasurement
+  >;
+  for (const derived of derivations) {
+    measurements[derived.field] = {
+      status: "derived",
+      valueMm: derived.valueMm,
+      derivation: derived,
+    };
   }
 
-  // The single missing field is the only gap in `partial`, and it is filled in
-  // here, so the record is complete even though its parts are typed as optional.
-  const measurements = {
-    ...validation.partial.measurements,
-    [missing]: {
-      status: "derived",
-      valueMm: derivation.derivation.valueMm,
-      derivation: derivation.derivation,
-    },
-  } as Record<MeasurementFieldId, ResolvedMeasurement>;
   return judge(
     {
       counts: validation.partial.counts as Record<CountFieldId, number>,
       measurements,
       cornerRadius: validation.partial.cornerRadius,
-      derivation: derivation.derivation,
+      derivations,
     },
     input.cornerRadius,
   );

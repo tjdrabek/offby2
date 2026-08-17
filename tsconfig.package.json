@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    // No DOM. The published surface is pure by contract, so a stray reference
+    // to `document` or `indexedDB` should fail this build rather than ship.
+    "lib": ["ES2022"],
+    "types": [],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    // Not `dist`: that belongs to the Vite app build, and the published
+    // package must not carry the application around with it.
+    "outDir": "lib",
+    "rootDir": "src",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "skipLibCheck": true
+  },
+  // Only the entry point. Everything the package publishes is reachable from
+  // here, and anything that is not reachable is not part of the package.
+  "files": ["src/index.ts"]
+}

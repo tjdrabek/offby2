@@ -62,7 +62,7 @@ describe("resolveSheetLayout", () => {
       throw new Error("Expected the complete sheet to resolve.");
     }
 
-    expect(result.layout.derivation).toBeNull();
+    expect(result.layout.derivations).toEqual([]);
     expect(result.layout.counts).toEqual({ rows: 7, columns: 3 });
     expect(result.layout.measurements.marginLeft).toEqual({
       status: "parsed",
@@ -80,7 +80,9 @@ describe("resolveSheetLayout", () => {
     const marginLeft = result.layout.measurements.marginLeft;
     expect(marginLeft.status).toBe("derived");
     expect(marginLeft.valueMm).toBe(10);
-    expect(result.layout.derivation?.field).toBe("marginLeft");
+    expect(result.layout.derivations.map((one) => one.field)).toEqual([
+      "marginLeft",
+    ]);
     // Every other value keeps its source text, so the two are told apart.
     expect(result.layout.measurements.marginRight.status).toBe("parsed");
   });
@@ -108,7 +110,7 @@ describe("resolveSheetLayout", () => {
     }
 
     expect(result.layout.measurements.marginLeft.valueMm).toBeCloseTo(10, 6);
-    expect(result.layout.derivation?.axis).toBe("horizontal");
+    expect(result.layout.derivations[0].axis).toBe("horizontal");
   });
 
   it("reports a refused derivation against the field it belongs to", () => {
@@ -126,10 +128,37 @@ describe("resolveSheetLayout", () => {
     });
     // The bare "Enter a value." is replaced by the reason it cannot be supplied.
     expect(result.issues[0].message).not.toBe("Enter a value.");
-    expect(result.derivation.status).toBe("refused");
+    expect(result.derivation.horizontal.status).toBe("refused");
+    // The vertical axis had nothing missing and says so for itself.
+    expect(result.derivation.vertical).toEqual({
+      status: "not-attempted",
+      reason: "nothing-missing",
+    });
   });
 
-  it("does not derive when two dimensions are missing", () => {
+  it("derives one dimension on each axis at once", () => {
+    const result = resolveSheetLayout(
+      sheet({ labelWidth: "", labelHeight: "" }),
+    );
+    if (result.status !== "resolved") {
+      throw new Error("Expected one unknown per axis to be derivable.");
+    }
+
+    expect(result.layout.derivations.map((one) => one.field)).toEqual([
+      "labelWidth",
+      "labelHeight",
+    ]);
+    expect(result.layout.derivations.map((one) => one.axis)).toEqual([
+      "horizontal",
+      "vertical",
+    ]);
+    expect(result.layout.measurements.labelWidth.status).toBe("derived");
+    expect(result.layout.measurements.labelHeight.status).toBe("derived");
+    // The entered values on both axes are untouched by the other's solution.
+    expect(result.layout.measurements.marginLeft.status).toBe("parsed");
+  });
+
+  it("does not derive two dimensions on the same axis", () => {
     const result = resolveSheetLayout(
       sheet({ marginLeft: "", marginRight: "" }),
     );
@@ -144,7 +173,7 @@ describe("resolveSheetLayout", () => {
     expect(result.issues.every((issue) => issue.code === "required")).toBe(
       true,
     );
-    expect(result.derivation).toEqual({
+    expect(result.derivation.horizontal).toEqual({
       status: "not-attempted",
       reason: "multiple-missing",
     });
