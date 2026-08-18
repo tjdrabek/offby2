@@ -107,6 +107,35 @@ export function measurementFrom(value: number, unit: LengthUnit): Millimetres {
 }
 
 /**
+ * Entry precision per unit: what a converted value is rounded to when it is
+ * written back into a field. A tenth of a millimetre, and two decimals in
+ * centimetres or inches — the precision a person with a rule works at. An
+ * entry reading 0.4724409449 is not a measurement anyone made, and the small
+ * loss it avoids is far below any physical printing tolerance.
+ */
+const ENTRY_FRACTION_DIGITS: Record<LengthUnit, number> = {
+  mm: 1,
+  cm: 2,
+  in: 2,
+};
+
+/** The value as a person would type it in `unit`, rounded to entry precision. */
+export function roundedMeasurementText(
+  value: Millimetres,
+  unit: LengthUnit,
+): string {
+  return formatMillimetres(value, unit, ENTRY_FRACTION_DIGITS[unit]);
+}
+
+/**
+ * The largest error entry rounding can introduce: half the coarsest entry
+ * step, which is two inch decimals — 0.005 in, a little under 0.13 mm.
+ * Comparisons that must recognise a rounded entry as the value it came from
+ * use this; geometry comparisons keep {@link MEASUREMENT_TOLERANCE_MM}.
+ */
+export const ENTRY_TOLERANCE_MM = 0.13;
+
+/**
  * As many fraction digits as a converted value could ever need. Only reached
  * by a value with no exact decimal in the target unit, and far more precision
  * than any physical label dimension carries.

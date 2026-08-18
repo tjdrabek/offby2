@@ -7,7 +7,7 @@
  * module is the other behaviour: the same sheet, shown in a different unit.
  */
 
-import { losslessMeasurementText } from "./measurementUnits";
+import { roundedMeasurementText } from "./measurementUnits";
 import { parseMeasurement } from "./parseMeasurement";
 import {
   MEASUREMENT_FIELDS,
@@ -22,10 +22,14 @@ import {
 } from "./SheetLayoutInput";
 
 /**
- * Rewrites one entry in a new unit, keeping the value the operator meant.
+ * Rewrites one entry in a new unit, at the precision a person types at.
  *
- * An entry that does not parse is left as typed and simply re-labelled, so
- * switching units never quietly discards text that is still being corrected.
+ * Rounded rather than lossless: 12 mm in inches is written "0.47", not
+ * "0.4724409449" — a converted entry should read like a measurement somebody
+ * could have made, and the digits dropped are far below any physical
+ * tolerance. An entry that does not parse is left as typed and simply
+ * re-labelled, so switching units never quietly discards text that is still
+ * being corrected.
  */
 function convertEntry(
   field: SheetLayoutFieldId,
@@ -36,7 +40,7 @@ function convertEntry(
   if (parsed.status !== "parsed") {
     return { ...entry, unit: to };
   }
-  return { text: losslessMeasurementText(parsed.valueMm, to), unit: to };
+  return { text: roundedMeasurementText(parsed.valueMm, to), unit: to };
 }
 
 function convertCornerRadius(

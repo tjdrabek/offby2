@@ -15,7 +15,11 @@
  */
 
 import { millimetres, type Millimetres } from "./SheetGeometry";
-import { measurementFrom, measurementsEqual } from "./measurementUnits";
+import {
+  ENTRY_TOLERANCE_MM,
+  measurementFrom,
+  measurementsEqual,
+} from "./measurementUnits";
 
 export interface StandardSheetSize {
   id: string;
@@ -97,10 +101,12 @@ export function standardSheetSize(id: string): StandardSheetSize | undefined {
  * The standard size these dimensions describe, or undefined for a sheet that is
  * not one of them.
  *
- * Compared within the documented measurement tolerance rather than exactly:
- * 8.5 in normalizes to 215.89999999999998 mm, and a sheet entered as 215.9 mm
- * is the same piece of paper. Orientation is not inferred — a sheet is the size
- * it was entered as, and a rotated sheet is a different entry.
+ * Compared within entry tolerance rather than exactly: 8.5 in normalizes to
+ * 215.89999999999998 mm, and A4 converted to inches is entered back as
+ * "8.27" — both are the same piece of paper as the size they came from. The
+ * tolerance is far below the gap between any two listed sizes. Orientation
+ * is not inferred — a sheet is the size it was entered as, and a rotated
+ * sheet is a different entry.
  */
 export function matchStandardSheetSize(
   widthMm: number,
@@ -108,7 +114,7 @@ export function matchStandardSheetSize(
 ): StandardSheetSize | undefined {
   return STANDARD_SHEET_SIZES.find(
     (size) =>
-      measurementsEqual(size.widthMm, widthMm) &&
-      measurementsEqual(size.heightMm, heightMm),
+      measurementsEqual(size.widthMm, widthMm, ENTRY_TOLERANCE_MM) &&
+      measurementsEqual(size.heightMm, heightMm, ENTRY_TOLERANCE_MM),
   );
 }

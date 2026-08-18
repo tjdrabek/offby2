@@ -21,6 +21,16 @@ describe("standard sheet sizes", () => {
     });
   });
 
+  it("recognises a size entered back at rounded entry precision", () => {
+    // A4 converted to inches is entered as 8.27 × 11.69 — still A4.
+    expect(
+      matchStandardSheetSize(
+        measurementFrom(8.27, "in"),
+        measurementFrom(11.69, "in"),
+      ),
+    ).toMatchObject({ id: "a4" });
+  });
+
   it("has no size for an unknown id", () => {
     expect(standardSheetSize("foolscap")).toBeUndefined();
   });

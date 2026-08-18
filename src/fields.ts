@@ -66,4 +66,5 @@ export {
   fromMillimetres,
   losslessMeasurementText,
   measurementsEqual,
+  roundedMeasurementText,
 } from "./sheet-layouts/measurementUnits";

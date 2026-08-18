@@ -33,6 +33,25 @@ describe("losslessMeasurementText", () => {
 });
 
 describe("convertInputUnits", () => {
+  it("rounds converted entries to what a person would type", () => {
+    const input = {
+      ...createEmptySheetLayoutInput("mm"),
+      measurements: {
+        ...createEmptySheetLayoutInput("mm").measurements,
+        // 12 mm has no finite decimal in inches; the entry must not carry
+        // ten digits of the conversion's tail.
+        marginTop: { text: "12", unit: "mm" as const },
+        sheetWidth: { text: "215.9", unit: "mm" as const },
+      },
+    };
+
+    const converted = convertInputUnits(input, "in");
+
+    expect(converted.measurements.marginTop.text).toBe("0.47");
+    // An exact conversion still comes out exact.
+    expect(converted.measurements.sheetWidth.text).toBe("8.5");
+  });
+
   it("converts readable values and re-labels the rest", () => {
     const input = {
       ...createEmptySheetLayoutInput("mm"),
