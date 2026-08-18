@@ -42,3 +42,21 @@ export {
   type PrinterProfile,
   type ProfileEvidence,
 } from "./calibration/PrinterProfile";
+
+// Reading where the printing setup stops printing: the edge cut-off ladder.
+export {
+  CUTOFF_LINES,
+  CUTOFF_RUN_MM,
+  CUTOFF_STEP_MM,
+  NO_CUTOFF_COUNTS,
+  NO_EDGE_CUTOFF,
+  SHEET_EDGES,
+  cutoffMm,
+  cutoffWarnings,
+  edgeCutoffAllowance,
+  edgeCutoffLadder,
+  type CutoffCounts,
+  type CutoffLadderLineMm,
+  type CutoffWarning,
+  type SheetEdge,
+} from "./calibration/edgeCutoff";
