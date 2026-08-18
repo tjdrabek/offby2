@@ -57,8 +57,19 @@ export interface CalibrationPolicy {
  * about the workflow, not about the printer.
  */
 export const PROVISIONAL_CALIBRATION_POLICY: CalibrationPolicy = {
-  maxTargetDisagreementMm: 0.5,
-  maxSheetVariationMm: 0.5,
+  /*
+   * Sized for a hand-held rule, which is what the workflow asks for. Each
+   * mark's implied shift is the difference of two readings, and a reading is
+   * honestly off by up to half a millimetre — so two well-measured marks can
+   * disagree by a millimetre from reading error alone. The old 0.5 mm bound
+   * refused nearly every honest set of measurements. Genuine scaling is still
+   * caught: the printed-scale check refuses at 0.5 mm over 100 mm, which at
+   * the marks' ~150 mm separation shows up long before this bound does.
+   */
+  maxTargetDisagreementMm: 1.2,
+  // Between sheets the noise is averaged over four marks, so the bound is
+  // tighter than the per-mark one.
+  maxSheetVariationMm: 0.8,
   maxTranslationMm: 10,
   sheetsForConfirmation: 2,
 };
@@ -102,13 +113,18 @@ function mm(value: number): string {
   return `${Number(value.toFixed(4))} mm`;
 }
 
+/** One mark's implied shift, kept with the mark's name for the messages. */
+interface LabelledShift extends PlacementTranslation {
+  label: string;
+}
+
 /** The shift each mark on one sheet implies, as intended minus observed. */
 function shiftsFor(
   plan: CalibrationSheetPlan,
   set: CalibrationObservationSet,
   refusals: CalibrationRefusal[],
-): PlacementTranslation[] {
-  const shifts: PlacementTranslation[] = [];
+): LabelledShift[] {
+  const shifts: LabelledShift[] = [];
   for (const target of plan.targets) {
     const observation = observationOf(set, target.id);
     if (!observation) {
@@ -121,11 +137,23 @@ function shiftsFor(
       continue;
     }
     shifts.push({
+      label: target.label,
       xMm: target.intendedXMm - observation.observedXMm,
       yMm: target.intendedYMm - observation.observedYMm,
     });
   }
   return shifts;
+}
+
+/** The mark whose implied shift sits furthest from the others' average. */
+function standoutMark(shifts: readonly LabelledShift[]): LabelledShift {
+  const mean = meanShift(shifts);
+  return shifts.reduce((worst, shift) =>
+    Math.max(Math.abs(shift.xMm - mean.xMm), Math.abs(shift.yMm - mean.yMm)) >
+    Math.max(Math.abs(worst.xMm - mean.xMm), Math.abs(worst.yMm - mean.yMm))
+      ? shift
+      : worst,
+  );
 }
 
 /** Names an observation of a mark the calibration sheet does not carry. */
@@ -222,10 +250,12 @@ export function derivePrinterProfile(
       disagreement,
     );
     if (disagreement > policy.maxTargetDisagreementMm) {
+      // Named so the operator knows where to put the rule next, and worded as
+      // what happened rather than as the arithmetic that noticed it.
       refusals.push(
         refusal(
           "calibration-not-a-translation",
-          `On sheet ${set.sheetOrdinal} the marks disagree by ${mm(disagreement)}, more than the ${mm(policy.maxTargetDisagreementMm)} a whole-sheet shift can explain. The sheet was scaled or rotated, or a measurement is wrong; this package corrects neither.`,
+          `The marks on sheet ${set.sheetOrdinal} do not agree on a single shift: comparing each to where it should be, their answers are up to ${mm(disagreement)} apart, and up to ${mm(policy.maxTargetDisagreementMm)} of that is accepted as ruler-reading error. The ${standoutMark(shifts).label} stands out the most — re-measure that one first, reading to the nearest half millimetre. If the numbers are right, this sheet printed scaled or rotated, which a whole-sheet shift cannot correct.`,
         ),
       );
       continue;
