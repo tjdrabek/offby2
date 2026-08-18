@@ -110,6 +110,12 @@ export function labelCount(geometry: SheetGeometry): number {
  * printing setup cannot guarantee, the inset is what the composition chooses.
  * Collapsing them into one number loses the ability to say which one is
  * responsible when content will not fit.
+ *
+ * @deprecated The additive model this computes contradicts the content
+ * boundary's rule that hold-in lines do not add. Pass the tolerance and the
+ * inset to `contentBoundary` as named hold-in lines instead; this function
+ * will be reimplemented on the boundary or removed once the demo no longer
+ * calls it.
  */
 export function safeArea(
   position: LabelPosition,

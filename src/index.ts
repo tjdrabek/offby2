@@ -79,6 +79,17 @@ export {
   type LabelPosition,
 } from "./sheet-layouts/labelPositions";
 
+// Where content stops on a label: each hold-in is a line, and content stops
+// at whichever sits furthest in, per axis.
+export {
+  contentBoundary,
+  type ContentBoundary,
+  type DesignFrame,
+  type FrameDistancesMm,
+  type HoldInAxes,
+  type HoldInLine,
+} from "./sheet-layouts/contentBoundary";
+
 // Pointing at one exact revision of a layout, which a profile is measured
 // against. The records themselves are the host's persistence concern.
 export {
