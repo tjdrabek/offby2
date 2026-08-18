@@ -179,7 +179,10 @@ function rightHandSide(values: AxisValues, count: number): number {
 }
 
 function mm(value: number): string {
-  return formatMillimetres(millimetres(value), "mm");
+  // Full precision, not display precision: derivation messages state
+  // arithmetic the reader is invited to check, and rounded terms stop
+  // adding up.
+  return formatMillimetres(millimetres(value), "mm", 4);
 }
 
 /** "Sheet width = Left margin + Columns × Label width + …" */

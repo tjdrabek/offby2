@@ -60,6 +60,19 @@ export function measurementsEqual(
 }
 
 /**
+ * Display precision per unit, chosen from what each unit's products are
+ * actually specified in: a tenth of a millimetre covers every published label
+ * dimension, two centimetre decimals are that same tenth, and inch products
+ * are specified in eighths (0.125) so three decimals render them exactly.
+ * More digits than these are conversion dust, not information.
+ */
+const DISPLAY_FRACTION_DIGITS: Record<LengthUnit, number> = {
+  mm: 1,
+  cm: 2,
+  in: 3,
+};
+
+/**
  * Renders normalized millimetres in a display unit, dropping trailing zeros.
  *
  * The result is for display only. Nothing reads it back, so the rounding here
@@ -68,10 +81,10 @@ export function measurementsEqual(
 export function formatMillimetres(
   value: Millimetres,
   unit: LengthUnit,
-  maxFractionDigits = 4,
+  maxFractionDigits?: number,
 ): string {
   const scaled = fromMillimetres(value, unit);
-  const fixed = scaled.toFixed(maxFractionDigits);
+  const fixed = scaled.toFixed(maxFractionDigits ?? DISPLAY_FRACTION_DIGITS[unit]);
   const trimmed = fixed.includes(".")
     ? fixed.replace(/0+$/, "").replace(/\.$/, "")
     : fixed;

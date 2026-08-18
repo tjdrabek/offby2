@@ -115,7 +115,10 @@ function toleranceFor(extentMm: number): number {
 
 /** "63.5 mm", for a value already known to be finite. */
 function mm(value: number): string {
-  return `${formatMillimetres(millimetres(value), "mm")} mm`;
+  // Full precision, not display precision: these figures appear in refusals
+  // whose arithmetic the reader is invited to check, and a bound like
+  // "19.05 mm or less" rounded to 19.1 would invite a value that gets refused.
+  return `${formatMillimetres(millimetres(value), "mm", 4)} mm`;
 }
 
 /** Every dimensional value of a geometry, keyed by the field that carries it. */

@@ -71,7 +71,7 @@ describe("formatMillimetres", () => {
     const shown = formatMillimetres(parsed.valueMm, "mm");
 
     // The display string is rounded; the value it came from is not.
-    expect(shown).toBe("8.4667");
+    expect(shown).toBe("8.5");
     expect(parsed.valueMm).toBe((1 / 3) * MM_PER_INCH);
     expect(parsed.valueMm).not.toBe(Number(shown));
     // Re-formatting is idempotent, so nothing accumulates rounding either.
