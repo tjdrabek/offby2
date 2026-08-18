@@ -49,12 +49,20 @@ A saved body of work that combines label content, a sheet-layout revision, conte
 _Avoid_: Document, workspace
 
 **Content inset**:
-A user-selected distance inside the safe area that keeps label content farther from the label boundary for composition, appearance, or rounded-corner clearance. It is independent of and additive to the alignment tolerance.
+A user-selected hold-in line that keeps label content farther inside the label boundary for composition, appearance, or rounded-corner clearance.
 _Avoid_: Label margin, padding
 
-**Safe area**:
-The region inside a label boundary within which label content must remain after accounting for the alignment tolerance.
-_Avoid_: Margin, padding
+**Hold-in line**:
+A named distance that keeps label content in from the label boundary, declared on the axes of either the sheet or the design frame. Hold-in lines do not add; each holds content independently. Content insets, edge cut-off allowances, and alignment tolerances are all hold-in lines.
+_Avoid_: Inset, margin, offset
+
+**Content boundary**:
+Where label content actually stops: the most obtrusive hold-in line per design-frame axis, held to less than half the frame's extent on that axis.
+_Avoid_: Safe area, content box, printable area
+
+**Edge cut-off allowance**:
+A hold-in line on the sheet's axes covering how far a printing setup's dead band reaches past the sheet margins onto the labels. No printer profile can move where the printer stops printing, so the allowance applies to every label on the sheet.
+_Avoid_: Bleed, dead band compensation
 
 **Printable output**:
 A representation of label content positioned at intended physical locations on a label sheet and ready for a user to send through their printing setup.
