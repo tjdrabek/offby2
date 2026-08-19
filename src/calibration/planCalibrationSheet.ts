@@ -204,7 +204,7 @@ function sheetCornerPlan(geometry: SheetGeometry): CalibrationSheetPlan {
  * `corner-label-centre` placement is the default, unchanged for every
  * existing caller.
  */
-export function calibrationSheet(
+export function planCalibrationSheet(
   geometry: SheetGeometry,
   placement: MarkPlacement = "corner-label-centre",
 ): CalibrationSheetPlan {

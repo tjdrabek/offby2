@@ -3,6 +3,27 @@
   "version": "0.0.0",
   "description": "Sheet layouts for label printing: read what an operator entered, derive the values they left out, and refuse geometry that cannot exist.",
   "license": "MIT",
+  "author": "Tyler Drabek",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tjdrabek/offby2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tjdrabek/offby2/issues"
+  },
+  "homepage": "https://github.com/tjdrabek/offby2#readme",
+  "keywords": [
+    "labels",
+    "label-printing",
+    "sheet-layout",
+    "die-cut",
+    "calibration",
+    "printing",
+    "geometry"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "type": "module",
   "sideEffects": false,
   "files": ["lib"],

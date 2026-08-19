@@ -19,7 +19,7 @@
  */
 
 import type { SheetLayoutRevisionRef } from "./../sheet-layouts/SheetLayoutRevisionRef";
-import type { CalibrationSheetPlan } from "./calibrationSheet";
+import type { CalibrationSheetPlan } from "./planCalibrationSheet";
 import {
   allPhysical,
   distinctSheetCount,

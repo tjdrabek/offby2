@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { millimetres, type SheetGeometry } from "../sheet-layouts/SheetGeometry";
 import { labelPositions } from "../sheet-layouts/labelPositions";
-import { calibrationSheet } from "./calibrationSheet";
+import { planCalibrationSheet } from "./planCalibrationSheet";
 import type { CalibrationObservationSet } from "./PlacementObservation";
 import { correctedPoint } from "./PrinterProfile";
 import {
@@ -28,7 +28,7 @@ function geometry(): SheetGeometry {
   };
 }
 
-const PLAN = calibrationSheet(geometry());
+const PLAN = planCalibrationSheet(geometry());
 
 /**
  * A sheet printed with a known shift: every mark lands `shift` away from where
@@ -91,7 +91,7 @@ describe("derivePrinterProfile", () => {
   it.each(["corner-label-centre", "sheet-corner"] as const)(
     "derives the same shift under the %s placement",
     (placement) => {
-      const plan = calibrationSheet(geometry(), placement);
+      const plan = planCalibrationSheet(geometry(), placement);
       const result = derivePrinterProfile({
         plan,
         layoutRevision: REVISION,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { millimetres, type SheetGeometry } from "../sheet-layouts/SheetGeometry";
-import { calibrationSheet } from "./calibrationSheet";
+import { planCalibrationSheet } from "./planCalibrationSheet";
 
 function geometry(overrides: Partial<SheetGeometry> = {}): SheetGeometry {
   return {
@@ -19,9 +19,9 @@ function geometry(overrides: Partial<SheetGeometry> = {}): SheetGeometry {
   };
 }
 
-describe("calibrationSheet", () => {
+describe("planCalibrationSheet", () => {
   it("marks the four corners of the grid", () => {
-    const plan = calibrationSheet(geometry());
+    const plan = planCalibrationSheet(geometry());
 
     expect(plan.targets.map((target) => [target.row, target.column])).toEqual([
       [0, 0],
@@ -32,7 +32,7 @@ describe("calibrationSheet", () => {
   });
 
   it("places each mark at the centre of its label", () => {
-    const plan = calibrationSheet(geometry());
+    const plan = planCalibrationSheet(geometry());
     const [topLeft] = plan.targets;
 
     // Label starts at the left/top margin and is 20 x 30.
@@ -41,20 +41,20 @@ describe("calibrationSheet", () => {
   });
 
   it("carries the sheet extent for a renderer", () => {
-    expect(calibrationSheet(geometry()).sheet).toEqual({
+    expect(planCalibrationSheet(geometry()).sheet).toEqual({
       widthMm: 100,
       heightMm: 80,
     });
   });
 
   it("gives every mark a distinct id", () => {
-    const ids = calibrationSheet(geometry()).targets.map((one) => one.id);
+    const ids = planCalibrationSheet(geometry()).targets.map((one) => one.id);
 
     expect(new Set(ids).size).toBe(ids.length);
   });
 
   it("names each mark by where it sits", () => {
-    const plan = calibrationSheet(geometry());
+    const plan = planCalibrationSheet(geometry());
 
     expect(plan.targets.map((one) => one.label)).toEqual([
       "top left label",
@@ -66,7 +66,7 @@ describe("calibrationSheet", () => {
 
   describe("degenerate grids", () => {
     it("marks two labels on a single row", () => {
-      const plan = calibrationSheet(
+      const plan = planCalibrationSheet(
         geometry({ grid: { rows: 1, columns: 3 } }),
       );
 
@@ -78,7 +78,7 @@ describe("calibrationSheet", () => {
     });
 
     it("marks two labels on a single column", () => {
-      const plan = calibrationSheet(
+      const plan = planCalibrationSheet(
         geometry({ grid: { rows: 2, columns: 1 } }),
       );
 
@@ -90,7 +90,7 @@ describe("calibrationSheet", () => {
     });
 
     it("marks the only label on a one-label sheet", () => {
-      const plan = calibrationSheet(
+      const plan = planCalibrationSheet(
         geometry({ grid: { rows: 1, columns: 1 } }),
       );
 
@@ -103,11 +103,11 @@ describe("calibrationSheet", () => {
 
   describe("mark length", () => {
     it("uses the preferred length when the label is large enough", () => {
-      expect(calibrationSheet(geometry()).markLengthMm).toBe(10);
+      expect(planCalibrationSheet(geometry()).markLengthMm).toBe(10);
     });
 
     it("shrinks a mark to stay inside a small label", () => {
-      const plan = calibrationSheet(
+      const plan = planCalibrationSheet(
         geometry({
           label: { widthMm: millimetres(8), heightMm: millimetres(30) },
         }),
@@ -118,7 +118,7 @@ describe("calibrationSheet", () => {
     });
 
     it("never shrinks a mark below what can be measured", () => {
-      const plan = calibrationSheet(
+      const plan = planCalibrationSheet(
         geometry({
           label: { widthMm: millimetres(1), heightMm: millimetres(1) },
         }),
@@ -129,23 +129,23 @@ describe("calibrationSheet", () => {
   });
 
   it("states its placement, defaulting to corner-label-centre", () => {
-    expect(calibrationSheet(geometry()).placement).toBe("corner-label-centre");
+    expect(planCalibrationSheet(geometry()).placement).toBe("corner-label-centre");
     expect(
-      calibrationSheet(geometry(), "corner-label-centre").placement,
+      planCalibrationSheet(geometry(), "corner-label-centre").placement,
     ).toBe("corner-label-centre");
   });
 
   it("reproduces today's plan exactly when the placement is omitted", () => {
     // The regression pin for every existing caller: adding the parameter
     // must not move a single mark for a caller that never asked for one.
-    const withDefault = calibrationSheet(geometry());
-    const withoutPlacement = calibrationSheet(geometry(), "corner-label-centre");
+    const withDefault = planCalibrationSheet(geometry());
+    const withoutPlacement = planCalibrationSheet(geometry(), "corner-label-centre");
 
     expect(withDefault).toEqual(withoutPlacement);
   });
 });
 
-describe("calibrationSheet — sheet-corner placement", () => {
+describe("planCalibrationSheet — sheet-corner placement", () => {
   function sheet(widthMm: number, heightMm: number): SheetGeometry {
     return geometry({
       sheet: { widthMm: millimetres(widthMm), heightMm: millimetres(heightMm) },
@@ -153,7 +153,7 @@ describe("calibrationSheet — sheet-corner placement", () => {
   }
 
   it("marks all four sheet corners, independent of the grid", () => {
-    const plan = calibrationSheet(sheet(210, 297), "sheet-corner");
+    const plan = planCalibrationSheet(sheet(210, 297), "sheet-corner");
 
     expect(plan.placement).toBe("sheet-corner");
     expect(plan.targets).toHaveLength(4);
@@ -166,7 +166,7 @@ describe("calibrationSheet — sheet-corner placement", () => {
   });
 
   it("insets every mark by one shared, round distance from the two edges it is measured from", () => {
-    const plan = calibrationSheet(sheet(210, 297), "sheet-corner");
+    const plan = planCalibrationSheet(sheet(210, 297), "sheet-corner");
     const [topLeft, topRight, bottomLeft, bottomRight] = plan.targets;
 
     expect(topLeft.intendedXMm).toBe(30);
@@ -182,7 +182,7 @@ describe("calibrationSheet — sheet-corner placement", () => {
   it("shrinks the round inset to keep the marks a minimum distance apart", () => {
     // 30 mm needs 100 mm of the shorter axis (2 × 30 + 40 minimum separation);
     // a sheet just under that drops to the next preferred inset, 25 mm.
-    const plan = calibrationSheet(sheet(99, 200), "sheet-corner");
+    const plan = planCalibrationSheet(sheet(99, 200), "sheet-corner");
 
     expect(plan.targets[0].intendedXMm).toBe(25);
   });
@@ -190,22 +190,22 @@ describe("calibrationSheet — sheet-corner placement", () => {
   it("falls back to a quarter of the shorter axis on a sheet too small for any preferred inset", () => {
     // Smallest preferred inset (10 mm) needs 60 mm of the shorter axis; a 40 mm
     // sheet falls back to floor(40 / 4) = 10.
-    const plan = calibrationSheet(sheet(40, 200), "sheet-corner");
+    const plan = planCalibrationSheet(sheet(40, 200), "sheet-corner");
 
     expect(plan.targets[0].intendedXMm).toBe(10);
   });
 
   it("never floors the fallback inset below what can be measured", () => {
-    const plan = calibrationSheet(sheet(4, 200), "sheet-corner");
+    const plan = planCalibrationSheet(sheet(4, 200), "sheet-corner");
 
     expect(plan.targets[0].intendedXMm).toBe(2);
   });
 
   it("bounds the mark's arm length by its own inset from the sheet edge", () => {
-    const generous = calibrationSheet(sheet(210, 297), "sheet-corner");
+    const generous = planCalibrationSheet(sheet(210, 297), "sheet-corner");
     expect(generous.markLengthMm).toBe(10);
 
-    const tight = calibrationSheet(sheet(4, 200), "sheet-corner");
+    const tight = planCalibrationSheet(sheet(4, 200), "sheet-corner");
     expect(tight.markLengthMm).toBe(2);
   });
 });

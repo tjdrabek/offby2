@@ -138,8 +138,10 @@ profile derived from measuring it:
 
 ```ts
 interface CalibrationSheetPlan {
+  placement: MarkPlacement;     // which mark placement produced this plan
   sheet: { widthMm: number; heightMm: number };
-  targets: CalibrationTarget[]; // id, label, row/column, intended centre x/y
+  targets: CalibrationTarget[]; // id, operator-facing label, intended centre x/y
+                                // (grid row/column only under "corner-label-centre")
   markLengthMm: number;         // crosshair arm length, for a renderer
 }
 
@@ -349,7 +351,7 @@ physical printing occurred.
 ## This repository
 
 The package source is `src/`, with one file per entry point (`index.ts`,
-`fields.ts`, `calibration.ts`, `presets.ts`), published from `lib/` via
+`fields.ts`, `calibration.ts`, `presets.ts`, `web.ts`), published from `lib/` via
 `npm run build:package`. Anything not reachable from an entry point is not
 part of the package.
 
@@ -360,9 +362,9 @@ npm run build:package # emit lib/ for publishing
 
 ## Status
 
-Pre-release, unpublished. The surface is being tried out against a real
-consumer before it is frozen — see the `offby2-demo` repository, which consumes
-this package as a local dependency.
+The 1.0 surface was frozen against a real consumer — the `offby2-demo`
+application, which exercises the workflow, fields, calibration planning and
+derivation, presets, and web entry points end to end.
 
 Calibration is partly here: the marks a calibration sheet carries, the
 observations an operator records, and the derivation of a printer profile from
@@ -378,10 +380,10 @@ physical baseline that would justify real numbers has not been measured.
 
 ```ts
 import { labelPositions } from "offby2";
-import { calibrationSheet, derivePrinterProfile } from "offby2/calibration";
+import { planCalibrationSheet, derivePrinterProfile } from "offby2/calibration";
 
 // 1. Marks at the corners of the grid, with the positions they should print at.
-const plan = calibrationSheet(geometry);
+const plan = planCalibrationSheet(geometry);
 
 // 2. The host renders and prints it; the operator measures where each mark
 //    actually landed, from the sheet's left and top edges.

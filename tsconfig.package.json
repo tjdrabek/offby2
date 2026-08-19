@@ -10,8 +10,6 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    // Not `dist`: that belongs to the Vite app build, and the published
-    // package must not carry the application around with it.
     "outDir": "lib",
     "rootDir": "src",
     "strict": true,

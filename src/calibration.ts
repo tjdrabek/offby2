@@ -11,11 +11,11 @@
 
 // Planning the sheet whose printed targets the operator will measure.
 export {
-  calibrationSheet,
+  planCalibrationSheet,
   type CalibrationSheetPlan,
   type CalibrationTarget,
   type MarkPlacement,
-} from "./calibration/calibrationSheet";
+} from "./calibration/planCalibrationSheet";
 
 // What the operator reports back.
 export {
