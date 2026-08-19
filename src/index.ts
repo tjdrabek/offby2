@@ -90,6 +90,13 @@ export {
   type HoldInLine,
 } from "./sheet-layouts/contentBoundary";
 
+// The same boundary as percentages of the frame, for proportional renderers.
+export {
+  contentBoundaryPercents,
+  type ContentBoundaryPercents,
+  type FramePercents,
+} from "./sheet-layouts/contentBoundaryPercents";
+
 // Whether rendered content agrees with the boundary: plain numbers from a
 // readback in, a judgement out. `offby2/web` gathers the numbers.
 export {
