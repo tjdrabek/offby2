@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-- [ ] Fit measurement consumes the engine's readback judgement instead of its own computed-style reassignment
-- [ ] The demo carries no padding-to-screen-edge mapping of its own
+- [x] Fit measurement consumes the engine's readback judgement instead of its own computed-style reassignment
+- [x] The demo carries no padding-to-screen-edge mapping of its own
 - [ ] Overflow refusals behave as before for upright designs and correctly for sideways designs with unequal paddings (verified by running the demo)
 - [ ] Demo typecheck and build green
