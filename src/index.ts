@@ -90,6 +90,18 @@ export {
   type HoldInLine,
 } from "./sheet-layouts/contentBoundary";
 
+// Whether rendered content agrees with the boundary: plain numbers from a
+// readback in, a judgement out. `offby2/web` gathers the numbers.
+export {
+  AGREES,
+  SUBPIXEL_TOLERANCE_PX,
+  judgeBoundaryAgreement,
+  onScreenEdges,
+  type BoundaryAgreement,
+  type BoundaryReadback,
+  type EdgesPx,
+} from "./sheet-layouts/boundaryAgreement";
+
 // Pointing at one exact revision of a layout, which a profile is measured
 // against. The records themselves are the host's persistence concern.
 export {
