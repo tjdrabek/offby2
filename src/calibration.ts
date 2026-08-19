@@ -14,6 +14,7 @@ export {
   calibrationSheet,
   type CalibrationSheetPlan,
   type CalibrationTarget,
+  type MarkPlacement,
 } from "./calibration/calibrationSheet";
 
 // What the operator reports back.

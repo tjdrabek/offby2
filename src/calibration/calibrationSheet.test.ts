@@ -127,4 +127,85 @@ describe("calibrationSheet", () => {
       expect(plan.markLengthMm).toBe(2);
     });
   });
+
+  it("states its placement, defaulting to corner-label-centre", () => {
+    expect(calibrationSheet(geometry()).placement).toBe("corner-label-centre");
+    expect(
+      calibrationSheet(geometry(), "corner-label-centre").placement,
+    ).toBe("corner-label-centre");
+  });
+
+  it("reproduces today's plan exactly when the placement is omitted", () => {
+    // The regression pin for every existing caller: adding the parameter
+    // must not move a single mark for a caller that never asked for one.
+    const withDefault = calibrationSheet(geometry());
+    const withoutPlacement = calibrationSheet(geometry(), "corner-label-centre");
+
+    expect(withDefault).toEqual(withoutPlacement);
+  });
+});
+
+describe("calibrationSheet — sheet-corner placement", () => {
+  function sheet(widthMm: number, heightMm: number): SheetGeometry {
+    return geometry({
+      sheet: { widthMm: millimetres(widthMm), heightMm: millimetres(heightMm) },
+    });
+  }
+
+  it("marks all four sheet corners, independent of the grid", () => {
+    const plan = calibrationSheet(sheet(210, 297), "sheet-corner");
+
+    expect(plan.placement).toBe("sheet-corner");
+    expect(plan.targets).toHaveLength(4);
+    expect(plan.targets.map((target) => target.row)).toEqual([
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    ]);
+  });
+
+  it("insets every mark by one shared, round distance from the two edges it is measured from", () => {
+    const plan = calibrationSheet(sheet(210, 297), "sheet-corner");
+    const [topLeft, topRight, bottomLeft, bottomRight] = plan.targets;
+
+    expect(topLeft.intendedXMm).toBe(30);
+    expect(topLeft.intendedYMm).toBe(30);
+    expect(topRight.intendedXMm).toBe(210 - 30);
+    expect(topRight.intendedYMm).toBe(30);
+    expect(bottomLeft.intendedXMm).toBe(30);
+    expect(bottomLeft.intendedYMm).toBe(297 - 30);
+    expect(bottomRight.intendedXMm).toBe(210 - 30);
+    expect(bottomRight.intendedYMm).toBe(297 - 30);
+  });
+
+  it("shrinks the round inset to keep the marks a minimum distance apart", () => {
+    // 30 mm needs 100 mm of the shorter axis (2 × 30 + 40 minimum separation);
+    // a sheet just under that drops to the next preferred inset, 25 mm.
+    const plan = calibrationSheet(sheet(99, 200), "sheet-corner");
+
+    expect(plan.targets[0].intendedXMm).toBe(25);
+  });
+
+  it("falls back to a quarter of the shorter axis on a sheet too small for any preferred inset", () => {
+    // Smallest preferred inset (10 mm) needs 60 mm of the shorter axis; a 40 mm
+    // sheet falls back to floor(40 / 4) = 10.
+    const plan = calibrationSheet(sheet(40, 200), "sheet-corner");
+
+    expect(plan.targets[0].intendedXMm).toBe(10);
+  });
+
+  it("never floors the fallback inset below what can be measured", () => {
+    const plan = calibrationSheet(sheet(4, 200), "sheet-corner");
+
+    expect(plan.targets[0].intendedXMm).toBe(2);
+  });
+
+  it("bounds the mark's arm length by its own inset from the sheet edge", () => {
+    const generous = calibrationSheet(sheet(210, 297), "sheet-corner");
+    expect(generous.markLengthMm).toBe(10);
+
+    const tight = calibrationSheet(sheet(4, 200), "sheet-corner");
+    expect(tight.markLengthMm).toBe(2);
+  });
 });

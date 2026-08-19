@@ -88,6 +88,37 @@ describe("derivePrinterProfile", () => {
     expect(result.profile.translationMm.yMm).toBeCloseTo(-1, 9);
   });
 
+  it.each(["corner-label-centre", "sheet-corner"] as const)(
+    "derives the same shift under the %s placement",
+    (placement) => {
+      const plan = calibrationSheet(geometry(), placement);
+      const result = derivePrinterProfile({
+        plan,
+        layoutRevision: REVISION,
+        setupId: "setup-1",
+        sets: [
+          {
+            sheetOrdinal: 1,
+            provenance: "physical",
+            recordedAt: NOW,
+            observations: plan.targets.map((target) => ({
+              targetId: target.id,
+              observedXMm: target.intendedXMm + 2,
+              observedYMm: target.intendedYMm + 1,
+            })),
+          },
+        ],
+        now: NOW,
+      });
+      if (result.status !== "derived") {
+        throw new Error(`Expected a profile, got ${JSON.stringify(result)}`);
+      }
+
+      expect(result.profile.translationMm.xMm).toBeCloseTo(-2, 9);
+      expect(result.profile.translationMm.yMm).toBeCloseTo(-1, 9);
+    },
+  );
+
   it("derives no shift from a setup that prints where it is asked to", () => {
     const result = derive([printedWith({ xMm: 0, yMm: 0 })]);
     if (result.status !== "derived") {
