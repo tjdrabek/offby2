@@ -42,6 +42,7 @@ for ((i = 1; i <= MAX; i++)); do
 
 Issues directory for this run: $ISSUES_DIR" \
     --dangerously-skip-permissions \
+    --model opus \
     --add-dir ../offby2-demo \
     2>&1 | tee "$log"
   out="$(cat "$log")"
