@@ -445,6 +445,10 @@ export function geometryRefusalIssues(
     entry.fields.map((field) => ({
       field,
       code: entry.code,
+      // Geometry refusals are not composed from parts (see refusalMessage.ts);
+      // the whole sentence is the explanation, with nothing to filter.
+      explanation: entry.message,
+      remedies: [],
       message: entry.message,
     })),
   );

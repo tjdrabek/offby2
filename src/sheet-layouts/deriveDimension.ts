@@ -40,6 +40,11 @@ import {
   MEASUREMENT_TOLERANCE_MM,
   formatMillimetres,
 } from "./measurementUnits";
+import {
+  ENTER_VALUE_REMEDY,
+  composeRefusalMessage,
+  type RefusalRemedy,
+} from "./refusalMessage";
 
 export type DerivationAxis = "horizontal" | "vertical";
 
@@ -141,6 +146,11 @@ export type SheetLayoutDerivationResult =
       field: MeasurementFieldId;
       axis: DerivationAxis;
       code: DerivationRefusalCode;
+      /** What happened and why. */
+      explanation: string;
+      /** Empty when the explanation stands with nothing left to correct. */
+      remedies: readonly RefusalRemedy[];
+      /** {@link composeRefusalMessage} applied to explanation and remedies. */
       message: string;
     };
 
@@ -232,9 +242,28 @@ function refusal(
   field: MeasurementFieldId,
   axis: DerivationAxis,
   code: DerivationRefusalCode,
-  message: string,
+  explanation: string,
+  remedies: readonly RefusalRemedy[],
 ): SheetLayoutDerivationResult {
-  return { status: "refused", field, axis, code, message };
+  return {
+    status: "refused",
+    field,
+    axis,
+    code,
+    explanation,
+    remedies,
+    message: composeRefusalMessage({ explanation, remedies }),
+  };
+}
+
+/** The remedy pair a derivation refusal offers: try the other axis values, or supply this one directly. */
+function checkAxisOrEnterValueRemedies(
+  axis: DerivationAxis,
+): readonly RefusalRemedy[] {
+  return [
+    { action: "check-other-axis-values", text: `Check the other ${axis} values.` },
+    { action: "enter-value", text: "Enter this one." },
+  ];
 }
 
 /**
@@ -255,7 +284,8 @@ function solve(
       field,
       equation.axis,
       "derivation-not-unique",
-      `With a single ${COUNT_SINGULAR[equation.count]} there is no gap between labels, so ${label} does not appear in the sheet equation and cannot be derived. Enter a value.`,
+      `With a single ${COUNT_SINGULAR[equation.count]} there is no gap between labels, so ${label} does not appear in the sheet equation and cannot be derived.`,
+      [ENTER_VALUE_REMEDY],
     );
   }
 
@@ -277,7 +307,8 @@ function solve(
       field,
       equation.axis,
       "derivation-not-finite",
-      `${label} could not be derived as a finite value from the other measurements on this axis. Enter a value.`,
+      `${label} could not be derived as a finite value from the other measurements on this axis.`,
+      [ENTER_VALUE_REMEDY],
     );
   }
   // Values within the documented tolerance of zero are the same measurement as
@@ -288,7 +319,8 @@ function solve(
       field,
       equation.axis,
       "derivation-negative",
-      `Deriving ${label} from the other measurements gives ${mm(value)} mm, and a measurement cannot be negative. Check the other ${equation.axis} values, or enter this one.`,
+      `Deriving ${label} from the other measurements gives ${mm(value)} mm, and a measurement cannot be negative.`,
+      checkAxisOrEnterValueRemedies(equation.axis),
     );
   }
   if (value > MAX_MEASUREMENT_MM) {
@@ -296,7 +328,8 @@ function solve(
       field,
       equation.axis,
       "derivation-out-of-range",
-      `Deriving ${label} gives a value beyond the largest supported measurement of ${MAX_MEASUREMENT_MM} mm. Check the other ${equation.axis} values, or enter this one.`,
+      `Deriving ${label} gives a value beyond the largest supported measurement of ${MAX_MEASUREMENT_MM} mm.`,
+      checkAxisOrEnterValueRemedies(equation.axis),
     );
   }
 
@@ -311,7 +344,8 @@ function solve(
       field,
       equation.axis,
       "derivation-unreconciled",
-      `${label} could not be derived: the ${equation.axis} measurements do not reconcile within the supported precision. Enter a value.`,
+      `${label} could not be derived: the ${equation.axis} measurements do not reconcile within the supported precision.`,
+      [ENTER_VALUE_REMEDY],
     );
   }
 

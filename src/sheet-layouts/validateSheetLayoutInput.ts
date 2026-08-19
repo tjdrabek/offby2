@@ -16,11 +16,15 @@ import {
 import type { DerivationRefusalCode } from "./deriveDimension";
 import type { SheetGeometryRefusalCode } from "./validateSheetGeometry";
 import {
-  REQUIRED_MESSAGE,
   parseMeasurement,
   type MeasurementParseErrorCode,
   type ParsedMeasurement,
 } from "./parseMeasurement";
+import {
+  ENTER_VALUE_REMEDY,
+  composeRefusalMessage,
+  type RefusalRemedy,
+} from "./refusalMessage";
 
 /**
  * Turns source input into normalized millimetres, or into structured refusals.
@@ -53,7 +57,27 @@ export type SheetLayoutIssueCode =
 export interface SheetLayoutIssue {
   field: SheetLayoutFieldId;
   code: SheetLayoutIssueCode;
+  /** What happened and why. Empty when a remedy is the whole message. */
+  explanation: string;
+  /** Empty when the explanation stands with nothing left to correct. */
+  remedies: readonly RefusalRemedy[];
+  /** {@link composeRefusalMessage} applied to explanation and remedies. */
   message: string;
+}
+
+function issue(
+  field: SheetLayoutFieldId,
+  code: SheetLayoutIssueCode,
+  explanation: string,
+  remedies: readonly RefusalRemedy[],
+): SheetLayoutIssue {
+  return {
+    field,
+    code,
+    explanation,
+    remedies,
+    message: composeRefusalMessage({ explanation, remedies }),
+  };
 }
 
 /**
@@ -96,24 +120,30 @@ function validateCount(
   issues: SheetLayoutIssue[],
 ): number | null {
   if (!text.trim()) {
-    issues.push({ field, code: "required", message: REQUIRED_MESSAGE });
+    issues.push(issue(field, "required", "", [ENTER_VALUE_REMEDY]));
     return null;
   }
   const value = parseGridCountText(text);
   if (value === null) {
-    issues.push({
-      field,
-      code: "count-not-an-integer",
-      message: `${label} must be a whole number.`,
-    });
+    issues.push(
+      issue(
+        field,
+        "count-not-an-integer",
+        `${label} must be a whole number.`,
+        [],
+      ),
+    );
     return null;
   }
   if (!isGridCount(value)) {
-    issues.push({
-      field,
-      code: "count-out-of-range",
-      message: `${label} must be between ${MIN_GRID_COUNT} and ${MAX_GRID_COUNT}.`,
-    });
+    issues.push(
+      issue(
+        field,
+        "count-out-of-range",
+        `${label} must be between ${MIN_GRID_COUNT} and ${MAX_GRID_COUNT}.`,
+        [],
+      ),
+    );
     return null;
   }
   return value;
@@ -133,11 +163,14 @@ function normalizeMeasurement(
   if (result.status === "parsed") {
     return result;
   }
-  issues.push({
-    field,
-    code: result.code === "measurement-required" ? "required" : result.code,
-    message: result.message,
-  });
+  issues.push(
+    issue(
+      field,
+      result.code === "measurement-required" ? "required" : result.code,
+      result.explanation,
+      result.remedies,
+    ),
+  );
   return null;
 }
 

@@ -11,6 +11,7 @@ import {
   deriveMissingDimension,
 } from "./deriveDimension";
 import { MAX_GRID_COUNT } from "./SheetGeometry";
+import { composeRefusalMessage } from "./refusalMessage";
 
 /**
  * A sheet whose entries satisfy both axis equations exactly, so removing any
@@ -205,6 +206,20 @@ describe("deriveMissingDimension", () => {
 
     expect(result.code).toBe("derivation-negative");
     expect(result.message).toMatch(/-110 mm/);
+    expect(result.message).toBe(
+      composeRefusalMessage({
+        explanation: result.explanation,
+        remedies: result.remedies,
+      }),
+    );
+    // A host that derives this dimension instead of asking for it can drop
+    // the enter-value remedy and still get a complete sentence.
+    expect(
+      composeRefusalMessage({
+        explanation: result.explanation,
+        remedies: result.remedies.filter((r) => r.action !== "enter-value"),
+      }),
+    ).toBe("Deriving Left margin from the other measurements gives -110 mm, and a measurement cannot be negative. Check the other horizontal values.");
   });
 
   it("refuses a solution beyond the largest supported measurement", () => {

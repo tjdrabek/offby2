@@ -393,11 +393,15 @@ describe("geometryRefusalIssues", () => {
       {
         field: "sheetWidth",
         code: "geometry-extent-contradiction",
+        explanation: "Do not fit.",
+        remedies: [],
         message: "Do not fit.",
       },
       {
         field: "marginLeft",
         code: "geometry-extent-contradiction",
+        explanation: "Do not fit.",
+        remedies: [],
         message: "Do not fit.",
       },
     ]);

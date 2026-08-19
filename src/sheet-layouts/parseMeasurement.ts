@@ -21,6 +21,11 @@ import {
   type SheetLayoutFieldId,
 } from "./SheetLayoutInput";
 import { toMillimetres } from "./measurementUnits";
+import {
+  ENTER_VALUE_REMEDY,
+  composeRefusalMessage,
+  type RefusalRemedy,
+} from "./refusalMessage";
 
 /**
  * Largest supported magnitude. A sheet is never a kilometre across, and the
@@ -31,7 +36,7 @@ export const MAX_MEASUREMENT_MM = 1_000_000;
 /** Each fraction token is capped so no part of a fraction can be excessive. */
 export const MAX_FRACTION_TOKEN_DIGITS = 6;
 
-export const REQUIRED_MESSAGE = "Enter a value.";
+export const REQUIRED_MESSAGE = ENTER_VALUE_REMEDY.text;
 
 export type MeasurementParseErrorCode =
   | "measurement-required"
@@ -64,6 +69,8 @@ export interface MeasurementParseFailure {
   status: "invalid";
   field: SheetLayoutFieldId;
   code: MeasurementParseErrorCode;
+  explanation: string;
+  remedies: readonly RefusalRemedy[];
   message: string;
 }
 
@@ -79,9 +86,17 @@ const FRACTION_PATTERN = /^([+-]?)(?:(\d+)\s+)?(\d+)\s*\/\s*(\d+)$/;
 function failure(
   field: SheetLayoutFieldId,
   code: MeasurementParseErrorCode,
-  message: string,
+  explanation: string,
+  remedies: readonly RefusalRemedy[],
 ): MeasurementParseFailure {
-  return { status: "invalid", field, code, message };
+  return {
+    status: "invalid",
+    field,
+    code,
+    explanation,
+    remedies,
+    message: composeRefusalMessage({ explanation, remedies }),
+  };
 }
 
 function malformedMessage(unit: LengthUnit): string {
@@ -104,6 +119,7 @@ function normalize(
       field,
       "measurement-out-of-range",
       `Enter a smaller measurement. The largest supported value is ${MAX_MEASUREMENT_MM} mm.`,
+      [],
     );
   }
   return {
@@ -120,7 +136,9 @@ function parseFraction(
 ): MeasurementParseResult {
   const match = FRACTION_PATTERN.exec(text);
   if (!match) {
-    return failure(field, "measurement-malformed", malformedMessage(unit));
+    return failure(field, "measurement-malformed", "", [
+      { action: "enter-value", text: malformedMessage(unit) },
+    ]);
   }
   // Fraction notation is an imperial convention; "1 1/2 mm" is far more likely
   // a mistake than an intent, so it is refused rather than guessed at.
@@ -128,7 +146,14 @@ function parseFraction(
     return failure(
       field,
       "measurement-fraction-requires-inches",
-      "Fractions are only accepted for inches. Enter a decimal value, or change the measurement unit to inches.",
+      "Fractions are only accepted for inches.",
+      [
+        { action: "enter-value", text: "Enter a decimal value." },
+        {
+          action: "change-unit",
+          text: "Change the measurement unit to inches.",
+        },
+      ],
     );
   }
   const [, sign, whole = "0", numerator, denominator] = match;
@@ -137,18 +162,25 @@ function parseFraction(
     numerator.length > MAX_FRACTION_TOKEN_DIGITS ||
     denominator.length > MAX_FRACTION_TOKEN_DIGITS
   ) {
-    return failure(
-      field,
-      "measurement-fraction-too-large",
-      `Keep each part of a fraction to ${MAX_FRACTION_TOKEN_DIGITS} digits or fewer.`,
-    );
+    return failure(field, "measurement-fraction-too-large", "", [
+      {
+        action: "enter-value",
+        text: `Keep each part of a fraction to ${MAX_FRACTION_TOKEN_DIGITS} digits or fewer.`,
+      },
+    ]);
   }
   const divisor = Number(denominator);
   if (divisor === 0) {
     return failure(
       field,
       "measurement-zero-denominator",
-      "A fraction cannot be divided by zero. Use a denominator such as 2, 4, 8, or 16.",
+      "A fraction cannot be divided by zero.",
+      [
+        {
+          action: "enter-value",
+          text: "Use a denominator such as 2, 4, 8, or 16.",
+        },
+      ],
     );
   }
   const magnitude = Number(whole) + Number(numerator) / divisor;
@@ -171,17 +203,15 @@ export function parseMeasurement(
 ): MeasurementParseResult {
   const text = input.text.trim();
   if (!text) {
-    return failure(field, "measurement-required", REQUIRED_MESSAGE);
+    return failure(field, "measurement-required", "", [ENTER_VALUE_REMEDY]);
   }
   if (text.includes("/")) {
     return parseFraction(field, text, input.unit);
   }
   if (!DECIMAL_PATTERN.test(text)) {
-    return failure(
-      field,
-      "measurement-malformed",
-      malformedMessage(input.unit),
-    );
+    return failure(field, "measurement-malformed", "", [
+      { action: "enter-value", text: malformedMessage(input.unit) },
+    ]);
   }
   return normalize(field, Number(text), input.unit, text, "decimal");
 }

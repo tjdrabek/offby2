@@ -211,6 +211,8 @@ export function resolveSheetLayout(
       refusals.push({
         field: result.field,
         code: result.code,
+        explanation: result.explanation,
+        remedies: result.remedies,
         message: result.message,
       });
     }

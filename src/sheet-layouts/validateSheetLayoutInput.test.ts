@@ -13,6 +13,7 @@ import {
   validateSheetLayoutInput,
 } from "./validateSheetLayoutInput";
 import { MAX_GRID_COUNT } from "./SheetGeometry";
+import { composeRefusalMessage } from "./refusalMessage";
 
 /** A complete, representable entry in millimetres with square corners. */
 function completeInput(): SheetLayoutSourceInput {
@@ -174,7 +175,7 @@ describe("validateSheetLayoutInput", () => {
       },
     };
 
-    expect(countIssues(withBlank)).toEqual([
+    expect(countIssues(withBlank)).toMatchObject([
       { field: "marginLeft", code: "required", message: "Enter a value." },
     ]);
     // The source text survives validation untouched.
@@ -228,7 +229,7 @@ describe("validateSheetLayoutInput", () => {
     for (const state of ["known", "estimated"] as const) {
       const input = withCornerRadiusState(completeInput(), state, "mm");
 
-      expect(countIssues(input)).toEqual([
+      expect(countIssues(input)).toMatchObject([
         {
           field: "cornerRadius",
           code: "required",
@@ -264,6 +265,25 @@ describe("validateSheetLayoutInput", () => {
       text: "210",
       unit: "in",
     });
+  });
+});
+
+describe("issue parts", () => {
+  it("composes the message from the explanation and remedies on every issue", () => {
+    const empty = countIssues(createEmptySheetLayoutInput());
+    const outOfRange = countIssues({
+      ...completeInput(),
+      counts: { rows: { text: "1" }, columns: { text: `${MAX_GRID_COUNT + 1}` } },
+    });
+
+    for (const found of [...empty, ...outOfRange]) {
+      expect(
+        composeRefusalMessage({
+          explanation: found.explanation,
+          remedies: found.remedies,
+        }),
+      ).toBe(found.message);
+    }
   });
 });
 

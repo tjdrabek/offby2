@@ -11,6 +11,7 @@ import {
   measurementsEqual,
 } from "./measurementUnits";
 import type { LengthUnit } from "./SheetLayoutInput";
+import { composeRefusalMessage } from "./refusalMessage";
 
 function parse(text: string, unit: LengthUnit = "mm") {
   return parseMeasurement("sheetWidth", { text, unit });
@@ -111,7 +112,7 @@ describe("parseMeasurement", () => {
       unit: "mm",
     });
 
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       status: "invalid",
       field: "labelHeight",
       code: "measurement-malformed",
@@ -182,4 +183,28 @@ describe("parseMeasurement", () => {
 
     expect(input).toEqual(snapshot);
   });
+
+  it.each<[string, LengthUnit]>([
+    ["", "mm"],
+    ["abc", "mm"],
+    ["1/2", "mm"],
+    ["1/0", "in"],
+    ["1".repeat(MAX_FRACTION_TOKEN_DIGITS + 1) + "/2", "in"],
+    [`${MAX_MEASUREMENT_MM + 1}`, "mm"],
+  ])(
+    "carries an explanation and remedies whose composition is the message for %s (%s)",
+    (text, unit) => {
+      const result = parseMeasurement("sheetWidth", { text, unit });
+      if (result.status !== "invalid") {
+        throw new Error("Expected a refusal.");
+      }
+
+      expect(
+        composeRefusalMessage({
+          explanation: result.explanation,
+          remedies: result.remedies,
+        }),
+      ).toBe(result.message);
+    },
+  );
 });
