@@ -50,6 +50,18 @@ export {
   type SheetLayoutIssueCode,
 } from "./sheet-layouts/validateSheetLayoutInput";
 
+// Composing a refusal's explanation and remedies into the prose a host shows
+// — or, for a host that can't honour every remedy, into what's left after it
+// filters the remedies list by action code.
+export {
+  ENTER_VALUE_REMEDY,
+  composeRefusalMessage,
+  composeRemedies,
+  type RefusalMessage,
+  type RefusalRemedy,
+  type RemedyActionCode,
+} from "./sheet-layouts/refusalMessage";
+
 export {
   geometryRefusalIssues,
   type SheetGeometryRefusal,
