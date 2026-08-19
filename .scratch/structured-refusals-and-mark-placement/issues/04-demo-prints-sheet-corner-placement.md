@@ -4,11 +4,17 @@
 
 **Blocked by:** 03 — `calibrationSheet()` takes a named mark placement.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] The calibration tab's plan comes from the package's calibration-sheet entry with the sheet-corner placement named; the demo constructs no plan of its own.
-- [ ] The replacement module and its fabricated grid coordinates are gone.
-- [ ] The printed sheet — marks, directions, and the single shared inset figure — is unchanged for the operator.
-- [ ] The demo's scene and focus suites adapt to consume the package's placement and pass; the demo ends with two fewer modules than the spec found it with (counting the message-surgery module from ticket 02).
+- [x] The calibration tab's plan comes from the package's calibration-sheet entry with the sheet-corner placement named; the demo constructs no plan of its own.
+- [x] The replacement module and its fabricated grid coordinates are gone.
+- [x] The printed sheet — marks, directions, and the single shared inset figure — is unchanged for the operator.
+- [x] The demo's scene and focus suites adapt to consume the package's placement and pass; the demo ends with two fewer modules than the spec found it with (counting the message-surgery module from ticket 02).
 
 ## Comments
+
+`App.tsx`'s calibration tab now calls the package's `calibrationSheet(geometry, "sheet-corner")` (imported aliased as `buildCalibrationSheet` to avoid shadowing the tab's own `calibrationSheet` memo). `lib/calibration/cornerMarks.ts` — the wholesale-replacement module that hand-built a `CalibrationSheetPlan` with meaningless grid coordinates — is deleted; `verify-calibration.mts` (a dev harness) and the scene/focus test suites now build their sheet-corner plans the same way, aliased as `sheetCornerPlan` in tests for clarity. `calibrationScene.ts` and every renderer downstream already took a generic `CalibrationSheetPlan`, so nothing there changed.
+
+One real fix, not just a rename: `targetReferences.ts` named each corner using distinct grid `row`/`column` values, which `sheet-corner` marks no longer carry (ticket 03 made them optional, sheet-corner sets them to neither). Corner naming now keys off distinct `intendedXMm`/`intendedYMm` values instead — the same answer as row/column ever gave for `corner-label-centre` marks, so this is a generalization, not a behaviour change, and is exercised by the same suites.
+
+Demo ends two modules lighter than the spec found it (`lib/messages.ts` from ticket 02, `lib/calibration/cornerMarks.ts` here). Full demo verification: typecheck, lint, 125/125 tests (including every calibration scene/focus suite, now against the package's own placement), and a clean production build.
