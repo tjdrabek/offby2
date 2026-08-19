@@ -31,16 +31,26 @@ spec name, typecheck and single test files regularly, the full suites once at
 the end, then `/mattpocock-skills:code-review` the work-in-progress diff
 against the ticket and fix what the review finds.
 
+Work checkbox by checkbox, and **commit as you go**: the moment an acceptance
+checkbox is genuinely satisfied (its tests green, typecheck clean), tick it
+in the ticket file and commit that slice — the code, its tests, and the
+ticked box together, Conventional Commits, one commit per repo touched. If
+the work for one checkbox is itself large, split it into smaller coherent
+commits (e.g. seam + tests first, call-site rewiring second, deletions
+third); every commit must leave the repo green. Never batch the whole ticket
+into one commit at the end.
+
 Every acceptance checkbox must be genuinely satisfied — including the
 "verified by running the demo" ones where present. If one cannot be
 satisfied, do not close the ticket: append what happened under a
-`## Comments` heading, leave the status alone, print
-`<promise>BLOCKED:` ticket and reason `</promise>` and stop.
+`## Comments` heading, leave the status alone, commit the checkboxes already
+completed, print `<promise>BLOCKED:` ticket and reason `</promise>` and stop.
 
 ## 3 · Close
 
-Tick every acceptance checkbox, set `**Status:** done`, and commit everything
-(Conventional Commits, one commit per repo touched, including the ticket file).
+With every checkbox ticked and committed, set `**Status:** done` and commit
+the closure (this final commit can also carry the full-suite verification —
+package and demo tests, typecheck, lint).
 
 ## 4 · Unblock check
 
