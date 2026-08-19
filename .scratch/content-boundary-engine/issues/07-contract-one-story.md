@@ -4,9 +4,9 @@
 
 **Blocked by:** 04 — The demo preview draws from the engine; 05 — Fit measurement agrees with the engine; 06 — The printable output holds the same lines.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Demo boundary module and test file deleted; no demo code computes a boundary
-- [ ] Old symmetric safe-area function reimplemented on the boundary or deprecated, so the package exposes one model
-- [ ] Engine docs use the CONTEXT.md vocabulary (hold-in line, content boundary, edge cut-off allowance)
-- [ ] Full package and demo typecheck, lint, tests, and builds green
+- [x] Demo boundary module and test file deleted; no demo code computes a boundary
+- [x] Old symmetric safe-area function reimplemented on the boundary or deprecated, so the package exposes one model
+- [x] Engine docs use the CONTEXT.md vocabulary (hold-in line, content boundary, edge cut-off allowance)
+- [x] Full package and demo typecheck, lint, tests, and builds green
