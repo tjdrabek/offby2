@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-- [ ] `offby2/web` entry point published from the package with the CSS var map and the readback shim
+- [x] `offby2/web` entry point published from the package with the CSS var map and the readback shim
 - [x] Quarter-turn reassignment and agreement judgement live in the core, tested with plain objects
 - [x] CSS custom-property names documented as package interface
 - [x] Example tests assert the var map for a few boundaries; no jsdom introduced anywhere in the package

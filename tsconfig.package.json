@@ -27,6 +27,7 @@
     "src/index.ts",
     "src/fields.ts",
     "src/calibration.ts",
-    "src/presets.ts"
+    "src/presets.ts",
+    "src/web.ts"
   ]
 }

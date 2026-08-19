@@ -21,3 +21,11 @@ export {
   lineCssVarNames,
   type ContentBoundaryCssVars,
 } from "./web/contentBoundaryCssVars";
+
+// Verifying: numbers gathered from a rendered element, for the core's
+// `judgeBoundaryAgreement` to judge.
+export {
+  boundaryReadback,
+  type ReadbackFrame,
+  type ReadbackPart,
+} from "./web/boundaryReadback";

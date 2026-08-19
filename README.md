@@ -57,6 +57,7 @@ The package is split by job, so a consumer imports only what they are building:
 | `offby2/fields` | Building an entry form: field definitions, units, parsing and formatting entries. |
 | `offby2/calibration` | Measuring where a printing setup puts content, and correcting for it. |
 | `offby2/presets` | Published figures for common label products and standard sheet sizes. |
+| `offby2/web` | Browser conveniences: the boundary's CSS custom-property map (`--offby2-boundary-x`/`-y`, `--offby2-line-<name>-x`/`-y`, percent of frame extent) and the element readback shim for the pixel agreement check. |
 
 ## The shapes it creates
 

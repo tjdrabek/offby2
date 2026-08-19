@@ -24,6 +24,10 @@
     "./presets": {
       "types": "./lib/presets.d.ts",
       "default": "./lib/presets.js"
+    },
+    "./web": {
+      "types": "./lib/web.d.ts",
+      "default": "./lib/web.js"
     }
   },
   "publishConfig": {
