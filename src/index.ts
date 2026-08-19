@@ -74,7 +74,6 @@ export {
 export {
   labelCount,
   labelPositions,
-  safeArea,
   sheetExtent,
   type LabelPosition,
 } from "./sheet-layouts/labelPositions";

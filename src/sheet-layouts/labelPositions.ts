@@ -102,42 +102,6 @@ export function labelCount(geometry: SheetGeometry): number {
   return geometry.grid.rows * geometry.grid.columns;
 }
 
-/**
- * The region inside a label boundary that content must stay within, given an
- * alignment tolerance and an optional content inset.
- *
- * The two are additive and independent by design: the tolerance is what the
- * printing setup cannot guarantee, the inset is what the composition chooses.
- * Collapsing them into one number loses the ability to say which one is
- * responsible when content will not fit.
- *
- * @deprecated The additive model this computes contradicts the content
- * boundary's rule that hold-in lines do not add. Pass the tolerance and the
- * inset to `contentBoundary` as named hold-in lines instead; this function
- * will be reimplemented on the boundary or removed once the demo no longer
- * calls it.
- */
-export function safeArea(
-  position: LabelPosition,
-  alignmentToleranceMm: number,
-  contentInsetMm = 0,
-): { xMm: number; yMm: number; widthMm: number; heightMm: number } | null {
-  const inset = alignmentToleranceMm + contentInsetMm;
-  const widthMm = position.widthMm - inset * 2;
-  const heightMm = position.heightMm - inset * 2;
-  // A tolerance wider than the label leaves nothing to place content in. That
-  // is a real answer about the printing setup, not a zero-sized rectangle.
-  if (widthMm <= 0 || heightMm <= 0) {
-    return null;
-  }
-  return {
-    xMm: position.xMm + inset,
-    yMm: position.yMm + inset,
-    widthMm,
-    heightMm,
-  };
-}
-
 /** The sheet's own extent, for a renderer sizing its canvas or viewBox. */
 export function sheetExtent(geometry: SheetGeometry): {
   widthMm: Millimetres;

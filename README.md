@@ -245,19 +245,23 @@ axis equations — `result.layout.derivations` says what was worked out.
 ## Placing content that fits
 
 A `resolved` result is everything a renderer needs. `labelPositions` says
-where each label is; `safeArea` shrinks that to the region content must stay
-inside, given what the printing setup cannot guarantee (alignment tolerance)
-and what the composition chooses (an optional content inset). Content sized to
-the safe area still lands on the label even when the print drifts by the full
-tolerance:
+where each label is; `contentBoundary` answers where content stops inside
+it — the content boundary. Several things hold content in from the label
+edge (an alignment tolerance, an edge cut-off allowance, a design's own
+content inset); they do not add. Each is a named hold-in line, and content
+stops at whichever line sits furthest in, per axis:
 
 ```tsx
-import { labelPositions, safeArea, sheetExtent } from "offby2";
-import type { ResolvedSheetLayout } from "offby2";
+import { contentBoundary, labelPositions, sheetExtent } from "offby2";
+import type { HoldInLine, ResolvedSheetLayout } from "offby2";
 
 // What your printing setup cannot guarantee. 1 mm is a fair uncalibrated
 // default; a confirmed PrinterProfile is the evidence for a smaller number.
-const ALIGNMENT_TOLERANCE_MM = 1;
+const ALIGNMENT_TOLERANCE: HoldInLine = {
+  axes: "sheet",
+  xMm: 1,
+  yMm: 1,
+};
 
 export function SheetWithContent({ layout }: { layout: ResolvedSheetLayout }) {
   const sheet = sheetExtent(layout.geometry);
@@ -265,10 +269,10 @@ export function SheetWithContent({ layout }: { layout: ResolvedSheetLayout }) {
     // millimetre viewBox: every package value is usable as-is, no scaling math.
     <svg viewBox={`0 0 ${sheet.widthMm} ${sheet.heightMm}`}>
       {labelPositions(layout.geometry).map((label) => {
-        const safe = safeArea(label, ALIGNMENT_TOLERANCE_MM);
-        // null means the tolerance ate the whole label — a real answer about
-        // the printing setup, not a zero-sized box. Skip, or warn the user.
-        if (!safe) return null;
+        const boundary = contentBoundary(
+          { tolerance: ALIGNMENT_TOLERANCE },
+          { orientation: "upright", widthMm: label.widthMm, heightMm: label.heightMm },
+        );
         return (
           <g key={label.index}>
             <rect
@@ -277,8 +281,13 @@ export function SheetWithContent({ layout }: { layout: ResolvedSheetLayout }) {
               rx={label.cornerRadiusMm ?? 0}
               fill="none" stroke="currentColor" strokeWidth={0.2}
             />
-            {/* Anything constrained to the safe rectangle is guaranteed to fit. */}
-            <foreignObject x={safe.xMm} y={safe.yMm} width={safe.widthMm} height={safe.heightMm}>
+            {/* Anything constrained to the content boundary is guaranteed to fit. */}
+            <foreignObject
+              x={label.xMm + boundary.xMm}
+              y={label.yMm + boundary.yMm}
+              width={label.widthMm - boundary.xMm * 2}
+              height={label.heightMm - boundary.yMm * 2}
+            >
               <div style={{ overflow: "hidden", width: "100%", height: "100%" }}>
                 Label {label.index + 1}
               </div>
@@ -291,10 +300,10 @@ export function SheetWithContent({ layout }: { layout: ResolvedSheetLayout }) {
 }
 ```
 
-The same numbers drive a PDF writer: `LabelPosition` and the safe area are
-plain millimetres from the sheet's top-left corner, and a calibrated setup
-passes its profile — `labelPositions(geometry, profile)` — to shift every
-position by the measured correction before rendering.
+The same numbers drive a PDF writer: `LabelPosition` and the content boundary
+are plain millimetres from the label's own top-left corner, and a calibrated
+setup passes its profile — `labelPositions(geometry, profile)` — to shift
+every position by the measured correction before rendering.
 
 ## Starting from a preset: `offby2/presets`
 

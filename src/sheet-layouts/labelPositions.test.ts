@@ -1,11 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { millimetres, type SheetGeometry } from "./SheetGeometry";
-import {
-  labelCount,
-  labelPositions,
-  safeArea,
-  sheetExtent,
-} from "./labelPositions";
+import { labelCount, labelPositions, sheetExtent } from "./labelPositions";
 
 /** A 2 x 3 sheet with distinct label and gap sizes, so axes cannot be confused. */
 function geometry(overrides: Partial<SheetGeometry> = {}): SheetGeometry {
@@ -92,31 +87,3 @@ describe("labelPositions", () => {
   });
 });
 
-describe("safeArea", () => {
-  const position = labelPositions(geometry())[0];
-
-  it("insets by the tolerance alone when no inset is chosen", () => {
-    expect(safeArea(position, 1)).toEqual({
-      xMm: 11,
-      yMm: 6,
-      widthMm: 18,
-      heightMm: 28,
-    });
-  });
-
-  it("adds the content inset to the tolerance", () => {
-    expect(safeArea(position, 1, 2)).toEqual({
-      xMm: 13,
-      yMm: 8,
-      widthMm: 14,
-      heightMm: 24,
-    });
-  });
-
-  it("returns null when the insets leave nothing to place content in", () => {
-    // 20 mm wide, inset 10 mm each side: there is no region, and a zero-sized
-    // rectangle would be a claim that there is.
-    expect(safeArea(position, 10)).toBeNull();
-    expect(safeArea(position, 6, 4)).toBeNull();
-  });
-});
