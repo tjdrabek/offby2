@@ -4,7 +4,7 @@
 
 **Blocked by:** 01 — The content boundary answers in the engine's main entry.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] `offby2/web` entry point published from the package with the CSS var map and the readback shim
 - [x] Quarter-turn reassignment and agreement judgement live in the core, tested with plain objects
