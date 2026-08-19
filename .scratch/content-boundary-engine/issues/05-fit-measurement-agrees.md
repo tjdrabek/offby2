@@ -4,9 +4,9 @@
 
 **Blocked by:** 03 — The web conveniences ship.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Fit measurement consumes the engine's readback judgement instead of its own computed-style reassignment
 - [x] The demo carries no padding-to-screen-edge mapping of its own
-- [ ] Overflow refusals behave as before for upright designs and correctly for sideways designs with unequal paddings (verified by running the demo)
-- [ ] Demo typecheck and build green
+- [x] Overflow refusals behave as before for upright designs and correctly for sideways designs with unequal paddings (verified by running the demo)
+- [x] Demo typecheck and build green
