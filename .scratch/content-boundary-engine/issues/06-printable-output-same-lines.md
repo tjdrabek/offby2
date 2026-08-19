@@ -4,9 +4,9 @@
 
 **Blocked by:** 01 — The content boundary answers in the engine's main entry; 02 — Edge cut-off becomes an engine line producer.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Print options build their PDF inputs from a single engine boundary call
-- [ ] The PDF path applies no clamp of its own — the engine's held answer is used as-is
-- [ ] A printed sheet places content identically to before for upright and sideways designs (verified against a downloaded PDF)
-- [ ] Demo typecheck and build green
+- [x] Print options build their PDF inputs from a single engine boundary call
+- [x] The PDF path applies no clamp of its own — the engine's held answer is used as-is
+- [x] A printed sheet places content identically to before for upright and sideways designs (verified against a downloaded PDF)
+- [x] Demo typecheck and build green
