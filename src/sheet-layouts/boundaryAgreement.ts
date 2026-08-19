@@ -76,13 +76,16 @@ export interface BoundaryAgreement {
   axis: "width" | "height" | "both" | "none";
 }
 
-/** The judgement when everything sits where the boundary allows. */
-export const AGREES: BoundaryAgreement = {
+/**
+ * The judgement when everything sits where the boundary allows. Frozen,
+ * because every agreeing judgement is this one object.
+ */
+export const AGREES: BoundaryAgreement = Object.freeze({
   agrees: true,
   overflowPx: 0,
   overflowRatio: 0,
   axis: "none",
-};
+});
 
 /** Sub-pixel slack, so rounding alone never reads as an overflow. */
 export const SUBPIXEL_TOLERANCE_PX = 0.75;
