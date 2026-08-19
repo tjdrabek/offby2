@@ -155,6 +155,38 @@ describe("validateSheetGeometry", () => {
   });
 
   describe("extent refusals", () => {
+    it("refuses a horizontal gap on a single-column sheet", () => {
+      // 210 = 7.25 + 1 x 195.5 + 7.25 reconciles; the gap is the one claim
+      // the sheet cannot carry, and the vanished term would never catch it.
+      const [refusal, ...rest] = refusalsOf(
+        sheet({ columns: 1, labelWidth: 195.5, horizontalGap: 2.5 }),
+      );
+
+      expect(refusal.code).toBe("geometry-gap-single-count");
+      expect(refusal.fields).toEqual(["horizontalGap", "columns"]);
+      expect(refusal.message).toContain("single column");
+      expect(rest).toEqual([]);
+    });
+
+    it("refuses a vertical gap on a single-row sheet", () => {
+      const [refusal] = refusalsOf(
+        sheet({ rows: 1, labelHeight: 266.7, verticalGap: 2 }),
+      );
+
+      expect(refusal.code).toBe("geometry-gap-single-count");
+      expect(refusal.fields).toEqual(["verticalGap", "rows"]);
+    });
+
+    it("accepts a zero gap on a single-column sheet", () => {
+      const geometry = sheet({
+        columns: 1,
+        labelWidth: 195.5,
+        horizontalGap: 0,
+      });
+
+      expect(validateSheetGeometry(geometry)).toEqual({ status: "valid" });
+    });
+
     it("refuses a negative gap as the overlap it produces", () => {
       const [refusal, ...rest] = refusalsOf(
         sheet({ horizontalGap: -2, marginLeft: 16.25, marginRight: 3.25 }),
@@ -223,7 +255,7 @@ describe("validateSheetGeometry", () => {
       expect(codesOf(sheet({ sheetWidth: 210 + 1e-9 }))).toEqual([]);
     });
 
-    it("accepts a single row and column, where no gap applies", () => {
+    it("refuses both gaps of a single-label sheet, one per axis", () => {
       expect(
         codesOf(
           sheet({
@@ -235,7 +267,20 @@ describe("validateSheetGeometry", () => {
             verticalGap: 4,
           }),
         ),
-      ).toEqual([]);
+      ).toEqual(["geometry-gap-single-count", "geometry-gap-single-count"]);
+    });
+
+    it("accepts a single row and column once its gaps are zero", () => {
+      const geometry = sheet({
+        rows: 1,
+        columns: 1,
+        labelWidth: 195.5,
+        labelHeight: 266.7,
+        horizontalGap: 0,
+        verticalGap: 0,
+      });
+
+      expect(validateSheetGeometry(geometry)).toEqual({ status: "valid" });
     });
   });
 

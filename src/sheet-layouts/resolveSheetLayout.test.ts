@@ -113,18 +113,31 @@ describe("resolveSheetLayout", () => {
     expect(result.layout.derivations[0].axis).toBe("horizontal");
   });
 
+  it("derives a blank single-column gap as 0", () => {
+    // 210 = 10 + 1 x 190 + 0 x gap + 10: one column has no gap, and leaving
+    // the field blank resolves to the 0 that describes that.
+    const result = resolveSheetLayout(
+      sheet({ horizontalGap: "", labelWidth: "190" }, { columns: "1" }),
+    );
+    if (result.status !== "resolved") {
+      throw new Error("Expected the single-column gap to derive as 0.");
+    }
+
+    expect(result.layout.measurements.horizontalGap.valueMm).toBe(0);
+  });
+
   it("reports a refused derivation against the field it belongs to", () => {
     const result = resolveSheetLayout(
       sheet({ horizontalGap: "" }, { columns: "1" }),
     );
     if (result.status !== "unresolved") {
-      throw new Error("Expected the un-derivable gap to stay unresolved.");
+      throw new Error("Expected the irreconcilable axis to stay unresolved.");
     }
 
     expect(result.issues).toHaveLength(1);
     expect(result.issues[0]).toMatchObject({
       field: "horizontalGap",
-      code: "derivation-not-unique",
+      code: "derivation-unreconciled",
     });
     // The bare "Enter a value." is replaced by the reason it cannot be supplied.
     expect(result.issues[0].message).not.toBe("Enter a value.");

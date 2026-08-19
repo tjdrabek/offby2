@@ -57,6 +57,7 @@ export type SheetGeometryRefusalCode =
   | "geometry-negative"
   | "geometry-not-positive"
   | "geometry-count-unusable"
+  | "geometry-gap-single-count"
   | "geometry-labels-overlap"
   | "geometry-labels-outside-sheet"
   | "geometry-extent-contradiction"
@@ -278,6 +279,17 @@ function checkAxis(
   const fields = axisFields(equation);
   const noun = COUNT_SINGULAR[equation.count];
   const tracks = labelTracks(leading, size, gap, count);
+
+  // A single row or column leaves no gap on the axis at all, so a nonzero
+  // value describes a distance the sheet does not contain — and the equation,
+  // in which the term carries a zero coefficient, could never catch it.
+  if (count === 1 && Math.abs(gap) > tolerance) {
+    return refusal(
+      "geometry-gap-single-count",
+      [equation.gap, equation.count],
+      `${measurementFieldLabel(equation.gap)} is ${mm(gap)}, but with a single ${noun} there is no gap between labels on this axis. Enter 0, or leave it blank and it is derived as 0.`,
+    );
+  }
 
   for (let index = 0; index + 1 < tracks.length; index += 1) {
     const overlap = tracks[index].endMm - tracks[index + 1].startMm;

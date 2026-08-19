@@ -174,15 +174,29 @@ describe("deriveMissingDimension", () => {
     });
   });
 
-  it("refuses a gap that a single column removes from the equation", () => {
+  it("derives 0 for the gap a single column removes from the equation", () => {
+    // 210 = 10 + 1 x 190 + 0 x gap + 10: the axis reconciles without the
+    // term, and 0 is the only value describing a sheet with no such gap.
+    const result = derive(
+      "horizontalGap",
+      { labelWidth: "190" },
+      { columns: "1" },
+    );
+    if (result.status !== "derived") {
+      throw new Error(`Expected a derivation, got ${result.status}.`);
+    }
+
+    expect(result.derivation.valueMm).toBe(0);
+  });
+
+  it("still refuses the single-column gap when the axis does not reconcile", () => {
     const result = derive("horizontalGap", {}, { columns: "1" });
     if (result.status !== "refused") {
       throw new Error(`Expected a refusal, got ${result.status}.`);
     }
 
-    expect(result.code).toBe("derivation-not-unique");
+    expect(result.code).toBe("derivation-unreconciled");
     expect(result.field).toBe("horizontalGap");
-    expect(result.message).toMatch(/cannot be derived/);
   });
 
   it("still derives a label size when there is a single column", () => {

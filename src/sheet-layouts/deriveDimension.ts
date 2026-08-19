@@ -104,7 +104,6 @@ export function axisEquationFor(field: MeasurementFieldId): AxisEquation {
 }
 
 export type DerivationRefusalCode =
-  | "derivation-not-unique"
   | "derivation-not-finite"
   | "derivation-negative"
   | "derivation-out-of-range"
@@ -279,16 +278,6 @@ function solve(
   const field = equation[term];
   const label = measurementFieldLabel(field);
   const coefficient = coefficientOf(term, count);
-  if (coefficient === 0) {
-    return refusal(
-      field,
-      equation.axis,
-      "derivation-not-unique",
-      `With a single ${COUNT_SINGULAR[equation.count]} there is no gap between labels, so ${label} does not appear in the sheet equation and cannot be derived.`,
-      [ENTER_VALUE_REMEDY],
-    );
-  }
-
   const withoutTerm: AxisValues = {
     extent: known.extent ?? 0,
     leading: known.leading ?? 0,
@@ -297,10 +286,17 @@ function solve(
     trailing: known.trailing ?? 0,
     [term]: 0,
   };
+  // A zero coefficient is the gap on a single-row or single-column axis: the
+  // term vanishes from the equation because the sheet has no such gap. Zero
+  // is the only value that describes that, so it is derived as exactly zero
+  // — the residual check below still holds the rest of the axis to account.
   const solved =
-    term === "extent"
-      ? rightHandSide(withoutTerm, count)
-      : (withoutTerm.extent - rightHandSide(withoutTerm, count)) / coefficient;
+    coefficient === 0
+      ? 0
+      : term === "extent"
+        ? rightHandSide(withoutTerm, count)
+        : (withoutTerm.extent - rightHandSide(withoutTerm, count)) /
+          coefficient;
 
   if (!Number.isFinite(solved)) {
     return refusal(
