@@ -24,11 +24,11 @@ import {
   COUNT_SINGULAR,
   axisEquationText,
   type AxisEquation,
-} from "./deriveDimension";
+} from "./deriveDimension.js";
 import {
   MEASUREMENT_TOLERANCE_MM,
   formatMillimetres,
-} from "./measurementUnits";
+} from "./measurementUnits.js";
 import {
   MAX_GRID_COUNT,
   MIN_GRID_COUNT,
@@ -36,20 +36,20 @@ import {
   isGridCount,
   millimetres,
   type SheetGeometry,
-} from "./SheetGeometry";
+} from "./SheetGeometry.js";
 import {
   COUNT_FIELDS,
   measurementFieldLabel,
   type CountFieldId,
   type MeasurementFieldId,
   type SheetLayoutFieldId,
-} from "./SheetLayoutInput";
+} from "./SheetLayoutInput.js";
 import {
   SUPPORTED_MEDIA_KIND,
   describeUnsupportedMedia,
   unsupportedMediaMessage,
-} from "./supportedMedia";
-import type { SheetLayoutIssue } from "./validateSheetLayoutInput";
+} from "./supportedMedia.js";
+import type { SheetLayoutIssue } from "./validateSheetLayoutInput.js";
 
 export type SheetGeometryRefusalCode =
   | "geometry-unsupported-media"

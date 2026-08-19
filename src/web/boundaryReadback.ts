@@ -12,8 +12,8 @@
 import type {
   BoundaryReadback,
   EdgesPx,
-} from "../sheet-layouts/boundaryAgreement";
-import type { DesignFrame } from "../sheet-layouts/contentBoundary";
+} from "../sheet-layouts/boundaryAgreement.js";
+import type { DesignFrame } from "../sheet-layouts/contentBoundary.js";
 
 /** The slice of an element a part reading needs. Any DOM element fits. */
 export interface ReadbackPart {

@@ -5,8 +5,8 @@ import {
   withCornerRadiusState,
   type MeasurementFieldId,
   type SheetLayoutSourceInput,
-} from "./SheetLayoutInput";
-import { resolveSheetLayout } from "./resolveSheetLayout";
+} from "./SheetLayoutInput.js";
+import { resolveSheetLayout } from "./resolveSheetLayout.js";
 
 /** Horizontal: 210 = 10 + 3 × 60 + 2 × 5 + 10. Vertical: 297 = 9.5 + 7 × 38 + 6 × 2 + 9.5. */
 const CONSISTENT: Record<MeasurementFieldId, string> = {

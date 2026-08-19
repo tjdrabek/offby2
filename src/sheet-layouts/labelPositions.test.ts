@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { millimetres, type SheetGeometry } from "./SheetGeometry";
-import { labelCount, labelPositions, sheetExtent } from "./labelPositions";
+import { millimetres, type SheetGeometry } from "./SheetGeometry.js";
+import { labelCount, labelPositions, sheetExtent } from "./labelPositions.js";
 
 /** A 2 x 3 sheet with distinct label and gap sizes, so axes cannot be confused. */
 function geometry(overrides: Partial<SheetGeometry> = {}): SheetGeometry {

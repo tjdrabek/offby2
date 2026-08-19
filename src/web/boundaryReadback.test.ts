@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { boundaryReadback, type ReadbackFrame, type ReadbackPart } from "../web";
+import { boundaryReadback, type ReadbackFrame, type ReadbackPart } from "../web.js";
 
 /** A stand-in element: the shim's structural slice, no DOM anywhere. */
 const fakePart = (

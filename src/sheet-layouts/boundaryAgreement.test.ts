@@ -6,7 +6,7 @@ import {
   onScreenEdges,
   type BoundaryReadback,
   type EdgesPx,
-} from "../index";
+} from "../index.js";
 
 const edges = (
   topPx: number,

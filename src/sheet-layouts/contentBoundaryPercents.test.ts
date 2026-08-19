@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { contentBoundary, contentBoundaryPercents } from "../index";
-import type { DesignFrame, HoldInLine } from "../index";
+import { contentBoundary, contentBoundaryPercents } from "../index.js";
+import type { DesignFrame, HoldInLine } from "../index.js";
 
 const frame: DesignFrame = {
   orientation: "upright",

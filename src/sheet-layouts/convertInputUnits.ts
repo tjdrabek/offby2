@@ -7,8 +7,8 @@
  * module is the other behaviour: the same sheet, shown in a different unit.
  */
 
-import { roundedMeasurementText } from "./measurementUnits";
-import { parseMeasurement } from "./parseMeasurement";
+import { roundedMeasurementText } from "./measurementUnits.js";
+import { parseMeasurement } from "./parseMeasurement.js";
 import {
   MEASUREMENT_FIELDS,
   cornerRadiusValue,
@@ -19,7 +19,7 @@ import {
   type MeasurementInput,
   type SheetLayoutFieldId,
   type SheetLayoutSourceInput,
-} from "./SheetLayoutInput";
+} from "./SheetLayoutInput.js";
 
 /**
  * Rewrites one entry in a new unit, at the precision a person types at.

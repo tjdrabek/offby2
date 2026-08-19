@@ -4,14 +4,14 @@ import {
   createEmptySheetLayoutInput,
   type MeasurementFieldId,
   type SheetLayoutSourceInput,
-} from "./SheetLayoutInput";
+} from "./SheetLayoutInput.js";
 import {
   AXIS_EQUATIONS,
   axisEquationFor,
   deriveMissingDimension,
-} from "./deriveDimension";
-import { MAX_GRID_COUNT } from "./SheetGeometry";
-import { composeRefusalMessage } from "./refusalMessage";
+} from "./deriveDimension.js";
+import { MAX_GRID_COUNT } from "./SheetGeometry.js";
+import { composeRefusalMessage } from "./refusalMessage.js";
 
 /**
  * A sheet whose entries satisfy both axis equations exactly, so removing any

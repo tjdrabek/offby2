@@ -6,14 +6,14 @@ import {
   withMeasurementUnit,
   type LengthUnit,
   type SheetLayoutSourceInput,
-} from "./SheetLayoutInput";
-import { measurementsEqual } from "./measurementUnits";
+} from "./SheetLayoutInput.js";
+import { measurementsEqual } from "./measurementUnits.js";
 import {
   issuesByField,
   validateSheetLayoutInput,
-} from "./validateSheetLayoutInput";
-import { MAX_GRID_COUNT } from "./SheetGeometry";
-import { composeRefusalMessage } from "./refusalMessage";
+} from "./validateSheetLayoutInput.js";
+import { MAX_GRID_COUNT } from "./SheetGeometry.js";
+import { composeRefusalMessage } from "./refusalMessage.js";
 
 /** A complete, representable entry in millimetres with square corners. */
 function completeInput(): SheetLayoutSourceInput {

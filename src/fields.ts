@@ -17,7 +17,7 @@ export {
   type CountFieldDefinition,
   type MeasurementFieldDefinition,
   type MeasurementGroup,
-} from "./sheet-layouts/SheetLayoutInput";
+} from "./sheet-layouts/SheetLayoutInput.js";
 
 // Units, and switching an input between them.
 export {
@@ -26,10 +26,10 @@ export {
   lengthUnitSuffix,
   withMeasurementUnit,
   type LengthUnitOption,
-} from "./sheet-layouts/SheetLayoutInput";
+} from "./sheet-layouts/SheetLayoutInput.js";
 
 // Converting the values, not just the label: the same sheet in a new unit.
-export { convertInputUnits } from "./sheet-layouts/convertInputUnits";
+export { convertInputUnits } from "./sheet-layouts/convertInputUnits.js";
 
 // Corner radius: a four-state disclosure, not a nullable number.
 export {
@@ -38,7 +38,7 @@ export {
   cornerRadiusValue,
   withCornerRadiusState,
   type CornerRadiusStateOption,
-} from "./sheet-layouts/SheetLayoutInput";
+} from "./sheet-layouts/SheetLayoutInput.js";
 
 // Reading one entry, for validating a field as it is typed.
 export {
@@ -49,7 +49,7 @@ export {
   type MeasurementParseResult,
   type MeasurementSourceDisclosure,
   type ParsedMeasurement,
-} from "./sheet-layouts/parseMeasurement";
+} from "./sheet-layouts/parseMeasurement.js";
 
 // Grid counts: reading and bounding the integer entries.
 export {
@@ -57,7 +57,7 @@ export {
   MIN_GRID_COUNT,
   isGridCount,
   parseGridCountText,
-} from "./sheet-layouts/SheetGeometry";
+} from "./sheet-layouts/SheetGeometry.js";
 
 // Showing a normalized value back to the operator.
 export {
@@ -67,4 +67,4 @@ export {
   losslessMeasurementText,
   measurementsEqual,
   roundedMeasurementText,
-} from "./sheet-layouts/measurementUnits";
+} from "./sheet-layouts/measurementUnits.js";

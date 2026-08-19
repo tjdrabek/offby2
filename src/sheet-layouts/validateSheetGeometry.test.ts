@@ -6,15 +6,15 @@ import {
   labelTracks,
   validateSheetGeometry,
   type SheetGeometryRefusal,
-} from "./validateSheetGeometry";
+} from "./validateSheetGeometry.js";
 import {
   MAX_GRID_COUNT,
   type CornerRadiusDisclosure,
   type Millimetres,
   type SheetGeometry,
-} from "./SheetGeometry";
-import type { MeasurementFieldId } from "./SheetLayoutInput";
-import { measurementFrom } from "./measurementUnits";
+} from "./SheetGeometry.js";
+import type { MeasurementFieldId } from "./SheetLayoutInput.js";
+import { measurementFrom } from "./measurementUnits.js";
 
 /**
  * An A4 sheet of 21 labels. Both axis equations balance exactly:

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { millimetres, type SheetGeometry } from "../sheet-layouts/SheetGeometry";
-import { planCalibrationSheet } from "./planCalibrationSheet";
+import { millimetres, type SheetGeometry } from "../sheet-layouts/SheetGeometry.js";
+import { planCalibrationSheet } from "./planCalibrationSheet.js";
 
 function geometry(overrides: Partial<SheetGeometry> = {}): SheetGeometry {
   return {

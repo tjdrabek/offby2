@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { contentBoundary, millimetres } from "../index";
+import { contentBoundary, millimetres } from "../index.js";
 import {
   CUTOFF_LINES,
   NO_CUTOFF_COUNTS,
@@ -7,7 +7,7 @@ import {
   cutoffWarnings,
   edgeCutoffAllowance,
   edgeCutoffLadder,
-} from "../calibration";
+} from "../calibration.js";
 
 describe("cutoffMm", () => {
   it("reads a missing line as one step of blank paper", () => {

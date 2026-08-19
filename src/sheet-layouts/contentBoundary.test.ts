@@ -3,7 +3,7 @@ import {
   contentBoundary,
   type DesignFrame,
   type HoldInLine,
-} from "../index";
+} from "../index.js";
 
 /** An upright frame roomy enough that the half-extent clamp never bites. */
 const roomyFrame: DesignFrame = {

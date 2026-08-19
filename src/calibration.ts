@@ -15,14 +15,14 @@ export {
   type CalibrationSheetPlan,
   type CalibrationTarget,
   type MarkPlacement,
-} from "./calibration/planCalibrationSheet";
+} from "./calibration/planCalibrationSheet.js";
 
 // What the operator reports back.
 export {
   type CalibrationObservationSet,
   type ObservationProvenance,
   type TargetObservation,
-} from "./calibration/PlacementObservation";
+} from "./calibration/PlacementObservation.js";
 
 // Deriving a profile from the evidence, or refusing to.
 export {
@@ -33,7 +33,7 @@ export {
   type CalibrationRefusalCode,
   type DerivePrinterProfileInput,
   type PrinterProfileDerivation,
-} from "./calibration/derivePrinterProfile";
+} from "./calibration/derivePrinterProfile.js";
 
 // Using the profile: correcting points, checking it still applies.
 export {
@@ -42,7 +42,7 @@ export {
   type PlacementTranslation,
   type PrinterProfile,
   type ProfileEvidence,
-} from "./calibration/PrinterProfile";
+} from "./calibration/PrinterProfile.js";
 
 // Reading where the printing setup stops printing: the edge cut-off ladder.
 export {
@@ -60,4 +60,4 @@ export {
   type CutoffLadderLineMm,
   type CutoffWarning,
   type SheetEdge,
-} from "./calibration/edgeCutoff";
+} from "./calibration/edgeCutoff.js";

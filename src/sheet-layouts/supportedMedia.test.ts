@@ -4,7 +4,7 @@ import {
   UNSUPPORTED_MEDIA,
   describeUnsupportedMedia,
   unsupportedMediaMessage,
-} from "./supportedMedia";
+} from "./supportedMedia.js";
 
 describe("supportedMedia", () => {
   it("treats the one uniform-grid kind as supported", () => {

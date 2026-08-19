@@ -18,19 +18,19 @@
  * This module is pure: it imports no React, DOM, IndexedDB, or PDF API.
  */
 
-import type { SheetLayoutRevisionRef } from "./../sheet-layouts/SheetLayoutRevisionRef";
-import type { CalibrationSheetPlan } from "./planCalibrationSheet";
+import type { SheetLayoutRevisionRef } from "./../sheet-layouts/SheetLayoutRevisionRef.js";
+import type { CalibrationSheetPlan } from "./planCalibrationSheet.js";
 import {
   allPhysical,
   distinctSheetCount,
   observationOf,
   type CalibrationObservationSet,
-} from "./PlacementObservation";
+} from "./PlacementObservation.js";
 import type {
   PlacementTranslation,
   PrinterProfile,
   ProfileEvidence,
-} from "./PrinterProfile";
+} from "./PrinterProfile.js";
 
 export interface CalibrationPolicy {
   /**

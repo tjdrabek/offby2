@@ -15,8 +15,8 @@
  * This module is pure: it imports no React, DOM, IndexedDB, or PDF API.
  */
 
-import { millimetres, type Millimetres } from "./SheetGeometry";
-import { lengthUnitSuffix, type LengthUnit } from "./SheetLayoutInput";
+import { millimetres, type Millimetres } from "./SheetGeometry.js";
+import { lengthUnitSuffix, type LengthUnit } from "./SheetLayoutInput.js";
 
 /** Exact by definition of the international inch. */
 export const MM_PER_INCH = 25.4;

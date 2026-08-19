@@ -11,11 +11,11 @@ export {
   SHEET_LAYOUT_PRESETS,
   sheetLayoutPreset,
   type SheetLayoutPreset,
-} from "./sheet-layouts/presets";
+} from "./sheet-layouts/presets.js";
 
 export {
   STANDARD_SHEET_SIZES,
   matchStandardSheetSize,
   standardSheetSize,
   type StandardSheetSize,
-} from "./sheet-layouts/standardSheetSizes";
+} from "./sheet-layouts/standardSheetSizes.js";

@@ -14,7 +14,7 @@ import type {
   LengthUnit,
   MeasurementFieldId,
   SheetLayoutSourceInput,
-} from "./SheetLayoutInput";
+} from "./SheetLayoutInput.js";
 
 export interface SheetLayoutPreset {
   id: string;

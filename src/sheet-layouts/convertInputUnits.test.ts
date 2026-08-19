@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { convertInputUnits } from "./convertInputUnits";
+import { convertInputUnits } from "./convertInputUnits.js";
 import {
   losslessMeasurementText,
   measurementFrom,
   measurementsEqual,
   toMillimetres,
-} from "./measurementUnits";
-import { createEmptySheetLayoutInput } from "./SheetLayoutInput";
+} from "./measurementUnits.js";
+import { createEmptySheetLayoutInput } from "./SheetLayoutInput.js";
 
 describe("losslessMeasurementText", () => {
   it("prefers the shortest text that still means the same measurement", () => {

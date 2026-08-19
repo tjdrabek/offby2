@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { millimetres, type SheetGeometry } from "../sheet-layouts/SheetGeometry";
-import { labelPositions } from "../sheet-layouts/labelPositions";
-import { planCalibrationSheet } from "./planCalibrationSheet";
-import type { CalibrationObservationSet } from "./PlacementObservation";
-import { correctedPoint } from "./PrinterProfile";
+import { millimetres, type SheetGeometry } from "../sheet-layouts/SheetGeometry.js";
+import { labelPositions } from "../sheet-layouts/labelPositions.js";
+import { planCalibrationSheet } from "./planCalibrationSheet.js";
+import type { CalibrationObservationSet } from "./PlacementObservation.js";
+import { correctedPoint } from "./PrinterProfile.js";
 import {
   PROVISIONAL_CALIBRATION_POLICY,
   derivePrinterProfile,
-} from "./derivePrinterProfile";
+} from "./derivePrinterProfile.js";
 
 const REVISION = { layoutId: "layout-1", revisionNumber: 1 };
 const NOW = 1_700_000_000_000;

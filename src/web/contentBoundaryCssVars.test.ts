@@ -4,8 +4,8 @@ import {
   BOUNDARY_Y_VAR,
   contentBoundaryCssVars,
   lineCssVarNames,
-} from "../web";
-import type { DesignFrame } from "../index";
+} from "../web.js";
+import type { DesignFrame } from "../index.js";
 
 const frame: DesignFrame = {
   orientation: "upright",

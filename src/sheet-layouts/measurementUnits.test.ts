@@ -10,9 +10,9 @@ import {
   measurementsEqual,
   millimetresPerUnit,
   toMillimetres,
-} from "./measurementUnits";
-import { millimetres } from "./SheetGeometry";
-import { parseMeasurement } from "./parseMeasurement";
+} from "./measurementUnits.js";
+import { millimetres } from "./SheetGeometry.js";
+import { parseMeasurement } from "./parseMeasurement.js";
 
 describe("unit conversion", () => {
   it("uses the exact documented constants", () => {

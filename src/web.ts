@@ -20,7 +20,7 @@ export {
   contentBoundaryCssVars,
   lineCssVarNames,
   type ContentBoundaryCssVars,
-} from "./web/contentBoundaryCssVars";
+} from "./web/contentBoundaryCssVars.js";
 
 // Verifying: numbers gathered from a rendered element, for the core's
 // `judgeBoundaryAgreement` to judge.
@@ -28,4 +28,4 @@ export {
   boundaryReadback,
   type ReadbackFrame,
   type ReadbackPart,
-} from "./web/boundaryReadback";
+} from "./web/boundaryReadback.js";

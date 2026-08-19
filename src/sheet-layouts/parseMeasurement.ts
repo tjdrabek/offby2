@@ -14,18 +14,18 @@
  * This module is pure: it imports no React, DOM, IndexedDB, or PDF API.
  */
 
-import { millimetres, type Millimetres } from "./SheetGeometry";
+import { millimetres, type Millimetres } from "./SheetGeometry.js";
 import {
   type LengthUnit,
   type MeasurementInput,
   type SheetLayoutFieldId,
-} from "./SheetLayoutInput";
-import { toMillimetres } from "./measurementUnits";
+} from "./SheetLayoutInput.js";
+import { toMillimetres } from "./measurementUnits.js";
 import {
   ENTER_VALUE_REMEDY,
   composeRefusalMessage,
   type RefusalRemedy,
-} from "./refusalMessage";
+} from "./refusalMessage.js";
 
 /**
  * Largest supported magnitude. A sheet is never a kilometre across, and the

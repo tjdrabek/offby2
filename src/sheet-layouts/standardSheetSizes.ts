@@ -14,12 +14,12 @@
  * This module is pure: it imports no React, DOM, IndexedDB, or PDF API.
  */
 
-import { millimetres, type Millimetres } from "./SheetGeometry";
+import { millimetres, type Millimetres } from "./SheetGeometry.js";
 import {
   ENTRY_TOLERANCE_MM,
   measurementFrom,
   measurementsEqual,
-} from "./measurementUnits";
+} from "./measurementUnits.js";
 
 export interface StandardSheetSize {
   id: string;

@@ -32,8 +32,8 @@
  * This module is pure: it imports no React, DOM, IndexedDB, or PDF API.
  */
 
-import type { SheetGeometry } from "./../sheet-layouts/SheetGeometry";
-import { labelPositions } from "./../sheet-layouts/labelPositions";
+import type { SheetGeometry } from "./../sheet-layouts/SheetGeometry.js";
+import { labelPositions } from "./../sheet-layouts/labelPositions.js";
 
 export type MarkPlacement = "corner-label-centre" | "sheet-corner";
 

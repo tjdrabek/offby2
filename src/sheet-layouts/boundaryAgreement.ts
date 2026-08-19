@@ -20,7 +20,7 @@
  * numbers from a live element is `offby2/web`'s job.
  */
 
-import type { DesignFrame } from "./contentBoundary";
+import type { DesignFrame } from "./contentBoundary.js";
 
 /**
  * A value read at each screen edge: a box's edge positions, or distances in

@@ -16,12 +16,12 @@ import {
   cornerRadiusMm,
   type Millimetres,
   type SheetGeometry,
-} from "./SheetGeometry";
-import { labelTracks } from "./validateSheetGeometry";
+} from "./SheetGeometry.js";
+import { labelTracks } from "./validateSheetGeometry.js";
 import {
   correctedPoint,
   type PrinterProfile,
-} from "../calibration/PrinterProfile";
+} from "../calibration/PrinterProfile.js";
 
 /** One label's boundary on the sheet. */
 export interface LabelPosition {

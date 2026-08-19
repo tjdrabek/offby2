@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { SHEET_LAYOUT_PRESETS, sheetLayoutPreset } from "./presets";
-import { resolveSheetLayout } from "./resolveSheetLayout";
-import { labelCount } from "./labelPositions";
-import { matchStandardSheetSize } from "./standardSheetSizes";
+import { SHEET_LAYOUT_PRESETS, sheetLayoutPreset } from "./presets.js";
+import { resolveSheetLayout } from "./resolveSheetLayout.js";
+import { labelCount } from "./labelPositions.js";
+import { matchStandardSheetSize } from "./standardSheetSizes.js";
 
 describe("sheet layout presets", () => {
   it("gives every preset a distinct id", () => {

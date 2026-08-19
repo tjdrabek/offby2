@@ -4,14 +4,14 @@ import {
   MAX_MEASUREMENT_MM,
   parseMeasurement,
   type MeasurementParseErrorCode,
-} from "./parseMeasurement";
+} from "./parseMeasurement.js";
 import {
   MEASUREMENT_TOLERANCE_MM,
   MM_PER_INCH,
   measurementsEqual,
-} from "./measurementUnits";
-import type { LengthUnit } from "./SheetLayoutInput";
-import { composeRefusalMessage } from "./refusalMessage";
+} from "./measurementUnits.js";
+import type { LengthUnit } from "./SheetLayoutInput.js";
+import { composeRefusalMessage } from "./refusalMessage.js";
 
 function parse(text: string, unit: LengthUnit = "mm") {
   return parseMeasurement("sheetWidth", { text, unit });

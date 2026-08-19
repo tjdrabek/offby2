@@ -7,7 +7,7 @@ import {
   lengthUnitSuffix,
   withCornerRadiusState,
   withMeasurementUnit,
-} from "./SheetLayoutInput";
+} from "./SheetLayoutInput.js";
 
 describe("createEmptySheetLayoutInput", () => {
   it("carries an explicit unit on every dimensional field", () => {

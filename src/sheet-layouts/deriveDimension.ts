@@ -28,23 +28,23 @@ import {
   type CountFieldId,
   type MeasurementFieldId,
   type SheetLayoutSourceInput,
-} from "./SheetLayoutInput";
+} from "./SheetLayoutInput.js";
 import {
   isGridCount,
   millimetres,
   parseGridCountText,
   type Millimetres,
-} from "./SheetGeometry";
-import { MAX_MEASUREMENT_MM, parseMeasurement } from "./parseMeasurement";
+} from "./SheetGeometry.js";
+import { MAX_MEASUREMENT_MM, parseMeasurement } from "./parseMeasurement.js";
 import {
   MEASUREMENT_TOLERANCE_MM,
   formatMillimetres,
-} from "./measurementUnits";
+} from "./measurementUnits.js";
 import {
   ENTER_VALUE_REMEDY,
   composeRefusalMessage,
   type RefusalRemedy,
-} from "./refusalMessage";
+} from "./refusalMessage.js";
 
 export type DerivationAxis = "horizontal" | "vertical";
 

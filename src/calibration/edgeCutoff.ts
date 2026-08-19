@@ -15,8 +15,8 @@
  * and what the counts mean can never disagree.
  */
 
-import type { HoldInLine } from "../sheet-layouts/contentBoundary";
-import type { SheetMargins } from "../sheet-layouts/SheetGeometry";
+import type { HoldInLine } from "../sheet-layouts/contentBoundary.js";
+import type { SheetMargins } from "../sheet-layouts/SheetGeometry.js";
 
 /** Spacing between the counted lines. */
 export const CUTOFF_STEP_MM = 2;

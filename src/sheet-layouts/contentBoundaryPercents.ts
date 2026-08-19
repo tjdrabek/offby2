@@ -16,7 +16,7 @@ import {
   type DesignFrame,
   type FrameDistancesMm,
   type HoldInLine,
-} from "./contentBoundary";
+} from "./contentBoundary.js";
 
 /** A held distance per design-frame axis, as a percentage of that extent. */
 export interface FramePercents {

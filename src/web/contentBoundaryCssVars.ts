@@ -19,8 +19,8 @@
  * ({@link contentBoundaryPercents}), and this module only names them.
  */
 
-import type { DesignFrame, HoldInLine } from "../sheet-layouts/contentBoundary";
-import { contentBoundaryPercents } from "../sheet-layouts/contentBoundaryPercents";
+import type { DesignFrame, HoldInLine } from "../sheet-layouts/contentBoundary.js";
+import { contentBoundaryPercents } from "../sheet-layouts/contentBoundaryPercents.js";
 
 /** Where content stops across the frame, as a percentage of its width. */
 export const BOUNDARY_X_VAR = "--offby2-boundary-x";

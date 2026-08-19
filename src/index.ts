@@ -33,7 +33,7 @@ export {
   type MeasurementInput,
   type SheetLayoutFieldId,
   type SheetLayoutSourceInput,
-} from "./sheet-layouts/SheetLayoutInput";
+} from "./sheet-layouts/SheetLayoutInput.js";
 
 export {
   resolveSheetLayout,
@@ -41,14 +41,14 @@ export {
   type ResolvedMeasurement,
   type ResolvedSheetLayout,
   type SheetLayoutResolution,
-} from "./sheet-layouts/resolveSheetLayout";
+} from "./sheet-layouts/resolveSheetLayout.js";
 
 // Reading an unresolved or refused result back onto the fields it came from.
 export {
   issuesByField,
   type SheetLayoutIssue,
   type SheetLayoutIssueCode,
-} from "./sheet-layouts/validateSheetLayoutInput";
+} from "./sheet-layouts/validateSheetLayoutInput.js";
 
 // Composing a refusal's explanation and remedies into the prose a host shows
 // — or, for a host that can't honour every remedy, into what's left after it
@@ -60,13 +60,13 @@ export {
   type RefusalMessage,
   type RefusalRemedy,
   type RemedyActionCode,
-} from "./sheet-layouts/refusalMessage";
+} from "./sheet-layouts/refusalMessage.js";
 
 export {
   geometryRefusalIssues,
   type SheetGeometryRefusal,
   type SheetGeometryRefusalCode,
-} from "./sheet-layouts/validateSheetGeometry";
+} from "./sheet-layouts/validateSheetGeometry.js";
 
 // Normalized geometry: millimetres, branded so a raw number cannot pose as one.
 export {
@@ -80,7 +80,7 @@ export {
   type SheetGeometry,
   type SheetMargins,
   type SheetSize,
-} from "./sheet-layouts/SheetGeometry";
+} from "./sheet-layouts/SheetGeometry.js";
 
 // Where each label lands, for a preview, a picker, or a PDF writer.
 export {
@@ -88,7 +88,7 @@ export {
   labelPositions,
   sheetExtent,
   type LabelPosition,
-} from "./sheet-layouts/labelPositions";
+} from "./sheet-layouts/labelPositions.js";
 
 // Where content stops on a label: each hold-in is a line, and content stops
 // at whichever sits furthest in, per axis.
@@ -99,14 +99,14 @@ export {
   type FrameDistancesMm,
   type HoldInAxes,
   type HoldInLine,
-} from "./sheet-layouts/contentBoundary";
+} from "./sheet-layouts/contentBoundary.js";
 
 // The same boundary as percentages of the frame, for proportional renderers.
 export {
   contentBoundaryPercents,
   type ContentBoundaryPercents,
   type FramePercents,
-} from "./sheet-layouts/contentBoundaryPercents";
+} from "./sheet-layouts/contentBoundaryPercents.js";
 
 // Whether rendered content agrees with the boundary: plain numbers from a
 // readback in, a judgement out. `offby2/web` gathers the numbers.
@@ -118,14 +118,14 @@ export {
   type BoundaryAgreement,
   type BoundaryReadback,
   type EdgesPx,
-} from "./sheet-layouts/boundaryAgreement";
+} from "./sheet-layouts/boundaryAgreement.js";
 
 // Pointing at one exact revision of a layout, which a profile is measured
 // against. The records themselves are the host's persistence concern.
 export {
   sameRevision,
   type SheetLayoutRevisionRef,
-} from "./sheet-layouts/SheetLayoutRevisionRef";
+} from "./sheet-layouts/SheetLayoutRevisionRef.js";
 
 // What this package represents, and — just as importantly — what it does not.
 export {
@@ -134,4 +134,4 @@ export {
   type SupportedMediaKind,
   type UnsupportedMediaDescription,
   type UnsupportedMediaKind,
-} from "./sheet-layouts/supportedMedia";
+} from "./sheet-layouts/supportedMedia.js";

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { measurementFrom } from "./measurementUnits";
+import { measurementFrom } from "./measurementUnits.js";
 import {
   STANDARD_SHEET_SIZES,
   matchStandardSheetSize,
   standardSheetSize,
-} from "./standardSheetSizes";
+} from "./standardSheetSizes.js";
 
 describe("standard sheet sizes", () => {
   it("defines A sizes in whole millimetres", () => {

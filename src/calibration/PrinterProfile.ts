@@ -28,7 +28,7 @@
 import {
   sameRevision,
   type SheetLayoutRevisionRef,
-} from "./../sheet-layouts/SheetLayoutRevisionRef";
+} from "./../sheet-layouts/SheetLayoutRevisionRef.js";
 
 /** The correction itself: a whole-sheet shift, in millimetres. */
 export interface PlacementTranslation {

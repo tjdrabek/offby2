@@ -6,25 +6,25 @@ import {
   type MeasurementFieldId,
   type SheetLayoutFieldId,
   type SheetLayoutSourceInput,
-} from "./SheetLayoutInput";
+} from "./SheetLayoutInput.js";
 import {
   MAX_GRID_COUNT,
   MIN_GRID_COUNT,
   isGridCount,
   parseGridCountText,
-} from "./SheetGeometry";
-import type { DerivationRefusalCode } from "./deriveDimension";
-import type { SheetGeometryRefusalCode } from "./validateSheetGeometry";
+} from "./SheetGeometry.js";
+import type { DerivationRefusalCode } from "./deriveDimension.js";
+import type { SheetGeometryRefusalCode } from "./validateSheetGeometry.js";
 import {
   parseMeasurement,
   type MeasurementParseErrorCode,
   type ParsedMeasurement,
-} from "./parseMeasurement";
+} from "./parseMeasurement.js";
 import {
   ENTER_VALUE_REMEDY,
   composeRefusalMessage,
   type RefusalRemedy,
-} from "./refusalMessage";
+} from "./refusalMessage.js";
 
 /**
  * Turns source input into normalized millimetres, or into structured refusals.

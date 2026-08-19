@@ -29,28 +29,28 @@ import {
   type CountFieldId,
   type MeasurementFieldId,
   type SheetLayoutSourceInput,
-} from "./SheetLayoutInput";
+} from "./SheetLayoutInput.js";
 import type {
   CornerRadiusDisclosure,
   Millimetres,
   SheetGeometry,
-} from "./SheetGeometry";
-import type { ParsedMeasurement } from "./parseMeasurement";
+} from "./SheetGeometry.js";
+import type { ParsedMeasurement } from "./parseMeasurement.js";
 import {
   validateSheetGeometry,
   type SheetGeometryRefusal,
-} from "./validateSheetGeometry";
+} from "./validateSheetGeometry.js";
 import {
   axisEquationFor,
   deriveMissingDimensions,
   type AxisDerivationResults,
   type DerivationAxis,
   type SheetLayoutDerivation,
-} from "./deriveDimension";
+} from "./deriveDimension.js";
 import {
   validateSheetLayoutInput,
   type SheetLayoutIssue,
-} from "./validateSheetLayoutInput";
+} from "./validateSheetLayoutInput.js";
 
 /** A value the user typed, or the one value the sheet equation supplied. */
 export interface DerivedMeasurement {

@@ -5,7 +5,7 @@ import {
   isGridCount,
   millimetres,
   type CornerRadiusDisclosure,
-} from "./SheetGeometry";
+} from "./SheetGeometry.js";
 
 describe("millimetres", () => {
   it("brands finite values, including zero and negatives", () => {
