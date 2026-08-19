@@ -4,12 +4,16 @@
 
 **Blocked by:** None — can start immediately.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Calling the calibration-sheet entry without a placement reproduces today's plans exactly — the regression pin for every current caller.
-- [ ] The sheet-corner placement yields four marks each at one shared, round inset from the two sheet edges it is measured from; the existing round-inset, minimum-separation, tiny-sheet-fallback, and arm-length cases move in from the demo as package tests.
-- [ ] The plan states its placement; targets no longer require grid coordinates, and the corner-label placement may still state them where they mean something.
-- [ ] Profile derivation is untouched and passes unchanged against plans from both placements.
-- [ ] Tests exercise external behaviour only, through the package's public entry points, following the existing calibration suite's pure-data example style.
+- [x] Calling the calibration-sheet entry without a placement reproduces today's plans exactly — the regression pin for every current caller.
+- [x] The sheet-corner placement yields four marks each at one shared, round inset from the two sheet edges it is measured from; the existing round-inset, minimum-separation, tiny-sheet-fallback, and arm-length cases move in from the demo as package tests.
+- [x] The plan states its placement; targets no longer require grid coordinates, and the corner-label placement may still state them where they mean something.
+- [x] Profile derivation is untouched and passes unchanged against plans from both placements.
+- [x] Tests exercise external behaviour only, through the package's public entry points, following the existing calibration suite's pure-data example style.
 
 ## Comments
+
+`calibrationSheet(geometry, placement?)` — `placement` is a new `MarkPlacement` (`"corner-label-centre" | "sheet-corner"`), defaulting to `"corner-label-centre"`. The old function became `cornerLabelCentrePlan`; `sheetCornerPlan` is a straight port of the demo's `cornerMarks.ts` algorithm (same preferred-inset list, minimum separation, floor fallback, and arm-length bound), now with its trade-off documented in `calibrationSheet.ts`'s module docstring rather than only in the demo module being deleted next. `CalibrationTarget.row`/`.column` are now optional; `sheet-corner` targets omit them entirely. `CalibrationSheetPlan` gained `placement`. `derivePrinterProfile.ts` was not touched — verified with a new parametrized test deriving the same translation from both placements' plans, since derivation reads only `target.id`/`.label`/`.intendedXMm`/`.intendedYMm`. Regression pin: `calibrationSheet(geometry())` deep-equals `calibrationSheet(geometry(), "corner-label-centre")`. Package: 363/363 tests, typecheck and lint clean.
+
+Side effect recorded rather than fixed here: adding the required `placement` field to `CalibrationSheetPlan` breaks the demo's `cornerMarks.ts`, which builds that type by hand — exactly the module ticket 04 deletes. The demo's typecheck is red between this ticket and 04 landing.
