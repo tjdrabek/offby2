@@ -27,7 +27,7 @@ import {
 } from "./deriveDimension.js";
 import {
   MEASUREMENT_TOLERANCE_MM,
-  formatMillimetres,
+  formatMeasurement,
 } from "./measurementUnits.js";
 import {
   MAX_GRID_COUNT,
@@ -39,8 +39,10 @@ import {
 } from "./SheetGeometry.js";
 import {
   COUNT_FIELDS,
+  countFieldLabel,
   measurementFieldLabel,
   type CountFieldId,
+  type LengthUnit,
   type MeasurementFieldId,
   type SheetLayoutFieldId,
 } from "./SheetLayoutInput.js";
@@ -114,12 +116,15 @@ function toleranceFor(extentMm: number): number {
   return MEASUREMENT_TOLERANCE_MM * Math.max(1, Math.abs(extentMm));
 }
 
-/** "63.5 mm", for a value already known to be finite. */
-function mm(value: number): string {
+/** How a refusal writes a figure: in the unit the sheet was entered in. */
+type Show = (value: number) => string;
+
+/** "63.5 mm" — or "2.5 in" — for a value already known to be finite. */
+function shownIn(unit: LengthUnit): Show {
   // Full precision, not display precision: these figures appear in refusals
   // whose arithmetic the reader is invited to check, and a bound like
   // "19.05 mm or less" rounded to 19.1 would invite a value that gets refused.
-  return `${formatMillimetres(millimetres(value), "mm", 4)} mm`;
+  return (value) => formatMeasurement(millimetres(value), unit, 4);
 }
 
 /** Every dimensional value of a geometry, keyed by the field that carries it. */
@@ -179,8 +184,9 @@ function refusal(
 
 /** Refuses non-finite, non-positive, and negative values, each against its own field. */
 function checkMeasurements(
-  values: Record<MeasurementFieldId, number>,
+  values: Readonly<Partial<Record<MeasurementFieldId, number>>>,
   refusals: SheetGeometryRefusal[],
+  show: Show,
 ): Set<MeasurementFieldId> {
   const refused = new Set<MeasurementFieldId>();
   for (const [field, value] of Object.entries(values) as [
@@ -204,7 +210,7 @@ function checkMeasurements(
         refusal(
           "geometry-not-positive",
           [field],
-          `${label} is ${mm(value)}. It must be greater than zero.`,
+          `${label} is ${show(value)}. It must be greater than zero.`,
         ),
       );
       refused.add(field);
@@ -215,7 +221,7 @@ function checkMeasurements(
         refusal(
           "geometry-negative",
           [field],
-          `${label} is ${mm(value)}. A margin cannot be negative.`,
+          `${label} is ${show(value)}. A margin cannot be negative.`,
         ),
       );
       refused.add(field);
@@ -267,8 +273,9 @@ function axisFields(equation: AxisEquation): SheetLayoutFieldId[] {
  */
 function checkAxis(
   equation: AxisEquation,
-  values: Record<MeasurementFieldId, number>,
+  values: Readonly<Record<MeasurementFieldId, number>>,
   count: number,
+  show: Show,
 ): SheetGeometryRefusal | null {
   const extent = values[equation.extent];
   const leading = values[equation.leading];
@@ -287,7 +294,7 @@ function checkAxis(
     return refusal(
       "geometry-gap-single-count",
       [equation.gap, equation.count],
-      `${measurementFieldLabel(equation.gap)} is ${mm(gap)}, but with a single ${noun} there is no gap between labels on this axis. Enter 0, or leave it blank and it is derived as 0.`,
+      `${measurementFieldLabel(equation.gap)} is ${show(gap)}, but with a single ${noun} there is no gap between labels on this axis. Enter 0, or leave it blank and it is derived as 0.`,
     );
   }
 
@@ -297,7 +304,7 @@ function checkAxis(
       return refusal(
         "geometry-labels-overlap",
         [equation.gap, equation.size, equation.count],
-        `${measurementFieldLabel(equation.gap)} is ${mm(gap)}, so ${noun} ${index + 2} would overlap ${noun} ${index + 1} by ${mm(overlap)}. Labels on a uniform grid cannot overlap.`,
+        `${measurementFieldLabel(equation.gap)} is ${show(gap)}, so ${noun} ${index + 2} would overlap ${noun} ${index + 1} by ${show(overlap)}. Labels on a uniform grid cannot overlap.`,
       );
     }
   }
@@ -310,8 +317,8 @@ function checkAxis(
       "geometry-labels-outside-sheet",
       fields,
       [
-        `The grid does not fit the sheet: ${noun} ${outside.index + 1} runs from ${mm(outside.startMm)} to ${mm(outside.endMm)}`,
-        `and ${measurementFieldLabel(equation.extent)} is ${mm(extent)}.`,
+        `The grid does not fit the sheet: ${noun} ${outside.index + 1} runs from ${show(outside.startMm)} to ${show(outside.endMm)}`,
+        `and ${measurementFieldLabel(equation.extent)} is ${show(extent)}.`,
         "Every label boundary must lie within the sheet.",
       ].join(" "),
     );
@@ -323,7 +330,7 @@ function checkAxis(
       "geometry-extent-contradiction",
       fields,
       [
-        `The ${equation.axis} measurements add up to ${mm(content)}, but ${measurementFieldLabel(equation.extent)} is ${mm(extent)}`,
+        `The ${equation.axis} measurements add up to ${show(content)}, but ${measurementFieldLabel(equation.extent)} is ${show(extent)}`,
         `(${axisEquationText(equation)}).`,
         "Correct one of these values, or clear one and let it be derived.",
       ].join(" "),
@@ -341,6 +348,7 @@ function checkCornerRadius(
   geometry: SheetGeometry,
   refusedMeasurements: ReadonlySet<MeasurementFieldId>,
   refusals: SheetGeometryRefusal[],
+  show: Show,
 ): void {
   const radius = cornerRadiusMm(geometry.cornerRadius);
   if (radius === null) {
@@ -361,7 +369,7 @@ function checkCornerRadius(
       refusal(
         "geometry-negative",
         ["cornerRadius"],
-        `Corner radius is ${mm(radius)}. A radius cannot be negative.`,
+        `Corner radius is ${show(radius)}. A radius cannot be negative.`,
       ),
     );
     return;
@@ -380,7 +388,7 @@ function checkCornerRadius(
       refusal(
         "geometry-radius-exceeds-label",
         ["cornerRadius", "labelWidth", "labelHeight"],
-        `Corner radius is ${mm(radius)}, which is more than half the shorter side of a ${mm(width)} by ${mm(height)} label. Enter ${mm(limit)} or less.`,
+        `Corner radius is ${show(radius)}, which is more than half the shorter side of a ${show(width)} by ${show(height)} label. Enter ${show(limit)} or less.`,
       ),
     );
   }
@@ -390,12 +398,16 @@ function checkCornerRadius(
  * Validates normalized geometry, returning every refusal that stands on its
  * own. `media` defaults to the one supported kind: callers holding a value
  * from catalog data or an imported workspace pass it so unsupported media is
- * refused explicitly rather than assumed to be a uniform grid.
+ * refused explicitly rather than assumed to be a uniform grid. `unit` is the
+ * one the figures in each refusal are written in — the unit the sheet was
+ * entered in, so the reader can check them against the ruler.
  */
 export function validateSheetGeometry(
   geometry: SheetGeometry,
   media: string = SUPPORTED_MEDIA_KIND,
+  unit: LengthUnit = "mm",
 ): SheetGeometryValidation {
+  const show = shownIn(unit);
   const unsupported = describeUnsupportedMedia(media);
   if (unsupported) {
     // Nothing measured about unsupported media is worth reporting: the shape
@@ -414,7 +426,7 @@ export function validateSheetGeometry(
 
   const refusals: SheetGeometryRefusal[] = [];
   const values = geometryMeasurements(geometry);
-  const refusedMeasurements = checkMeasurements(values, refusals);
+  const refusedMeasurements = checkMeasurements(values, refusals, show);
   const refusedCounts = checkCounts(geometry, refusals);
 
   for (const equation of AXIS_EQUATIONS) {
@@ -432,17 +444,57 @@ export function validateSheetGeometry(
       equation,
       values,
       geometry.grid[equation.count],
+      show,
     );
     if (axisRefusal) {
       refusals.push(axisRefusal);
     }
   }
 
-  checkCornerRadius(geometry, refusedMeasurements, refusals);
+  checkCornerRadius(geometry, refusedMeasurements, refusals, show);
 
   return refusals.length > 0
     ? { status: "refused", refusals }
     : { status: "valid" };
+}
+
+/**
+ * Judges one axis on its own: the checks `validateSheetGeometry` runs, on the
+ * five values this axis relates and nothing from the other one. For a drawing
+ * that lays each axis out as soon as it can (`sketchSheetLayout`), where the
+ * other axis may still be blank. The first refusal is returned, in the same
+ * order the whole-sheet judgement would report it.
+ */
+export function judgeAxis(
+  equation: AxisEquation,
+  values: Readonly<Partial<Record<MeasurementFieldId, number>>>,
+  count: number,
+  unit: LengthUnit = "mm",
+): SheetGeometryRefusal | null {
+  const show = shownIn(unit);
+  const refusals: SheetGeometryRefusal[] = [];
+  const own: Partial<Record<MeasurementFieldId, number>> = {};
+  for (const field of axisMeasurementFields(equation)) {
+    own[field] = values[field] ?? Number.NaN;
+  }
+  if (checkMeasurements(own, refusals, show).size > 0) {
+    return refusals[0];
+  }
+  if (!isGridCount(count)) {
+    return refusal(
+      "geometry-count-unusable",
+      [equation.count],
+      `${countFieldLabel(equation.count)} is ${String(count)}. It must be a whole number between ${MIN_GRID_COUNT} and ${MAX_GRID_COUNT}.`,
+    );
+  }
+  // `checkAxis` reads only this equation's fields, so the other axis's absence
+  // is never observed.
+  return checkAxis(
+    equation,
+    own as Record<MeasurementFieldId, number>,
+    count,
+    show,
+  );
 }
 
 /**

@@ -27,6 +27,7 @@ import {
   MEASUREMENT_FIELDS,
   type CornerRadiusInput,
   type CountFieldId,
+  type LengthUnit,
   type MeasurementFieldId,
   type SheetLayoutSourceInput,
 } from "./SheetLayoutInput.js";
@@ -164,13 +165,23 @@ function geometryOf(
   };
 }
 
+/**
+ * The unit a layout's refusals speak in: the one its sheet width was entered
+ * in. Every entry normally shares it; when they do not, the paper's is as good
+ * a choice as any.
+ */
+export function entryUnitOf(input: SheetLayoutSourceInput): LengthUnit {
+  return input.measurements.sheetWidth.unit;
+}
+
 /** Judges the geometry these values describe before anything may hold them. */
 function judge(
   layout: Omit<ResolvedSheetLayout, "geometry">,
   entered: CornerRadiusInput,
+  unit: LengthUnit,
 ): SheetLayoutResolution {
   const geometry = geometryOf(layout, entered);
-  const validation = validateSheetGeometry(geometry);
+  const validation = validateSheetGeometry(geometry, undefined, unit);
   return validation.status === "refused"
     ? { status: "refused", refusals: validation.refusals }
     : { status: "resolved", layout: { ...layout, geometry } };
@@ -189,6 +200,7 @@ export function resolveSheetLayout(
         derivations: [],
       },
       input.cornerRadius,
+      entryUnitOf(input),
     );
   }
 
@@ -248,5 +260,6 @@ export function resolveSheetLayout(
       derivations,
     },
     input.cornerRadius,
+    entryUnitOf(input),
   );
 }

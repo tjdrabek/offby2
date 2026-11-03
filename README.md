@@ -244,6 +244,35 @@ Leave one dimension blank per axis and `resolveSheetLayout` supplies it: enter
 the sheet size, counts, margins and gaps, and the label size comes out of the
 axis equations — `result.layout.derivations` says what was worked out.
 
+### Drawing the sheet as it is entered
+
+`resolveSheetLayout` says no until every entry is in. A figure beside the
+fields should not wait that long: the paper is drawable the moment its two
+extents parse, each margin can shade its strip as it is typed, and because the
+two axis equations share no term, an axis whose entries are all in can lay its
+labels out before the other axis has a count. `sketchSheetLayout` is that
+reading — the same parser, derivation and per-axis judgement the resolver
+uses, reported as whatever is known now:
+
+```ts
+import { sketchSheetLayout } from "offby2";
+
+const sketch = sketchSheetLayout(input);
+sketch.sheet;          // { widthMm, heightMm } — null until each parses
+sketch.margins;        // each margin, or null
+sketch.horizontal;     // one of three, per axis:
+//   { status: "laid-out",   layout: { extentMm, leadingMm, sizeMm, gapMm, trailingMm, count, derived } }
+//   { status: "incomplete", missing: ["horizontalGap", "columns"] }
+//   { status: "refused",    code, fields, message }  // every field on the axis, in the entry unit
+sketch.geometry;       // the resolver's SheetGeometry once it resolves, else null
+```
+
+A refusal's `fields` lists the whole axis — a label width that derives negative
+is wrong because of something among the paper, the margins, the gap or the
+count, and the figure's job is to light that axis rather than to guess which.
+Every figure in a refusal message, here and from `resolveSheetLayout`, is
+written in the unit the sheet was entered in.
+
 ## Placing content that fits
 
 A `resolved` result is everything a renderer needs. `labelPositions` says

@@ -56,6 +56,38 @@ function withRadius(
 }
 
 describe("resolveSheetLayout", () => {
+  it("writes a refusal's figures in the unit the sheet was entered in", () => {
+    // A 1 in label three abreast with margins and gaps is wider than 2 in of paper.
+    const input = createEmptySheetLayoutInput("in");
+    const measurements = { ...input.measurements };
+    const inches: Record<MeasurementFieldId, string> = {
+      sheetWidth: "2",
+      sheetHeight: "11",
+      labelWidth: "1",
+      labelHeight: "1",
+      marginTop: "0.5",
+      marginRight: "0.1",
+      marginBottom: "0.5",
+      marginLeft: "0.1",
+      horizontalGap: "0.1",
+      verticalGap: "0",
+    };
+    for (const field of MEASUREMENT_FIELDS) {
+      measurements[field.id] = { unit: "in", text: inches[field.id] };
+    }
+    const result = resolveSheetLayout({
+      ...input,
+      measurements,
+      counts: { rows: { text: "10" }, columns: { text: "3" } },
+    });
+
+    if (result.status !== "refused") {
+      throw new Error(`Expected a refusal, got ${result.status}.`);
+    }
+    expect(result.refusals[0].message).toContain("Sheet width is 2 in");
+    expect(result.refusals[0].message).not.toContain("mm");
+  });
+
   it("resolves a fully entered layout without deriving anything", () => {
     const result = resolveSheetLayout(sheet());
     if (result.status !== "resolved") {

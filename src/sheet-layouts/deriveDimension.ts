@@ -26,6 +26,7 @@ import {
   countFieldLabel,
   measurementFieldLabel,
   type CountFieldId,
+  type LengthUnit,
   type MeasurementFieldId,
   type SheetLayoutSourceInput,
 } from "./SheetLayoutInput.js";
@@ -38,6 +39,7 @@ import {
 import { MAX_MEASUREMENT_MM, parseMeasurement } from "./parseMeasurement.js";
 import {
   MEASUREMENT_TOLERANCE_MM,
+  formatMeasurement,
   formatMillimetres,
 } from "./measurementUnits.js";
 import {
@@ -194,6 +196,17 @@ function mm(value: number): string {
   return formatMillimetres(millimetres(value), "mm", 4);
 }
 
+/**
+ * "-4.3307 in" — a figure inside a refusal, in the unit the axis was entered
+ * in. The substitution stays in millimetres because it restates the arithmetic
+ * the package actually did; a refusal is read by the person holding the ruler,
+ * and a millimetre figure on an inch sheet is a number they cannot check
+ * against anything.
+ */
+function shown(value: number, unit: LengthUnit): string {
+  return formatMeasurement(millimetres(value), unit, 4);
+}
+
 /** "Sheet width = Left margin + Columns × Label width + …" */
 export function axisEquationText(equation: AxisEquation): string {
   const count = countFieldLabel(equation.count);
@@ -274,6 +287,7 @@ function solve(
   known: Partial<Record<AxisTermId, number>>,
   count: number,
   term: AxisTermId,
+  unit: LengthUnit,
 ): SheetLayoutDerivationResult {
   const field = equation[term];
   const label = measurementFieldLabel(field);
@@ -315,7 +329,7 @@ function solve(
       field,
       equation.axis,
       "derivation-negative",
-      `Deriving ${label} from the other measurements gives ${mm(value)} mm, and a measurement cannot be negative.`,
+      `Deriving ${label} from the other measurements gives ${shown(value, unit)}, and a measurement cannot be negative.`,
       checkAxisOrEnterValueRemedies(equation.axis),
     );
   }
@@ -324,7 +338,7 @@ function solve(
       field,
       equation.axis,
       "derivation-out-of-range",
-      `Deriving ${label} gives a value beyond the largest supported measurement of ${MAX_MEASUREMENT_MM} mm.`,
+      `Deriving ${label} gives a value beyond the largest supported measurement of ${shown(MAX_MEASUREMENT_MM, unit)}.`,
       checkAxisOrEnterValueRemedies(equation.axis),
     );
   }
@@ -359,6 +373,15 @@ function solve(
   };
 }
 
+/** One usable count, or null when it is blank, unreadable or out of range. */
+export function readCount(
+  input: SheetLayoutSourceInput,
+  field: CountFieldId,
+): number | null {
+  const value = parseGridCountText(input.counts[field].text);
+  return value !== null && isGridCount(value) ? value : null;
+}
+
 /** The usable row and column counts, or null when either is unusable. */
 function readCounts(
   input: SheetLayoutSourceInput,
@@ -372,16 +395,22 @@ function readCounts(
 }
 
 /** Every entry read once, so both axes are solved from the same reading. */
-interface MeasurementEntries {
+export interface MeasurementEntries {
   parsed: ReadonlyMap<MeasurementFieldId, number>;
   /** Fields left blank. A field that was entered but unreadable is in neither. */
   missing: readonly MeasurementFieldId[];
+  /** The unit each field was entered in, so a refusal can speak it. */
+  units: ReadonlyMap<MeasurementFieldId, LengthUnit>;
 }
 
-function readMeasurements(input: SheetLayoutSourceInput): MeasurementEntries {
+export function readMeasurements(
+  input: SheetLayoutSourceInput,
+): MeasurementEntries {
   const parsed = new Map<MeasurementFieldId, number>();
   const missing: MeasurementFieldId[] = [];
+  const units = new Map<MeasurementFieldId, LengthUnit>();
   for (const field of MEASUREMENT_FIELDS) {
+    units.set(field.id, input.measurements[field.id].unit);
     const result = parseMeasurement(field.id, input.measurements[field.id]);
     if (result.status === "parsed") {
       parsed.set(field.id, result.valueMm);
@@ -389,7 +418,7 @@ function readMeasurements(input: SheetLayoutSourceInput): MeasurementEntries {
       missing.push(field.id);
     }
   }
-  return { parsed, missing };
+  return { parsed, missing, units };
 }
 
 /**
@@ -399,7 +428,7 @@ function readMeasurements(input: SheetLayoutSourceInput): MeasurementEntries {
  * axis alone. The other axis is a separate equation with separate terms, and
  * says nothing about whether this one can be solved.
  */
-function deriveOnAxis(
+export function deriveOnAxis(
   equation: AxisEquation,
   entries: MeasurementEntries,
   count: number,
@@ -433,7 +462,13 @@ function deriveOnAxis(
     return { status: "not-attempted", reason: "operands-unusable" };
   }
 
-  return solve(equation, known, count, derivedTerm);
+  return solve(
+    equation,
+    known,
+    count,
+    derivedTerm,
+    entries.units.get(equation.extent) ?? "mm",
+  );
 }
 
 /** One result per axis, in the order of {@link AXIS_EQUATIONS}. */

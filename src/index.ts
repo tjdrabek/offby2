@@ -43,6 +43,16 @@ export {
   type SheetLayoutResolution,
 } from "./sheet-layouts/resolveSheetLayout.js";
 
+// The sheet as entered so far, for a drawing beside the fields that does not
+// wait for the whole layout to resolve: the paper, each margin, and each axis
+// laid out the moment its own entries allow.
+export {
+  sketchSheetLayout,
+  type AxisLayout,
+  type AxisSketch,
+  type SheetSketch,
+} from "./sheet-layouts/sketchSheetLayout.js";
+
 // Reading an unresolved or refused result back onto the fields it came from.
 export {
   issuesByField,
