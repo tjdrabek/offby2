@@ -1,6 +1,6 @@
 {
   "name": "offby2",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Sheet layouts for label printing: read what an operator entered, derive the values they left out, and refuse geometry that cannot exist.",
   "license": "MIT",
   "author": "Tyler Drabek",
